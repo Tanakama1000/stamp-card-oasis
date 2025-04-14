@@ -185,7 +185,9 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
                   ? (isMiniRewardStamp ? 
                       '#F97316' : // Special color for mini rewards
                       cardStyle?.stampActiveColor || '#8B4513')
-                  : cardStyle?.stampBgColor || '#F5F5DC',
+                  : (isMiniRewardStamp && cardStyle?.miniRewardStampColor ? 
+                      cardStyle.miniRewardStampColor : 
+                      cardStyle?.stampBgColor || '#F5F5DC'),
                 borderColor: (isLastStamp || isMiniRewardStamp)
                   ? (stampIndex < stamps ? '#F97316' : '#F97316')
                   : cardStyle?.stampActiveColor || '#8B4513',
@@ -218,8 +220,17 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   // Define styles based on cardStyle prop or fallback to defaults
   const cardBgColor = cardStyle?.cardBgColor || "#FFFFFF";
   const textColor = cardStyle?.textColor || "#6F4E37";
+  const businessNameColor = cardStyle?.businessNameColor || textColor;
+  const rewardTextColor = cardStyle?.rewardTextColor || textColor;
   const progressBarColor = cardStyle?.stampActiveColor || "#8B4513";
   const progressBarBgColor = cardStyle?.stampBgColor || "#F5F5DC";
+
+  // Background image styles
+  const backgroundImageStyle = cardStyle?.useBackgroundImage && cardStyle?.backgroundImage ? {
+    backgroundImage: `url(${cardStyle.backgroundImage})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center'
+  } : {};
 
   return (
     <>
@@ -234,19 +245,33 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
       )}
       
       <Card 
-        className="p-6 card-shadow overflow-hidden"
-        style={{ backgroundColor: cardBgColor }}
+        className="p-6 card-shadow overflow-hidden relative"
+        style={{ 
+          backgroundColor: cardBgColor,
+          ...backgroundImageStyle
+        }}
       >
-        <div className="flex items-center justify-between mb-6">
+        {/* Overlay for image background to ensure text readability */}
+        {cardStyle?.useBackgroundImage && cardStyle?.backgroundImage && (
+          <div 
+            className="absolute inset-0 bg-black opacity-30"
+            style={{ pointerEvents: 'none' }}
+          ></div>
+        )}
+        
+        <div className="flex items-center justify-between mb-6 relative z-10">
           <div className="flex items-center gap-3">
             {cardStyle?.businessLogo && (
               <Avatar className="h-10 w-10">
                 <AvatarImage src={cardStyle.businessLogo} alt="Business logo" />
-                <AvatarFallback>{cardStyle.businessName?.charAt(0) || "B"}</AvatarFallback>
+                <AvatarFallback>{cardStyle?.businessName?.charAt(0) || "B"}</AvatarFallback>
               </Avatar>
             )}
             <div>
-              <h3 className="font-medium" style={{ color: textColor }}>{customerName}'s Card</h3>
+              {cardStyle?.businessName && (
+                <h3 className="font-medium" style={{ color: businessNameColor }}>{cardStyle.businessName}</h3>
+              )}
+              <h4 className="font-medium" style={{ color: textColor }}>{customerName}'s Card</h4>
               <p className="text-sm" style={{ color: textColor }}>
                 Collect {maxStamps} stamps for a free item
               </p>
@@ -272,7 +297,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
         
         {/* Mini-rewards summary section */}
         {cardStyle?.rewards && cardStyle.rewards.length > 0 && (
-          <div className="mb-4 p-3 bg-cream rounded-lg">
+          <div className="mb-4 p-3 bg-cream bg-opacity-80 rounded-lg relative z-10">
             <h4 className="text-sm font-medium mb-2" style={{ color: textColor }}>Progress Rewards:</h4>
             <div className="flex flex-wrap gap-2">
               {cardStyle.rewards.map((reward, index) => {
@@ -295,15 +320,15 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
           </div>
         )}
 
-        <div className="flex flex-col gap-3">{renderStamps()}</div>
+        <div className="flex flex-col gap-3 relative z-10">{renderStamps()}</div>
 
         {stamps >= maxStamps && (
           <div 
-            className="mt-6 p-3 text-white text-center rounded-lg animate-pulse"
+            className="mt-6 p-3 text-white text-center rounded-lg animate-pulse relative z-10"
             style={{ backgroundColor: cardStyle?.stampActiveColor || "#8B4513" }}
           >
-            <p className="font-bold">Congratulations! You've earned a reward!</p>
-            <p className="text-sm">Show this to a staff member to claim.</p>
+            <p className="font-bold" style={{ color: rewardTextColor }}>Congratulations! You've earned a reward!</p>
+            <p className="text-sm" style={{ color: rewardTextColor }}>Show this to a staff member to claim.</p>
           </div>
         )}
       </Card>

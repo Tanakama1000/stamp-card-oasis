@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Palette, Edit, Eye, Upload, Coffee, Star, Heart, Award, Battery, Zap, Gift, Plus, Trash2 } from "lucide-react";
+import { Palette, Edit, Eye, Upload, Coffee, Star, Heart, Award, Battery, Zap, Gift, Plus, Trash2, Image } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Switch } from "@/components/ui/switch";
 
 interface LoyaltyCardEditorProps {
   onCardUpdate?: (cardConfig: LoyaltyCardConfig) => void;
@@ -32,9 +33,15 @@ export interface LoyaltyCardConfig {
   stampActiveColor: string;
   textColor: string;
   businessLogo?: string;
+  businessName?: string;
+  businessNameColor?: string;
+  rewardTextColor?: string;
   stampIcon: string;
   rewardIcon?: string;
   rewards: Reward[];
+  miniRewardStampColor?: string;
+  backgroundImage?: string;
+  useBackgroundImage?: boolean;
 }
 
 const STAMP_ICONS = [
@@ -58,6 +65,7 @@ const COLOR_PRESETS = {
   stampBg: ["#F5F5DC", "#FFFDD0", "#FFFFFF", "#F6F6F7", "#F1F0FB", "#C8C8C9"],
   stampActive: ["#8B4513", "#D2691E", "#FF8C00", "#A67B5B", "#9b87f5", "#F97316"],
   text: ["#6F4E37", "#222222", "#000000", "#403E43", "#1A1F2C", "#8B5CF6"],
+  miniReward: ["#D3D3D3", "#C0C0C0", "#A9A9A9", "#E5E4E2", "#CCCCCC", "#D8D8D8"],
 };
 
 const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) => {
@@ -74,9 +82,14 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
     stampActiveColor: "#8B4513",
     textColor: "#6F4E37",
     businessLogo: "",
+    businessNameColor: "#6F4E37",
+    rewardTextColor: "#6F4E37",
     stampIcon: "Coffee",
     rewardIcon: "Gift",
-    rewards: []
+    rewards: [],
+    miniRewardStampColor: "#C0C0C0",
+    backgroundImage: "",
+    useBackgroundImage: false
   });
 
   const form = useForm<LoyaltyCardConfig>({
@@ -107,6 +120,26 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
           const newConfig = { ...cardConfig, businessLogo: event.target.result as string };
           setCardConfig(newConfig);
           form.setValue("businessLogo", event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  const handleBackgroundImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          const newConfig = { 
+            ...cardConfig, 
+            backgroundImage: event.target.result as string,
+            useBackgroundImage: true 
+          };
+          setCardConfig(newConfig);
+          form.setValue("backgroundImage", event.target.result as string);
+          form.setValue("useBackgroundImage", true);
         }
       };
       reader.readAsDataURL(file);
@@ -289,6 +322,56 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                               src={cardConfig.businessLogo} 
                               alt="Business logo" 
                               className="max-h-full max-w-full object-contain" 
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              {/* Card Background Image Upload */}
+              <FormField
+                control={form.control}
+                name="backgroundImage"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel>Card Background Image</FormLabel>
+                    <FormControl>
+                      <div className="flex flex-col gap-2">
+                        <div className="relative flex-1">
+                          <Input 
+                            type="file" 
+                            accept="image/*"
+                            onChange={handleBackgroundImageUpload}
+                            className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                          />
+                          <div className="border border-dashed border-coffee-light rounded-md p-4 text-center flex items-center justify-center">
+                            <Image size={18} className="mr-2" />
+                            <span>Upload Background Image</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={form.watch("useBackgroundImage")}
+                            onCheckedChange={(checked) => {
+                              form.setValue("useBackgroundImage", checked);
+                            }}
+                            id="use-bg-image"
+                          />
+                          <label htmlFor="use-bg-image" className="text-sm cursor-pointer">
+                            Use background image
+                          </label>
+                        </div>
+                        
+                        {cardConfig.backgroundImage && (
+                          <div className="h-16 bg-cream rounded-md flex items-center justify-center overflow-hidden">
+                            <img 
+                              src={cardConfig.backgroundImage} 
+                              alt="Card background" 
+                              className="max-h-full w-full object-cover" 
                             />
                           </div>
                         )}
@@ -609,6 +692,43 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="miniRewardStampColor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center justify-between">
+                        Mini-Reward Stamp Color (before activation)
+                        <span 
+                          className="w-5 h-5 rounded-full" 
+                          style={{ backgroundColor: field.value }} 
+                        />
+                      </FormLabel>
+                      <FormControl>
+                        <div>
+                          <div className="flex gap-2 mb-2">
+                            {COLOR_PRESETS.miniReward.map(color => (
+                              <div
+                                key={color}
+                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
+                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
+                                }`}
+                                style={{ backgroundColor: color }}
+                                onClick={() => field.onChange(color)}
+                              />
+                            ))}
+                          </div>
+                          <Input 
+                            type="color"
+                            {...field}
+                            className="h-8 w-full"
+                          />
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
                 
                 <FormField
                   control={form.control}
@@ -617,6 +737,80 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                     <FormItem>
                       <FormLabel className="flex items-center justify-between">
                         Text Color
+                        <span 
+                          className="w-5 h-5 rounded-full" 
+                          style={{ backgroundColor: field.value }} 
+                        />
+                      </FormLabel>
+                      <FormControl>
+                        <div>
+                          <div className="flex gap-2 mb-2">
+                            {COLOR_PRESETS.text.map(color => (
+                              <div
+                                key={color}
+                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
+                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
+                                }`}
+                                style={{ backgroundColor: color }}
+                                onClick={() => field.onChange(color)}
+                              />
+                            ))}
+                          </div>
+                          <Input 
+                            type="color"
+                            {...field}
+                            className="h-8 w-full"
+                          />
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="businessNameColor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center justify-between">
+                        Business Name Color
+                        <span 
+                          className="w-5 h-5 rounded-full" 
+                          style={{ backgroundColor: field.value }} 
+                        />
+                      </FormLabel>
+                      <FormControl>
+                        <div>
+                          <div className="flex gap-2 mb-2">
+                            {COLOR_PRESETS.text.map(color => (
+                              <div
+                                key={color}
+                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
+                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
+                                }`}
+                                style={{ backgroundColor: color }}
+                                onClick={() => field.onChange(color)}
+                              />
+                            ))}
+                          </div>
+                          <Input 
+                            type="color"
+                            {...field}
+                            className="h-8 w-full"
+                          />
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="rewardTextColor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center justify-between">
+                        Reward Text Color
                         <span 
                           className="w-5 h-5 rounded-full" 
                           style={{ backgroundColor: field.value }} 

@@ -1,131 +1,111 @@
 
 import { useState } from "react";
-import QRCode from "react-qr-code";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { QrCode, Download, Copy, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import QRCode from "react-qr-code";
+import { Download, QrCode } from "lucide-react";
 
 interface QRCodeGeneratorProps {
-  onGenerate?: (code: string) => void;
-  businessId?: string;
+  onGenerate?: (codeData: string) => void;
 }
 
-const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessId = "coffee-oasis-123" }) => {
+const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
   const { toast } = useToast();
   const [customerName, setCustomerName] = useState<string>("");
-  const [stampValue, setStampValue] = useState<string>("1");
+  const [stampCount, setStampCount] = useState<number>(1);
   const [qrValue, setQrValue] = useState<string>("");
-  const [qrKey, setQrKey] = useState<number>(0);
+  const [qrGenerated, setQrGenerated] = useState<boolean>(false);
 
-  const generateQRCode = () => {
-    // We no longer require customer name for business QR generation
-    const qrData = JSON.stringify({
-      businessId: businessId,
-      timestamp: new Date().getTime(),
-      stamps: parseInt(stampValue),
-      // We still include customer if provided, but it's optional now
-      ...(customerName && { customer: customerName }),
-    });
-
-    setQrValue(qrData);
-    if (onGenerate) {
-      onGenerate(qrData);
+  const handleGenerate = () => {
+    if (!customerName.trim()) {
+      toast({
+        title: "Customer Name Required",
+        description: "Please enter a customer name to generate a QR code.",
+        variant: "destructive",
+      });
+      return;
     }
-    
+
+    const qrData = {
+      customer: customerName.trim(),
+      stamps: stampCount,
+      businessId: "your-business-id", // This would normally come from auth or context
+      timestamp: Date.now(),
+    };
+
+    const qrValue = JSON.stringify(qrData);
+    setQrValue(qrValue);
+    setQrGenerated(true);
+
     toast({
       title: "QR Code Generated",
-      description: `This code will award ${stampValue} stamp${parseInt(stampValue) > 1 ? 's' : ''} when scanned.`,
+      description: `QR code for ${customerName} created. Scan with the customer app to add ${stampCount} stamp${stampCount > 1 ? 's' : ''}.`,
     });
-  };
 
-  const regenerateQRCode = () => {
-    setQrKey(prev => prev + 1);
-    generateQRCode();
-  };
-
-  const downloadQRCode = () => {
-    const svg = document.getElementById("qr-code");
-    if (!svg) return;
-
-    const svgData = new XMLSerializer().serializeToString(svg);
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-    
-    img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx?.drawImage(img, 0, 0);
-      const pngFile = canvas.toDataURL("image/png");
-      
-      const downloadLink = document.createElement("a");
-      downloadLink.download = `business-qrcode-${stampValue}-stamps.png`;
-      downloadLink.href = pngFile;
-      downloadLink.click();
-      
-      toast({
-        title: "QR Code Downloaded",
-        description: "You can print this image or display it on a screen."
-      });
-    };
-    
-    img.src = "data:image/svg+xml;base64," + btoa(svgData);
-  };
-
-  const copyQRData = () => {
-    if (qrValue) {
-      navigator.clipboard.writeText(qrValue);
-      toast({
-        title: "QR Data Copied",
-        description: "QR code data copied to clipboard"
-      });
+    if (onGenerate) {
+      onGenerate(qrValue);
     }
+  };
+  
+  const downloadQRCode = () => {
+    const canvas = document.getElementById('qr-code-canvas');
+    if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
+      toast({
+        title: "Download Failed",
+        description: "Could not download the QR code. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const pngUrl = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+    const downloadLink = document.createElement("a");
+    downloadLink.href = pngUrl;
+    downloadLink.download = `qrcode-${customerName.replace(/\s+/g, '-')}-${Date.now()}.png`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    
+    toast({
+      title: "QR Code Downloaded",
+      description: "The QR code has been downloaded to your device.",
+    });
   };
 
   return (
     <Card className="p-6 bg-white card-shadow">
       <h3 className="text-xl font-semibold text-coffee-dark mb-4 flex items-center gap-2">
         <QrCode size={24} className="text-orange" />
-        Business QR Code Generator
+        Generate QR Code
       </h3>
 
-      <div className="flex flex-col gap-4">
+      <div className="space-y-4">
         <div>
-          <label htmlFor="businessId" className="block text-sm font-medium text-coffee-light mb-1">
-            Business ID
+          <label htmlFor="customer-name" className="block text-sm font-medium text-coffee-dark mb-1">
+            Customer Name
           </label>
           <Input
-            id="businessId"
-            value={businessId}
-            disabled
-            className="border-coffee-light bg-cream-light"
-          />
-          <p className="text-xs text-coffee-light mt-1">This is your unique business identifier</p>
-        </div>
-
-        <div>
-          <label htmlFor="customerName" className="block text-sm font-medium text-coffee-light mb-1">
-            Customer Name (Optional)
-          </label>
-          <Input
-            id="customerName"
+            id="customer-name"
             value={customerName}
             onChange={(e) => setCustomerName(e.target.value)}
-            placeholder="Enter customer name (optional)"
-            className="border-coffee-light focus:border-orange"
+            placeholder="Enter customer name"
+            className="border-coffee-light"
           />
         </div>
 
         <div>
-          <label htmlFor="stampValue" className="block text-sm font-medium text-coffee-light mb-1">
+          <label htmlFor="stamp-count" className="block text-sm font-medium text-coffee-dark mb-1">
             Number of Stamps
           </label>
-          <Select value={stampValue} onValueChange={setStampValue}>
-            <SelectTrigger className="border-coffee-light focus:border-orange">
-              <SelectValue placeholder="Select stamps" />
+          <Select
+            value={String(stampCount)}
+            onValueChange={(value) => setStampCount(parseInt(value))}
+          >
+            <SelectTrigger id="stamp-count" className="border-coffee-light">
+              <SelectValue placeholder="Select stamp count" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="1">1 Stamp</SelectItem>
@@ -134,49 +114,29 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
               <SelectItem value="5">5 Stamps</SelectItem>
             </SelectContent>
           </Select>
-          <p className="text-xs text-coffee-light mt-1">Number of stamps this QR code will award when scanned</p>
         </div>
 
         <Button 
-          onClick={generateQRCode} 
-          className="bg-orange hover:bg-orange-light transition-colors"
+          onClick={handleGenerate}
+          className="w-full bg-coffee-medium hover:bg-coffee-dark"
         >
-          Generate Business QR Code
+          Generate QR Code
         </Button>
 
-        {qrValue && (
-          <div className="mt-4 flex flex-col items-center">
-            <div className="bg-white p-4 rounded-lg shadow-md">
-              <QRCode
-                id="qr-code"
-                key={qrKey}
-                value={qrValue}
-                size={200}
-                bgColor="#FFFFFF"
-                fgColor="#6F4E37"
-                level="H"
-              />
+        {qrGenerated && (
+          <div className="flex flex-col items-center mt-6 space-y-4">
+            <div className="p-4 bg-white rounded-lg">
+              <QRCode id="qr-code-canvas" value={qrValue} size={200} />
             </div>
-            <p className="text-sm text-coffee-dark font-semibold mt-2 text-center">
-              This QR code awards {stampValue} stamp{parseInt(stampValue) > 1 ? 's' : ''}
-            </p>
-            <p className="text-xs text-coffee-light mt-1 text-center">
-              Expires in 5 minutes for security
-            </p>
-            <div className="mt-4 flex gap-2">
-              <Button onClick={downloadQRCode} variant="outline" className="flex items-center gap-1">
-                <Download size={16} />
-                Download
-              </Button>
-              <Button onClick={copyQRData} variant="outline" className="flex items-center gap-1">
-                <Copy size={16} />
-                Copy Data
-              </Button>
-              <Button onClick={regenerateQRCode} variant="outline" className="flex items-center gap-1">
-                <RefreshCw size={16} />
-                Refresh
-              </Button>
-            </div>
+            
+            <Button
+              onClick={downloadQRCode}
+              variant="outline"
+              className="w-full flex items-center justify-center gap-2"
+            >
+              <Download size={18} />
+              Download QR Code
+            </Button>
           </div>
         )}
       </div>

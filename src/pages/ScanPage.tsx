@@ -25,6 +25,10 @@ const ScanPage = () => {
         const parsedStyle = JSON.parse(savedCardStyle);
         setCardStyle(parsedStyle);
         setMaxStamps(parsedStyle.maxStamps || 10);
+        if (parsedStyle.businessName) {
+          // Set customer name to include the business name
+          setCustomerName(`${parsedStyle.businessName} Lover`);
+        }
       } catch (error) {
         console.error("Error parsing card style from localStorage", error);
       }
