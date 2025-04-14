@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import QRScanner from "@/components/QRScanner";
@@ -6,7 +5,7 @@ import LoyaltyCard from "@/components/LoyaltyCard";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ScanLine, BadgeCheck } from "lucide-react";
-import { LoyaltyCardConfig } from "@/components/loyalty/editor/types";
+import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
 
 const ScanPage = () => {
   const { toast } = useToast();

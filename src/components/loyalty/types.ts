@@ -1,5 +1,6 @@
 
 import { Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy, Sparkles } from "lucide-react";
+import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 
 export interface Reward {
   stampNumber: number;
@@ -12,7 +13,7 @@ export interface LoyaltyCardProps {
   maxStamps: number;
   currentStamps: number;
   onStampCollected?: () => void;
-  cardStyle?: any;
+  cardStyle?: LoyaltyCardConfig;
   onReset?: () => void;
   isMobile?: boolean;
 }
