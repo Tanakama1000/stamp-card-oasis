@@ -25,10 +25,13 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   onStampCollected,
   cardStyle,
   onReset,
+  isMobile: propIsMobile,
 }) => {
   const { toast } = useToast();
   const { width, height } = useWindowSize();
-  const isMobile = useIsMobile();
+  const deviceIsMobile = useIsMobile();
+  const isMobile = propIsMobile !== undefined ? propIsMobile : deviceIsMobile;
+  
   const [stamps, setStamps] = useState<number>(currentStamps);
   const [animatingStamp, setAnimatingStamp] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState<boolean>(false);

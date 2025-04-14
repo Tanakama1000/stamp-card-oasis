@@ -20,13 +20,17 @@ import CardColorsSection from "@/components/loyalty/editor/CardColorsSection";
 
 interface LoyaltyCardEditorProps {
   onCardUpdate?: (cardConfig: LoyaltyCardConfig) => void;
+  initialConfig?: LoyaltyCardConfig;
 }
 
-const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) => {
+const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ 
+  onCardUpdate,
+  initialConfig 
+}) => {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   
-  const [cardConfig, setCardConfig] = useState<LoyaltyCardConfig>({
+  const defaultConfig: LoyaltyCardConfig = {
     businessName: "Coffee Oasis",
     customerName: "",
     maxStamps: 10,
@@ -57,10 +61,28 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
     customerNameFontSize: "text-base",
     descriptionFontSize: "text-sm",
     progressRewardsFontSize: "text-sm",
-  });
+  };
+  
+  // Use initialConfig if provided, otherwise use default or local storage
+  useEffect(() => {
+    if (initialConfig) {
+      form.reset(initialConfig);
+    } else {
+      // Try to load from localStorage if no initialConfig provided
+      try {
+        const savedConfig = localStorage.getItem('loyaltyCardStyle');
+        if (savedConfig) {
+          const parsedConfig = JSON.parse(savedConfig);
+          form.reset(parsedConfig);
+        }
+      } catch (error) {
+        console.error("Error loading saved config:", error);
+      }
+    }
+  }, [initialConfig]);
 
   const form = useForm<LoyaltyCardConfig>({
-    defaultValues: cardConfig
+    defaultValues: initialConfig || defaultConfig
   });
 
   // Watch all form values for real-time preview updates
@@ -73,7 +95,7 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
     if (formValues && onCardUpdate) {
       // Create a complete card config by merging form values with defaults
       const updatedConfig: LoyaltyCardConfig = {
-        ...cardConfig,  // Start with current config to ensure all required fields
+        ...defaultConfig,  // Start with defaults to ensure all required fields
         ...formValues as Partial<LoyaltyCardConfig>, // Apply watched form values
         // Ensure rewards are properly sorted and have all required properties
         rewards: formValues.rewards 
@@ -82,14 +104,13 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
               description: reward.description || "Reward",
               icon: reward.icon || "Gift"
             })).sort((a, b) => a.stampNumber - b.stampNumber)
-          : cardConfig.rewards
+          : []
       };
       
       // Update preview with current form values
-      setCardConfig(updatedConfig);
       onCardUpdate(updatedConfig);
     }
-  }, [formValues, onCardUpdate, cardConfig]);
+  }, [formValues, onCardUpdate]);
 
   const handleSubmit = (data: LoyaltyCardConfig) => {
     setIsSaving(true);
@@ -97,7 +118,6 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
     const sortedRewards = [...data.rewards].sort((a, b) => a.stampNumber - b.stampNumber);
     const updatedData = {...data, rewards: sortedRewards};
     
-    setCardConfig(updatedData);
     if (onCardUpdate) {
       onCardUpdate(updatedData);
     }
@@ -122,19 +142,11 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
-          const newConfig = { 
-            ...cardConfig, 
-            backgroundImage: event.target.result as string,
-            useBackgroundImage: true 
-          };
-          setCardConfig(newConfig);
           form.setValue("backgroundImage", event.target.result as string);
           form.setValue("useBackgroundImage", true);
           
-          // Update preview immediately when background image changes
-          if (onCardUpdate) {
-            onCardUpdate(newConfig);
-          }
+          // Trigger form update
+          form.trigger(["backgroundImage", "useBackgroundImage"]);
         }
       };
       reader.readAsDataURL(file);
@@ -160,7 +172,7 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
           
           <BackgroundImageSection 
             form={form} 
-            cardConfig={cardConfig} 
+            cardConfig={formValues} 
             handleBackgroundImageUpload={handleBackgroundImageUpload} 
           />
           
