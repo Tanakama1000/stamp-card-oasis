@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,7 +32,6 @@ export interface LoyaltyCardConfig {
   stampActiveColor: string;
   textColor: string;
   businessLogo?: string;
-  businessName?: string;
   businessNameColor?: string;
   rewardTextColor?: string;
   stampIcon: string;
@@ -97,7 +95,6 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
   });
 
   const handleSubmit = (data: LoyaltyCardConfig) => {
-    // Sort rewards by stampNumber
     const sortedRewards = [...data.rewards].sort((a, b) => a.stampNumber - b.stampNumber);
     const updatedData = {...data, rewards: sortedRewards};
     
@@ -150,14 +147,14 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
     const maxStamps = form.getValues("maxStamps");
     const currentRewards = form.getValues("rewards") || [];
     
-    // Find the next available stamp number
-    const usedStampNumbers = currentRewards.map(r => r.stampNumber);
     let nextStampNumber = 1;
-    while (usedStampNumbers.includes(nextStampNumber) && nextStampNumber < maxStamps) {
+    while (nextStampNumber < maxStamps) {
+      if (!currentRewards.some(r => r.stampNumber === nextStampNumber)) {
+        break;
+      }
       nextStampNumber++;
     }
     
-    // If all stamps are used, don't add more
     if (nextStampNumber >= maxStamps) {
       toast({
         title: "Cannot Add More Rewards",
@@ -295,7 +292,6 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                 />
               </div>
               
-              {/* Business Logo Upload */}
               <FormField
                 control={form.control}
                 name="businessLogo"
@@ -331,7 +327,6 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                 )}
               />
               
-              {/* Card Background Image Upload */}
               <FormField
                 control={form.control}
                 name="backgroundImage"
@@ -381,7 +376,6 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                 )}
               />
 
-              {/* Custom Rewards Section */}
               <div className="space-y-4 border-t border-cream pt-4">
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium text-coffee-dark">Progress Rewards</h4>
@@ -508,11 +502,9 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                 />
               </div>
 
-              {/* Icons Selection */}
               <div className="space-y-4 border-t border-cream pt-4 mt-4">
                 <h4 className="font-medium text-coffee-dark">Card Icons</h4>
                 
-                {/* Stamp Icon Selection */}
                 <FormField
                   control={form.control}
                   name="stampIcon"
@@ -544,7 +536,6 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                   )}
                 />
 
-                {/* Reward Icon Selection */}
                 <FormField
                   control={form.control}
                   name="rewardIcon"
@@ -578,7 +569,6 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                 />
               </div>
 
-              {/* Color Pickers Section */}
               <div className="space-y-4 border-t border-cream pt-4 mt-4">
                 <h4 className="font-medium text-coffee-dark">Card Colors</h4>
                 
