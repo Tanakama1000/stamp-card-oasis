@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -67,7 +68,7 @@ const REWARD_ICONS = [
 ];
 
 const FONT_FAMILIES = [
-  { name: "Default", value: "" },
+  { name: "Default", value: "default" },
   { name: "Arial", value: "Arial, sans-serif" },
   { name: "Georgia", value: "Georgia, serif" },
   { name: "Verdana", value: "Verdana, sans-serif" },
@@ -82,7 +83,7 @@ const FONT_FAMILIES = [
 ];
 
 const FONT_SIZES = [
-  { name: "Default", value: "" },
+  { name: "Default", value: "default" },
   { name: "Extra Small", value: "text-xs" },
   { name: "Small", value: "text-sm" },
   { name: "Medium", value: "text-base" },
@@ -315,7 +316,7 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                           <SelectContent>
                             {FONT_FAMILIES.map((font) => (
                               <SelectItem key={font.value} value={font.value}>
-                                <span style={{ fontFamily: font.value || 'inherit' }}>
+                                <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
                                   {font.name}
                                 </span>
                               </SelectItem>
@@ -345,7 +346,7 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                             </SelectTrigger>
                             <SelectContent>
                               {FONT_SIZES.map((size) => (
-                                <SelectItem key={size.value || 'default'} value={size.value}>
+                                <SelectItem key={size.value} value={size.value}>
                                   {size.name}
                                 </SelectItem>
                               ))}
@@ -372,7 +373,7 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                             </SelectTrigger>
                             <SelectContent>
                               {FONT_SIZES.map((size) => (
-                                <SelectItem key={size.value || 'default'} value={size.value}>
+                                <SelectItem key={size.value} value={size.value}>
                                   {size.name}
                                 </SelectItem>
                               ))}
@@ -401,7 +402,7 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                             </SelectTrigger>
                             <SelectContent>
                               {FONT_SIZES.map((size) => (
-                                <SelectItem key={size.value || 'default'} value={size.value}>
+                                <SelectItem key={size.value} value={size.value}>
                                   {size.name}
                                 </SelectItem>
                               ))}
@@ -428,7 +429,7 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                             </SelectTrigger>
                             <SelectContent>
                               {FONT_SIZES.map((size) => (
-                                <SelectItem key={size.value || 'default'} value={size.value}>
+                                <SelectItem key={size.value} value={size.value}>
                                   {size.name}
                                 </SelectItem>
                               ))}
@@ -456,7 +457,7 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                           </SelectTrigger>
                           <SelectContent>
                             {FONT_SIZES.map((size) => (
-                              <SelectItem key={size.value || 'default'} value={size.value}>
+                              <SelectItem key={size.value} value={size.value}>
                                   {size.name}
                               </SelectItem>
                             ))}
@@ -946,3 +947,33 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                       </FormControl>
                     </FormItem>
                   )}
+                />
+              </div>
+              
+              <div className="border-t border-cream pt-6 mt-2">
+                <Button type="submit" className="w-full bg-orange hover:bg-orange-dark text-white">
+                  Save Card Configuration
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </TabsContent>
+
+        <TabsContent value="preview">
+          <div className="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-lg">
+            <h3 className="text-lg font-medium mb-4 text-coffee-dark">Card Preview</h3>
+            <div className="w-full max-w-md">
+              <LoyaltyCard {...cardConfig} />
+            </div>
+            <p className="mt-4 text-sm text-coffee-light text-center">
+              This preview shows how the loyalty card will appear to customers.
+              Switch to the Edit tab to make changes.
+            </p>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </Card>
+  );
+};
+
+export default LoyaltyCardEditor;
