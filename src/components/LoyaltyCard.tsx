@@ -219,7 +219,15 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   const rewardTextColor = cardStyle?.rewardTextColor || textColor;
   const progressBarColor = cardStyle?.stampActiveColor || "#8B4513";
   const progressBarBgColor = cardStyle?.stampBgColor || "#F5F5DC";
+  
+  // Individual font families for each text element
   const fontFamily = cardStyle?.fontFamily || "";
+  const businessNameFont = cardStyle?.businessNameFont || fontFamily;
+  const cardTitleFont = cardStyle?.cardTitleFont || fontFamily;
+  const customerNameFont = cardStyle?.customerNameFont || fontFamily;
+  const descriptionFont = cardStyle?.descriptionFont || fontFamily;
+  const progressRewardsFont = cardStyle?.progressRewardsFont || fontFamily;
+  
   const cardTitle = cardStyle?.cardTitle || "Loyalty Card";
   
   const businessNameFontSize = cardStyle?.businessNameFontSize || "text-sm";
@@ -251,7 +259,6 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
         className="p-6 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl overflow-hidden relative"
         style={{ 
           backgroundColor: cardBgColor,
-          fontFamily: fontFamily !== "default" ? fontFamily : 'inherit',
           ...backgroundImageStyle
         }}
       >
@@ -274,20 +281,29 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
               {cardStyle?.businessName && (
                 <h3 
                   className={`font-medium ${businessNameFontSize}`} 
-                  style={{ color: businessNameColor }}
+                  style={{ 
+                    color: businessNameColor,
+                    fontFamily: businessNameFont !== "default" ? businessNameFont : 'inherit'
+                  }}
                 >
                   {cardStyle.businessName}
                 </h3>
               )}
               <h2 
                 className={`font-bold ${cardTitleFontSize}`} 
-                style={{ color: cardTitleColor }}
+                style={{ 
+                  color: cardTitleColor,
+                  fontFamily: cardTitleFont !== "default" ? cardTitleFont : 'inherit'
+                }}
               >
                 {cardTitle}
               </h2>
               <p 
                 className={descriptionFontSize} 
-                style={{ color: textColor }}
+                style={{ 
+                  color: textColor,
+                  fontFamily: descriptionFont !== "default" ? descriptionFont : 'inherit'
+                }}
               >
                 Collect {maxStamps} stamps for a free item
               </p>
@@ -326,7 +342,15 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
         
         {cardStyle?.rewards && cardStyle.rewards.length > 0 && (
           <div className="mb-5 p-3 bg-cream bg-opacity-80 rounded-lg relative z-10 shadow-sm">
-            <h4 className={`font-medium mb-2 ${progressRewardsFontSize}`} style={{ color: textColor }}>Progress Rewards:</h4>
+            <h4 
+              className={`font-medium mb-2 ${progressRewardsFontSize}`} 
+              style={{ 
+                color: textColor,
+                fontFamily: progressRewardsFont !== "default" ? progressRewardsFont : 'inherit'
+              }}
+            >
+              Progress Rewards:
+            </h4>
             <div className="flex flex-wrap gap-2">
               {cardStyle.rewards.map((reward, index) => {
                 const RewardIcon = STAMP_ICONS[reward.icon as keyof typeof STAMP_ICONS] || Gift;
@@ -343,7 +367,12 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
                     variant={isCollected ? "default" : "outline"}
                   >
                     <RewardIcon size={14} className={isCollected ? "animate-pulse" : ""} />
-                    <span className="text-xs font-medium">
+                    <span 
+                      className="text-xs font-medium"
+                      style={{ 
+                        fontFamily: progressRewardsFont !== "default" ? progressRewardsFont : 'inherit'
+                      }}
+                    >
                       <span className="font-bold">{reward.stampNumber}:</span> {reward.description}
                     </span>
                     {isCollected && (
@@ -362,7 +391,10 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
           <div className="mt-5 text-center relative z-10">
             <h4 
               className={`font-medium ${customerNameFontSize}`} 
-              style={{ color: textColor }}
+              style={{ 
+                color: textColor,
+                fontFamily: customerNameFont !== "default" ? customerNameFont : 'inherit'
+              }}
             >
               {customerName}'s Card
             </h4>
@@ -374,8 +406,24 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
             className="mt-6 p-4 text-white text-center rounded-lg animate-pulse shadow-lg transform transition-transform hover:scale-105"
             style={{ backgroundColor: cardStyle?.stampActiveColor || "#8B4513" }}
           >
-            <p className="font-bold text-lg" style={{ color: rewardTextColor }}>Congratulations! You've earned a reward!</p>
-            <p className={`${descriptionFontSize} mt-1`} style={{ color: rewardTextColor }}>Show this to a staff member to claim.</p>
+            <p 
+              className="font-bold text-lg" 
+              style={{ 
+                color: rewardTextColor,
+                fontFamily: descriptionFont !== "default" ? descriptionFont : 'inherit' 
+              }}
+            >
+              Congratulations! You've earned a reward!
+            </p>
+            <p 
+              className={`${descriptionFontSize} mt-1`} 
+              style={{ 
+                color: rewardTextColor,
+                fontFamily: descriptionFont !== "default" ? descriptionFont : 'inherit'
+              }}
+            >
+              Show this to a staff member to claim.
+            </p>
             <div className="flex justify-center mt-2">
               <Trophy size={32} className="text-yellow-300 animate-pulse" />
             </div>
@@ -428,7 +476,12 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
                   );
                 })()}
                 <h3 className="text-xl font-semibold text-orange">{currentReward.description}</h3>
-                <p className={`text-center text-coffee-light ${descriptionFontSize}`}>
+                <p 
+                  className={`text-center text-coffee-light ${descriptionFontSize}`}
+                  style={{ 
+                    fontFamily: descriptionFont !== "default" ? descriptionFont : 'inherit'
+                  }}
+                >
                   Show this to a staff member to claim your reward.
                   Keep collecting stamps to earn more rewards!
                 </p>

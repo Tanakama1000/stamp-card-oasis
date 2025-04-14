@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -43,6 +44,11 @@ export interface LoyaltyCardConfig {
   cardTitle: string;
   cardTitleColor?: string;
   fontFamily: string;
+  businessNameFont?: string;
+  cardTitleFont?: string;
+  customerNameFont?: string;
+  descriptionFont?: string;
+  progressRewardsFont?: string;
   businessNameFontSize?: string;
   cardTitleFontSize?: string;
   customerNameFontSize?: string;
@@ -125,6 +131,11 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
     cardTitle: "Loyalty Card",
     cardTitleColor: "#8B4513",
     fontFamily: "",
+    businessNameFont: "",
+    cardTitleFont: "",
+    customerNameFont: "",
+    descriptionFont: "",
+    progressRewardsFont: "",
     businessNameFontSize: "text-sm",
     cardTitleFontSize: "text-lg",
     customerNameFontSize: "text-base",
@@ -303,7 +314,7 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                   name="fontFamily"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Font Family</FormLabel>
+                      <FormLabel>Default Font Family</FormLabel>
                       <FormControl>
                         <Select 
                           value={field.value} 
@@ -323,10 +334,163 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                           </SelectContent>
                         </Select>
                       </FormControl>
-                      <p className="text-xs text-coffee-light mt-1">Select a font for all text on the card</p>
+                      <p className="text-xs text-coffee-light mt-1">Default font for all text (can be overridden below)</p>
                     </FormItem>
                   )}
                 />
+                
+                <div className="border p-4 rounded-md space-y-4 bg-slate-50">
+                  <h4 className="font-medium text-coffee-dark">Individual Text Fonts</h4>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="businessNameFont"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Business Name Font</FormLabel>
+                          <FormControl>
+                            <Select 
+                              value={field.value} 
+                              onValueChange={(val) => field.onChange(val)}
+                            >
+                              <SelectTrigger className="border-coffee-light">
+                                <SelectValue placeholder="Select font" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {FONT_FAMILIES.map((font) => (
+                                  <SelectItem key={font.value} value={font.value}>
+                                    <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
+                                      {font.name}
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="cardTitleFont"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Card Title Font</FormLabel>
+                          <FormControl>
+                            <Select 
+                              value={field.value} 
+                              onValueChange={(val) => field.onChange(val)}
+                            >
+                              <SelectTrigger className="border-coffee-light">
+                                <SelectValue placeholder="Select font" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {FONT_FAMILIES.map((font) => (
+                                  <SelectItem key={font.value} value={font.value}>
+                                    <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
+                                      {font.name}
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="customerNameFont"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Customer Name Font</FormLabel>
+                          <FormControl>
+                            <Select 
+                              value={field.value} 
+                              onValueChange={(val) => field.onChange(val)}
+                            >
+                              <SelectTrigger className="border-coffee-light">
+                                <SelectValue placeholder="Select font" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {FONT_FAMILIES.map((font) => (
+                                  <SelectItem key={font.value} value={font.value}>
+                                    <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
+                                      {font.name}
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="descriptionFont"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description Font</FormLabel>
+                          <FormControl>
+                            <Select 
+                              value={field.value} 
+                              onValueChange={(val) => field.onChange(val)}
+                            >
+                              <SelectTrigger className="border-coffee-light">
+                                <SelectValue placeholder="Select font" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {FONT_FAMILIES.map((font) => (
+                                  <SelectItem key={font.value} value={font.value}>
+                                    <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
+                                      {font.name}
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <FormField
+                    control={form.control}
+                    name="progressRewardsFont"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Progress Rewards Font</FormLabel>
+                        <FormControl>
+                          <Select 
+                            value={field.value} 
+                            onValueChange={(val) => field.onChange(val)}
+                          >
+                            <SelectTrigger className="border-coffee-light">
+                              <SelectValue placeholder="Select font" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {FONT_FAMILIES.map((font) => (
+                                <SelectItem key={font.value} value={font.value}>
+                                  <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
+                                    {font.name}
+                                  </span>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
