@@ -27,6 +27,7 @@ export interface LoyaltyCardConfig {
   textColor: string;
   businessLogo?: string;
   stampIcon: string;
+  rewardIcon?: string;
 }
 
 const STAMP_ICONS = [
@@ -37,6 +38,12 @@ const STAMP_ICONS = [
   { name: "Battery", icon: Battery },
   { name: "Zap", icon: Zap },
   { name: "Gift", icon: Gift },
+];
+
+const REWARD_ICONS = [
+  { name: "Gift", icon: Gift },
+  { name: "Award", icon: Award },
+  { name: "Star", icon: Star },
 ];
 
 const COLOR_PRESETS = {
@@ -60,7 +67,8 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
     stampActiveColor: "#8B4513",
     textColor: "#6F4E37",
     businessLogo: "",
-    stampIcon: "Coffee"
+    stampIcon: "Coffee",
+    rewardIcon: "Gift"
   });
 
   const form = useForm<LoyaltyCardConfig>({
@@ -240,38 +248,76 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                   </FormItem>
                 )}
               />
-              
-              {/* Stamp Icon Selection */}
-              <FormField
-                control={form.control}
-                name="stampIcon"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Stamp Icon</FormLabel>
-                    <FormControl>
-                      <div className="grid grid-cols-4 gap-2">
-                        {STAMP_ICONS.map((stampIcon) => {
-                          const Icon = stampIcon.icon;
-                          return (
-                            <div 
-                              key={stampIcon.name}
-                              onClick={() => field.onChange(stampIcon.name)}
-                              className={`p-3 rounded-md cursor-pointer flex flex-col items-center justify-center gap-1 text-xs transition-all ${
-                                field.value === stampIcon.name 
-                                  ? 'bg-orange text-white' 
-                                  : 'bg-cream hover:bg-cream-light'
-                              }`}
-                            >
-                              <Icon size={18} />
-                              <span>{stampIcon.name}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+
+              {/* Icons Selection */}
+              <div className="space-y-4 border-t border-cream pt-4 mt-4">
+                <h4 className="font-medium text-coffee-dark">Card Icons</h4>
+                
+                {/* Stamp Icon Selection */}
+                <FormField
+                  control={form.control}
+                  name="stampIcon"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Stamp Icon</FormLabel>
+                      <FormControl>
+                        <div className="grid grid-cols-4 gap-2">
+                          {STAMP_ICONS.map((stampIcon) => {
+                            const Icon = stampIcon.icon;
+                            return (
+                              <div 
+                                key={stampIcon.name}
+                                onClick={() => field.onChange(stampIcon.name)}
+                                className={`p-3 rounded-md cursor-pointer flex flex-col items-center justify-center gap-1 text-xs transition-all ${
+                                  field.value === stampIcon.name 
+                                    ? 'bg-orange text-white' 
+                                    : 'bg-cream hover:bg-cream-light'
+                                }`}
+                              >
+                                <Icon size={18} />
+                                <span>{stampIcon.name}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                {/* Reward Icon Selection */}
+                <FormField
+                  control={form.control}
+                  name="rewardIcon"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Final Reward Icon</FormLabel>
+                      <FormControl>
+                        <div className="grid grid-cols-3 gap-2">
+                          {REWARD_ICONS.map((rewardIcon) => {
+                            const Icon = rewardIcon.icon;
+                            return (
+                              <div 
+                                key={rewardIcon.name}
+                                onClick={() => field.onChange(rewardIcon.name)}
+                                className={`p-3 rounded-md cursor-pointer flex flex-col items-center justify-center gap-1 text-xs transition-all ${
+                                  field.value === rewardIcon.name 
+                                    ? 'bg-orange text-white' 
+                                    : 'bg-cream hover:bg-cream-light'
+                                }`}
+                              >
+                                <Icon size={18} />
+                                <span>{rewardIcon.name}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </FormControl>
+                      <p className="text-xs text-coffee-light mt-1">This icon will appear on the final stamp</p>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               {/* Color Pickers Section */}
               <div className="space-y-4 border-t border-cream pt-4 mt-4">

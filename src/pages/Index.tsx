@@ -35,6 +35,25 @@ const Index = () => {
       description: "You're getting closer to your reward!",
       duration: 2000,
     });
+    
+    setStamps(prev => prev + 1);
+  };
+  
+  const handleCardReset = () => {
+    setStamps(0);
+    toast({
+      title: "New Card Started",
+      description: "Your loyalty card has been reset. Start collecting stamps!",
+      duration: 3000,
+    });
+  };
+  
+  const handleSaveName = () => {
+    toast({
+      title: "Name Updated",
+      description: "Your customer name has been updated.",
+      duration: 2000,
+    });
   };
 
   return (
@@ -75,13 +94,7 @@ const Index = () => {
                 className="border-coffee-light"
               />
               <Button
-                onClick={() => {
-                  toast({
-                    title: "Name Updated",
-                    description: "Your customer name has been updated.",
-                    duration: 2000,
-                  });
-                }}
+                onClick={handleSaveName}
                 className="bg-coffee-medium hover:bg-coffee-dark"
               >
                 Save
@@ -97,6 +110,7 @@ const Index = () => {
             currentStamps={stamps}
             cardStyle={cardStyle || undefined}
             onStampCollected={handleStampCollected}
+            onReset={handleCardReset}
           />
         </div>
       </div>
