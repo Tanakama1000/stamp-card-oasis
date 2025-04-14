@@ -1,71 +1,6 @@
 
-import { LucideIcon } from "lucide-react";
-import { Reward } from "../types";
-
-// Editor section props
-export interface IconSelectionProps {
-  icons: Array<{ name: string; icon: React.ElementType }>;
-  selectedIcon: string;
-  onSelectIcon: (iconName: string) => void;
-  label?: string;
-  description?: string;
-}
-
-export interface ColorSelectionProps {
-  value: string;
-  onChange: (value: string) => void;
-  label: string;
-  presets: string[];
-}
-
-export interface RewardsEditorProps {
-  rewards: Reward[];
-  maxStamps: number;
-  onChange: (rewards: Reward[]) => void;
-}
-
-export interface RewardItemProps {
-  reward: Reward;
-  index: number;
-  maxStamps: number;
-  rewards: Reward[];
-  onChange: (rewards: Reward[]) => void;
-  onRemove: (index: number) => void;
-}
-
-export interface TypographyEditorProps {
-  form: any;
-}
-
-export interface ImageUploadProps {
-  onFileSelected: (dataUrl: string) => void;
-  currentImage?: string;
-  label: string;
-  icon: React.ElementType;
-  hint?: string;
-}
-
-export interface BackgroundImageSectionProps {
-  form: any;
-  cardConfig: LoyaltyCardConfig;
-  handleBackgroundImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
-export interface BusinessInfoSectionProps {
-  form: any;
-}
-
-export interface CardIconsSectionProps {
-  form: any;
-}
-
-export interface CardColorsSectionProps {
-  form: any;
-}
-
-export interface StampConfigSectionProps {
-  form: any;
-}
+import { UseFormReturn } from "react-hook-form";
+import { Reward } from "@/components/loyalty/types";
 
 export interface LoyaltyCardConfig {
   businessName: string;
@@ -76,14 +11,14 @@ export interface LoyaltyCardConfig {
   stampBgColor: string;
   stampActiveColor: string;
   textColor: string;
-  businessLogo: string;
+  businessLogo?: string;
   businessNameColor: string;
   rewardTextColor: string;
   stampIcon: string;
   rewardIcon: string;
   rewards: Reward[];
   miniRewardStampColor: string;
-  backgroundImage: string;
+  backgroundImage?: string;
   useBackgroundImage: boolean;
   cardTitle: string;
   cardTitleColor: string;
@@ -100,6 +35,64 @@ export interface LoyaltyCardConfig {
   progressRewardsFontSize: string;
 }
 
-export interface LoyaltyCardEditorProps {
-  onCardUpdate?: (cardConfig: LoyaltyCardConfig) => void;
+export interface BusinessInfoSectionProps {
+  form: UseFormReturn<LoyaltyCardConfig, any>;
+}
+
+export interface StampConfigSectionProps {
+  form: UseFormReturn<LoyaltyCardConfig, any>;
+}
+
+export interface BackgroundImageSectionProps {
+  form: UseFormReturn<LoyaltyCardConfig, any>;
+  cardConfig: LoyaltyCardConfig;
+  handleBackgroundImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+export interface CardIconsSectionProps {
+  form: UseFormReturn<LoyaltyCardConfig, any>;
+}
+
+export interface CardColorsSectionProps {
+  form: UseFormReturn<LoyaltyCardConfig, any>;
+}
+
+export interface ColorSelectionProps {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  className?: string;
+}
+
+export interface ImageUploadProps {
+  onFileSelected: (dataUrl: string) => void;
+  currentImage?: string;
+  label: string;
+  icon: React.FC<{ size?: number; className?: string }>;
+  hint?: string;
+}
+
+export interface IconSelectionProps {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  icons: Record<string, React.FC<{ size?: number; className?: string }>>;
+}
+
+export interface RewardItemProps {
+  reward: Reward;
+  onChange: (updatedReward: Reward) => void;
+  onDelete: () => void;
+  maxStamps: number;
+  icons: Record<string, React.FC<{ size?: number; className?: string }>>;
+}
+
+export interface RewardsEditorProps {
+  rewards: Reward[];
+  onChange: (rewards: Reward[]) => void;
+  maxStamps: number;
+}
+
+export interface TypographyEditorProps {
+  form: UseFormReturn<LoyaltyCardConfig, any>;
 }

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
@@ -52,7 +53,10 @@ const JoinPage = () => {
               maxStamps: 10,
               stampIcon: "Coffee",
               cardBgColor: "#FFFFFF",
-              textColor: "#6F4E37"
+              textColor: "#6F4E37",
+              businessNameColor: "#2563EB", // Default blue color for business name
+              cardTitleColor: "#2563EB", // Default blue color for card title
+              rewardTextColor: "#2563EB", // Default blue color for card description
             }
           });
           setLoading(false);
@@ -180,9 +184,26 @@ const JoinPage = () => {
         <div className="max-w-md mx-auto mt-8">
           <Card className="p-6 bg-white card-shadow">
             <div className="text-center mb-6">
-              <Coffee size={40} className="mx-auto text-coffee-dark mb-2" />
-              <h2 className="text-2xl font-bold text-coffee-dark">Welcome to {businessName}!</h2>
-              <p className="text-coffee-light mt-1">Here's your loyalty card</p>
+              {businessData.cardConfig?.businessLogo ? (
+                <img 
+                  src={businessData.cardConfig.businessLogo} 
+                  alt={businessName}
+                  className="h-12 w-12 object-contain mx-auto mb-2"
+                />
+              ) : (
+                <Coffee size={40} className="mx-auto text-coffee-dark mb-2" />
+              )}
+              <h2 
+                className="text-2xl font-bold mb-1"
+                style={{ color: businessData.cardConfig?.businessNameColor || "#2563EB" }}
+              >
+                Welcome to {businessName}!
+              </h2>
+              <p 
+                style={{ color: businessData.cardConfig?.cardTitleColor || "#2563EB" }}
+              >
+                Here's your loyalty card
+              </p>
             </div>
             
             <div className="mb-6">
@@ -213,7 +234,10 @@ const JoinPage = () => {
             </div>
 
             <div className="text-center space-y-4">
-              <p className="text-sm text-coffee-light">
+              <p 
+                className="text-sm"
+                style={{ color: businessData.cardConfig?.rewardTextColor || "#2563EB" }}
+              >
                 Show this card when you visit {businessName} to collect stamps
               </p>
               

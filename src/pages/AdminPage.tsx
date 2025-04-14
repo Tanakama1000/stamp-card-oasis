@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import Layout from "@/components/Layout";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
@@ -16,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-// Types for business data
 interface BusinessData {
   id: string;
   name: string;
@@ -38,7 +36,6 @@ const AdminPage = () => {
   const isMobile = useIsMobile();
   const [previewUpdated, setPreviewUpdated] = useState(false);
   
-  // Business data state
   const [businessData, setBusinessData] = useState<BusinessData>({
     id: "b_" + Date.now(),
     name: "Coffee Oasis",
@@ -49,10 +46,8 @@ const AdminPage = () => {
   const [slugEditing, setSlugEditing] = useState(false);
   const [tempSlug, setTempSlug] = useState(businessData.slug);
 
-  // Force rerender of the preview when a configuration change happens
   const [previewKey, setPreviewKey] = useState<number>(0);
 
-  // Load saved card configuration on component mount
   useEffect(() => {
     const savedCardConfig = localStorage.getItem('loyaltyCardStyle');
     if (savedCardConfig) {
@@ -63,7 +58,6 @@ const AdminPage = () => {
       }
     }
     
-    // Load business data if available
     const savedBusinessData = localStorage.getItem('businessData');
     if (savedBusinessData) {
       try {
@@ -73,7 +67,6 @@ const AdminPage = () => {
         console.error("Error parsing business data:", e);
       }
     } else {
-      // Store initial business data
       localStorage.setItem('businessData', JSON.stringify(businessData));
     }
   }, []);
@@ -94,25 +87,45 @@ const AdminPage = () => {
       console.error("Error parsing QR data:", err);
     }
   };
-  
+
   const handleCardUpdate = (cardConfig: LoyaltyCardConfig) => {
     setCardConfig(cardConfig);
-    // Force a rerender of the preview by updating the key
     setPreviewKey(prev => prev + 1);
-    
-    // Show visual indicator that preview has updated
     setPreviewUpdated(true);
     setTimeout(() => {
       setPreviewUpdated(false);
     }, 500);
+    
+    const updatedBusinessData = {
+      ...businessData,
+      cardConfig: cardConfig
+    };
+    
+    setBusinessData(updatedBusinessData);
+    localStorage.setItem('businessData', JSON.stringify(updatedBusinessData));
+    
+    try {
+      const savedBusinesses = localStorage.getItem('businesses') || '[]';
+      const businesses = JSON.parse(savedBusinesses);
+      const businessIndex = businesses.findIndex((b: any) => b.slug === businessData.slug);
+      
+      if (businessIndex !== -1) {
+        businesses[businessIndex] = updatedBusinessData;
+      } else {
+        businesses.push(updatedBusinessData);
+      }
+      
+      localStorage.setItem('businesses', JSON.stringify(businesses));
+    } catch (e) {
+      console.error("Error updating businesses:", e);
+    }
   };
 
   const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp);
     return date.toLocaleString();
   };
-  
-  // Handle slug editing
+
   const handleSlugChange = () => {
     if (!tempSlug.trim()) {
       toast({
@@ -123,7 +136,6 @@ const AdminPage = () => {
       return;
     }
     
-    // Generate a valid slug - lowercase, replace spaces with hyphens, remove special chars
     const validSlug = tempSlug.trim()
       .toLowerCase()
       .replace(/\s+/g, '-')
@@ -138,7 +150,6 @@ const AdminPage = () => {
     setTempSlug(validSlug);
     setSlugEditing(false);
     
-    // Save to localStorage
     localStorage.setItem('businessData', JSON.stringify(updatedBusinessData));
     
     toast({
@@ -146,8 +157,7 @@ const AdminPage = () => {
       description: "Your business join link has been updated."
     });
   };
-  
-  // Copy join link to clipboard
+
   const copyJoinLink = () => {
     const joinLink = `${window.location.origin}/join/${businessData.slug}`;
     navigator.clipboard.writeText(joinLink);
@@ -166,7 +176,6 @@ const AdminPage = () => {
           <p className="text-coffee-light">Manage your loyalty program and generate QR codes</p>
         </div>
         
-        {/* Join Link Card */}
         <Card className="p-4 mb-6 bg-white card-shadow">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
