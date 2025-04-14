@@ -3,6 +3,7 @@ import React from "react";
 import { FormField } from "@/components/ui/form";
 import { CardColorsSectionProps } from "./types";
 import ColorSelection from "./ColorSelection";
+import { COLOR_PRESETS } from "./constants";
 
 const CardColorsSection: React.FC<CardColorsSectionProps> = ({ form }) => {
   return (
@@ -18,6 +19,7 @@ const CardColorsSection: React.FC<CardColorsSectionProps> = ({ form }) => {
               label="Card Background"
               value={field.value}
               onChange={field.onChange}
+              presets={COLOR_PRESETS.cardBg}
             />
           )}
         />
@@ -30,6 +32,7 @@ const CardColorsSection: React.FC<CardColorsSectionProps> = ({ form }) => {
               label="Default Text"
               value={field.value}
               onChange={field.onChange}
+              presets={COLOR_PRESETS.text}
             />
           )}
         />
@@ -42,6 +45,7 @@ const CardColorsSection: React.FC<CardColorsSectionProps> = ({ form }) => {
               label="Stamp Background"
               value={field.value}
               onChange={field.onChange}
+              presets={COLOR_PRESETS.stampBg}
             />
           )}
         />
@@ -54,6 +58,7 @@ const CardColorsSection: React.FC<CardColorsSectionProps> = ({ form }) => {
               label="Stamp Active"
               value={field.value}
               onChange={field.onChange}
+              presets={COLOR_PRESETS.stampActive}
             />
           )}
         />
@@ -66,6 +71,7 @@ const CardColorsSection: React.FC<CardColorsSectionProps> = ({ form }) => {
               label="Business Name Color"
               value={field.value || "#6F4E37"}
               onChange={field.onChange}
+              presets={COLOR_PRESETS.text}
             />
           )}
         />
@@ -78,6 +84,7 @@ const CardColorsSection: React.FC<CardColorsSectionProps> = ({ form }) => {
               label="Card Title Color"
               value={field.value || "#8B4513"}
               onChange={field.onChange}
+              presets={COLOR_PRESETS.text}
             />
           )}
         />
@@ -90,6 +97,7 @@ const CardColorsSection: React.FC<CardColorsSectionProps> = ({ form }) => {
               label="Description Text Color"
               value={field.value || "#6F4E37"}
               onChange={field.onChange}
+              presets={COLOR_PRESETS.text}
             />
           )}
         />

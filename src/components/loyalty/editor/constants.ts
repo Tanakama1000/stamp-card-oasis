@@ -1,7 +1,8 @@
 
 import { Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 
-export const STAMP_ICONS = [
+export const STAMP_ICONS: { name: string; icon: LucideIcon }[] = [
   { name: "Coffee", icon: Coffee },
   { name: "Star", icon: Star },
   { name: "Heart", icon: Heart },
@@ -12,7 +13,7 @@ export const STAMP_ICONS = [
   { name: "Trophy", icon: Trophy },
 ];
 
-export const REWARD_ICONS = [
+export const REWARD_ICONS: { name: string; icon: LucideIcon }[] = [
   { name: "Gift", icon: Gift },
   { name: "Award", icon: Award },
   { name: "Star", icon: Star },

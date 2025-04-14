@@ -6,6 +6,8 @@ import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import RewardItem from "./RewardItem";
 import { RewardsEditorProps } from "./types";
+import { STAMP_ICONS } from "./constants";
+import { Reward } from "@/components/loyalty/types";
 
 const RewardsEditor: React.FC<RewardsEditorProps> = ({ rewards, maxStamps, onChange }) => {
   const { toast } = useToast();
@@ -43,6 +45,12 @@ const RewardsEditor: React.FC<RewardsEditorProps> = ({ rewards, maxStamps, onCha
     onChange(updatedRewards);
   };
 
+  const handleRewardChange = (index: number, updatedReward: Reward) => {
+    const updatedRewards = [...rewards];
+    updatedRewards[index] = updatedReward;
+    onChange(updatedRewards);
+  };
+
   return (
     <FormItem>
       <div className="flex items-center justify-between">
@@ -65,11 +73,10 @@ const RewardsEditor: React.FC<RewardsEditorProps> = ({ rewards, maxStamps, onCha
             <RewardItem 
               key={index}
               reward={reward}
-              index={index}
+              onChange={(updatedReward) => handleRewardChange(index, updatedReward)}
+              onDelete={() => removeReward(index)}
               maxStamps={maxStamps}
-              rewards={rewards}
-              onChange={onChange}
-              onRemove={removeReward}
+              icons={STAMP_ICONS}
             />
           ))
         ) : (

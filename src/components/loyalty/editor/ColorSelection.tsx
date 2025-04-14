@@ -3,10 +3,17 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { FormControl, FormItem, FormLabel } from "@/components/ui/form";
 import { ColorSelectionProps } from "./types";
+import { COLOR_PRESETS } from "./constants";
 
-const ColorSelection: React.FC<ColorSelectionProps> = ({ value, onChange, label, presets }) => {
+const ColorSelection: React.FC<ColorSelectionProps> = ({ 
+  value, 
+  onChange, 
+  label, 
+  className,
+  presets = COLOR_PRESETS.cardBg 
+}) => {
   return (
-    <FormItem>
+    <FormItem className={className}>
       <FormLabel className="flex items-center justify-between">
         {label}
         <span 

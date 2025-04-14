@@ -4,24 +4,22 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash2 } from "lucide-react";
-import { STAMP_ICONS } from "./constants";
 import { RewardItemProps } from "./types";
+import { Reward } from "@/components/loyalty/types";
 
 const RewardItem: React.FC<RewardItemProps> = ({ 
   reward, 
-  index, 
-  maxStamps, 
-  rewards, 
-  onChange,
-  onRemove 
+  onChange, 
+  onDelete,
+  maxStamps,
+  icons
 }) => {
   const updateReward = (field: keyof typeof reward, value: any) => {
-    const newRewards = [...rewards];
-    newRewards[index] = {
-      ...newRewards[index],
+    const updatedReward: Reward = {
+      ...reward,
       [field]: value
     };
-    onChange(newRewards);
+    onChange(updatedReward);
   };
 
   return (
@@ -41,9 +39,6 @@ const RewardItem: React.FC<RewardItemProps> = ({
                 <SelectItem 
                   key={i} 
                   value={(i + 1).toString()}
-                  disabled={rewards.some((r, idx) => 
-                    idx !== index && r.stampNumber === i + 1
-                  )}
                 >
                   Stamp {i + 1}
                 </SelectItem>
@@ -65,7 +60,7 @@ const RewardItem: React.FC<RewardItemProps> = ({
         <div>
           <label className="text-sm font-medium">Reward Icon</label>
           <div className="grid grid-cols-4 gap-2">
-            {STAMP_ICONS.map((stampIcon) => {
+            {icons.map((stampIcon) => {
               const Icon = stampIcon.icon;
               return (
                 <div 
@@ -89,7 +84,7 @@ const RewardItem: React.FC<RewardItemProps> = ({
         type="button"
         variant="ghost"
         size="icon"
-        onClick={() => onRemove(index)}
+        onClick={onDelete}
         className="text-red-500 hover:bg-red-50 hover:text-red-600"
       >
         <Trash2 size={18} />

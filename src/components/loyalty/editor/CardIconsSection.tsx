@@ -16,8 +16,8 @@ const CardIconsSection: React.FC<CardIconsSectionProps> = ({ form }) => {
         render={({ field }) => (
           <IconSelection 
             icons={STAMP_ICONS}
-            selectedIcon={field.value}
-            onSelectIcon={(iconName) => field.onChange(iconName)}
+            value={field.value}
+            onChange={field.onChange}
             label="Stamp Icon"
           />
         )}
@@ -29,8 +29,8 @@ const CardIconsSection: React.FC<CardIconsSectionProps> = ({ form }) => {
         render={({ field }) => (
           <IconSelection 
             icons={REWARD_ICONS}
-            selectedIcon={field.value}
-            onSelectIcon={(iconName) => field.onChange(iconName)}
+            value={field.value}
+            onChange={field.onChange}
             label="Final Reward Icon"
             description="This icon will appear on the final stamp"
           />

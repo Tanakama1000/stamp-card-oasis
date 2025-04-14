@@ -5,8 +5,8 @@ import { IconSelectionProps } from "./types";
 
 const IconSelection: React.FC<IconSelectionProps> = ({ 
   icons, 
-  selectedIcon, 
-  onSelectIcon, 
+  value, 
+  onChange, 
   label,
   description 
 }) => {
@@ -20,9 +20,9 @@ const IconSelection: React.FC<IconSelectionProps> = ({
             return (
               <div 
                 key={iconItem.name}
-                onClick={() => onSelectIcon(iconItem.name)}
+                onClick={() => onChange(iconItem.name)}
                 className={`p-3 rounded-md cursor-pointer flex flex-col items-center justify-center gap-1 text-xs transition-all ${
-                  selectedIcon === iconItem.name ? 'ring-2 ring-offset-1 ring-orange' : ''
+                  value === iconItem.name ? 'ring-2 ring-offset-1 ring-orange' : ''
                 }`}
               >
                 <Icon size={18} />

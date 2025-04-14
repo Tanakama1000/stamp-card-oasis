@@ -1,6 +1,7 @@
 
 import { UseFormReturn } from "react-hook-form";
 import { Reward } from "@/components/loyalty/types";
+import { LucideIcon } from "lucide-react";
 
 export interface LoyaltyCardConfig {
   businessName: string;
@@ -62,13 +63,14 @@ export interface ColorSelectionProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  presets?: string[];
 }
 
 export interface ImageUploadProps {
   onFileSelected: (dataUrl: string) => void;
   currentImage?: string;
   label: string;
-  icon: React.FC<{ size?: number; className?: string }>;
+  icon: LucideIcon;
   hint?: string;
 }
 
@@ -76,7 +78,10 @@ export interface IconSelectionProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
-  icons: Record<string, React.FC<{ size?: number; className?: string }>>;
+  icons: { name: string; icon: LucideIcon }[];
+  description?: string;
+  selectedIcon?: string;
+  onSelectIcon?: (iconName: string) => void;
 }
 
 export interface RewardItemProps {
@@ -84,7 +89,10 @@ export interface RewardItemProps {
   onChange: (updatedReward: Reward) => void;
   onDelete: () => void;
   maxStamps: number;
-  icons: Record<string, React.FC<{ size?: number; className?: string }>>;
+  icons: { name: string; icon: LucideIcon }[];
+  index?: number;
+  rewards?: Reward[];
+  onRemove?: (index: number) => void;
 }
 
 export interface RewardsEditorProps {
