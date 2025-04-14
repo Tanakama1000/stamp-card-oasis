@@ -22,17 +22,6 @@ const Index = () => {
     });
   };
 
-  const simulateAddStamp = () => {
-    if (stamps < maxStamps) {
-      setStamps(stamps + 1);
-      toast({
-        title: "Stamp Added!",
-        description: "A stamp has been added to your card.",
-        duration: 2000,
-      });
-    }
-  };
-
   return (
     <Layout>
       <div className="max-w-3xl mx-auto">
@@ -81,15 +70,6 @@ const Index = () => {
                 className="bg-coffee-medium hover:bg-coffee-dark"
               >
                 Save
-              </Button>
-            </div>
-          </Card>
-
-          <Card className="p-4 bg-white card-shadow">
-            <h3 className="font-semibold text-coffee-dark mb-3">Simulation Controls</h3>
-            <div className="flex gap-2">
-              <Button onClick={simulateAddStamp} className="bg-orange hover:bg-orange-light w-full">
-                Simulate Stamp Collection
               </Button>
             </div>
           </Card>
