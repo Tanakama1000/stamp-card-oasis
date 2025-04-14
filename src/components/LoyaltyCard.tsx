@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -15,6 +16,7 @@ import CardDialogs from "./loyalty/CardDialogs";
 import CardAnimations from "./loyalty/CardAnimations";
 import CustomerName from "./loyalty/CustomerName";
 import { LoyaltyCardProps } from "./loyalty/types";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   customerName = "",
@@ -26,6 +28,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
 }) => {
   const { toast } = useToast();
   const { width, height } = useWindowSize();
+  const isMobile = useIsMobile();
   const [stamps, setStamps] = useState<number>(currentStamps);
   const [animatingStamp, setAnimatingStamp] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
@@ -130,6 +133,8 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
     backgroundPosition: 'center'
   } : {};
 
+  const cardPadding = isMobile ? "p-4" : "p-6";
+
   return (
     <>
       {showConfetti && (
@@ -144,7 +149,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
       )}
       
       <Card 
-        className="p-6 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl overflow-hidden relative"
+        className={`${cardPadding} rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl overflow-hidden relative`}
         style={{ 
           backgroundColor: cardBgColor,
           ...backgroundImageStyle
@@ -173,6 +178,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
           maxStamps={maxStamps}
           stamps={stamps}
           progressBarColor={progressBarColor}
+          isMobile={isMobile}
         />
 
         <ProgressBar
@@ -189,6 +195,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
             stamps={stamps}
             progressRewardsFont={progressRewardsFont}
             textColor={textColor}
+            isMobile={isMobile}
           />
         )}
 

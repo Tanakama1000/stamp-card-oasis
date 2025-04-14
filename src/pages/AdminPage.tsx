@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Layout from "@/components/Layout";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
 import BusinessStats from "@/components/BusinessStats";
@@ -23,6 +23,9 @@ const AdminPage = () => {
     { customer: "Jane Smith", stamps: 2, timestamp: Date.now() - 120000 },
     { customer: "Bob Johnson", stamps: 1, timestamp: Date.now() - 300000 },
   ]);
+
+  // Force rerender of the preview when a configuration change happens
+  const [previewKey, setPreviewKey] = useState<number>(0);
 
   // Load saved card configuration on component mount
   useEffect(() => {
@@ -56,6 +59,8 @@ const AdminPage = () => {
   const handleCardUpdate = (cardConfig: LoyaltyCardConfig) => {
     localStorage.setItem('loyaltyCardStyle', JSON.stringify(cardConfig));
     setCardConfig(cardConfig);
+    // Force a rerender of the preview by updating the key
+    setPreviewKey(prev => prev + 1);
     toast({
       title: "Card Style Saved",
       description: "The loyalty card style has been saved and will be visible to customers.",
@@ -88,19 +93,23 @@ const AdminPage = () => {
             <TabsList className="grid grid-cols-4 mb-6">
               <TabsTrigger value="qr-generator" className="flex items-center gap-2">
                 <QrCode size={18} />
-                QR Generator
+                <span className="hidden sm:inline">QR Generator</span>
+                <span className="sm:hidden">QR</span>
               </TabsTrigger>
               <TabsTrigger value="card-editor" className="flex items-center gap-2">
                 <Palette size={18} />
-                Card Editor
+                <span className="hidden sm:inline">Card Editor</span>
+                <span className="sm:hidden">Editor</span>
               </TabsTrigger>
               <TabsTrigger value="recent-activity" className="flex items-center gap-2">
                 <BarChart2 size={18} />
-                Recent Activity
+                <span className="hidden sm:inline">Recent Activity</span>
+                <span className="sm:hidden">Activity</span>
               </TabsTrigger>
               <TabsTrigger value="customers" className="flex items-center gap-2">
                 <UserCircle size={18} />
-                Customers
+                <span className="hidden sm:inline">Customers</span>
+                <span className="sm:hidden">Users</span>
               </TabsTrigger>
             </TabsList>
             <TabsContent value="qr-generator">
@@ -109,23 +118,25 @@ const AdminPage = () => {
               </div>
             </TabsContent>
             <TabsContent value="card-editor">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <LoyaltyCardEditor onCardUpdate={handleCardUpdate} />
                 
-                <Card className="p-6 bg-white card-shadow">
-                  <h3 className="text-xl font-semibold text-coffee-dark mb-4">Card Preview</h3>
-                  <div className="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-lg">
-                    <div className="w-full max-w-md">
-                      {cardConfig ? (
-                        <LoyaltyCard {...cardConfig} />
-                      ) : (
-                        <div className="text-center p-4 text-coffee-light">
-                          Edit and save the card to see a preview
-                        </div>
-                      )}
+                <div className="flex flex-col lg:sticky lg:top-4">
+                  <Card className="p-4 md:p-6 bg-white card-shadow">
+                    <h3 className="text-xl font-semibold text-coffee-dark mb-4">Card Preview</h3>
+                    <div className="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-lg">
+                      <div className="w-full max-w-xs md:max-w-md">
+                        {cardConfig ? (
+                          <LoyaltyCard key={previewKey} {...cardConfig} />
+                        ) : (
+                          <div className="text-center p-4 text-coffee-light">
+                            Edit and save the card to see a preview
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </Card>
+                  </Card>
+                </div>
               </div>
             </TabsContent>
             <TabsContent value="recent-activity">

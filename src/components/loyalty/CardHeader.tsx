@@ -18,6 +18,7 @@ interface CardHeaderProps {
   maxStamps: number;
   stamps: number;
   progressBarColor: string;
+  isMobile?: boolean;
 }
 
 const CardHeader: React.FC<CardHeaderProps> = ({
@@ -35,13 +36,18 @@ const CardHeader: React.FC<CardHeaderProps> = ({
   textColor,
   maxStamps,
   stamps,
-  progressBarColor
+  progressBarColor,
+  isMobile
 }) => {
+  const avatarSize = isMobile ? "h-10 w-10" : "h-12 w-12";
+  const counterSize = isMobile ? "h-11 w-11 text-base" : "h-14 w-14 text-lg";
+  const gapSize = isMobile ? "gap-2" : "gap-3";
+  
   return (
-    <div className="flex items-center justify-between mb-6 relative z-10">
-      <div className="flex items-center gap-3">
+    <div className={`flex items-center justify-between mb-4 md:mb-6 relative z-10 ${isMobile ? 'flex-wrap' : ''}`}>
+      <div className={`flex items-center ${gapSize} ${isMobile ? 'mb-2 w-full' : ''}`}>
         {businessLogo && (
-          <Avatar className="h-12 w-12 border-2 border-white shadow-md">
+          <Avatar className={`${avatarSize} border-2 border-white shadow-md`}>
             <AvatarImage src={businessLogo} alt="Business logo" />
             <AvatarFallback className="bg-orange text-white">{businessName?.charAt(0) || "B"}</AvatarFallback>
           </Avatar>
@@ -79,10 +85,10 @@ const CardHeader: React.FC<CardHeaderProps> = ({
         </div>
       </div>
       <div 
-        className="h-14 w-14 rounded-full flex items-center justify-center text-white font-bold shadow-md transform transition-transform hover:scale-105"
+        className={`${counterSize} rounded-full flex items-center justify-center text-white font-bold shadow-md transform transition-transform hover:scale-105 ${isMobile ? 'absolute top-0 right-0' : ''}`}
         style={{ backgroundColor: progressBarColor }}
       >
-        <span className="text-lg">{stamps}/{maxStamps}</span>
+        <span>{stamps}/{maxStamps}</span>
       </div>
     </div>
   );
