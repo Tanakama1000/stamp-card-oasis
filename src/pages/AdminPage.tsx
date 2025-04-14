@@ -4,14 +4,16 @@ import Layout from "@/components/Layout";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
 import BusinessStats from "@/components/BusinessStats";
 import CustomerList from "@/components/CustomerList";
+import CardCustomization from "@/components/loyalty/CardCustomization";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { QrCode, BarChart2, Users, UserCircle, Link as LinkIcon, Copy } from "lucide-react";
+import { QrCode, BarChart2, Users, UserCircle, Link as LinkIcon, Copy, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
 
 interface BusinessData {
   id: string;
@@ -42,6 +44,7 @@ const AdminPage = () => {
   
   const [slugEditing, setSlugEditing] = useState(false);
   const [tempSlug, setTempSlug] = useState(businessData.slug);
+  const [cardConfig, setCardConfig] = useState<LoyaltyCardConfig | null>(null);
 
   useEffect(() => {
     const savedBusinessData = localStorage.getItem('businessData');
@@ -55,6 +58,17 @@ const AdminPage = () => {
       }
     } else {
       localStorage.setItem('businessData', JSON.stringify(businessData));
+    }
+    
+    // Load card configuration
+    const savedCardConfig = localStorage.getItem('loyaltyCardConfig');
+    if (savedCardConfig) {
+      try {
+        const parsedConfig = JSON.parse(savedCardConfig);
+        setCardConfig(parsedConfig);
+      } catch (e) {
+        console.error("Error parsing card config:", e);
+      }
     }
   }, []);
 
@@ -120,6 +134,11 @@ const AdminPage = () => {
       title: "Link Copied",
       description: "Join link copied to clipboard"
     });
+  };
+  
+  const handleSaveCardConfig = (config: LoyaltyCardConfig) => {
+    setCardConfig(config);
+    localStorage.setItem('loyaltyCardConfig', JSON.stringify(config));
   };
 
   return (
@@ -204,11 +223,16 @@ const AdminPage = () => {
 
         <div className="mt-8">
           <Tabs defaultValue="qr-generator">
-            <TabsList className="grid grid-cols-3 mb-6">
+            <TabsList className="grid grid-cols-4 mb-6">
               <TabsTrigger value="qr-generator" className="flex items-center gap-2">
                 <QrCode size={18} />
                 <span className="hidden sm:inline">QR Generator</span>
                 <span className="sm:hidden">QR</span>
+              </TabsTrigger>
+              <TabsTrigger value="card-editor" className="flex items-center gap-2">
+                <CreditCard size={18} />
+                <span className="hidden sm:inline">Card Editor</span>
+                <span className="sm:hidden">Card</span>
               </TabsTrigger>
               <TabsTrigger value="recent-activity" className="flex items-center gap-2">
                 <BarChart2 size={18} />
@@ -225,6 +249,12 @@ const AdminPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <QRCodeGenerator onGenerate={handleQRGenerated} />
               </div>
+            </TabsContent>
+            <TabsContent value="card-editor">
+              <CardCustomization 
+                onSave={handleSaveCardConfig}
+                initialConfig={cardConfig || undefined}
+              />
             </TabsContent>
             <TabsContent value="recent-activity">
               <Card className="p-6 bg-white card-shadow">
