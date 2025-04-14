@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Palette } from "lucide-react";
+import { Palette, Save } from "lucide-react";
 import { Form } from "@/components/ui/form";
 import { useForm, useWatch } from "react-hook-form";
 import { FormField } from "@/components/ui/form";
@@ -24,6 +24,7 @@ interface LoyaltyCardEditorProps {
 
 const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) => {
   const { toast } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
   
   const [cardConfig, setCardConfig] = useState<LoyaltyCardConfig>({
     businessName: "Coffee Oasis",
@@ -91,6 +92,8 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
   }, [formValues, onCardUpdate, cardConfig]);
 
   const handleSubmit = (data: LoyaltyCardConfig) => {
+    setIsSaving(true);
+    
     const sortedRewards = [...data.rewards].sort((a, b) => a.stampNumber - b.stampNumber);
     const updatedData = {...data, rewards: sortedRewards};
     
@@ -106,6 +109,11 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
       title: "Card Updated",
       description: "Loyalty card configuration has been saved.",
     });
+    
+    // Add a small delay before removing saving indicator
+    setTimeout(() => {
+      setIsSaving(false);
+    }, 600);
   };
   
   const handleBackgroundImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,8 +191,19 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
           </div>
           
           <div className="border-t border-cream pt-6 mt-2">
-            <Button type="submit" className="w-full bg-orange hover:bg-orange-dark text-white">
-              Save Card Configuration
+            <Button 
+              type="submit" 
+              className="w-full bg-orange hover:bg-orange-dark text-white"
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <span className="flex items-center gap-2">
+                  <Save size={18} className="animate-pulse" />
+                  Saving Changes...
+                </span>
+              ) : (
+                "Save Card Configuration"
+              )}
             </Button>
           </div>
         </form>
