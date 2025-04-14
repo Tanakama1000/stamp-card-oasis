@@ -11,6 +11,7 @@ import { QrCode, BarChart2, Users, UserCircle, Palette } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LoyaltyCardConfig } from "@/components/loyalty/editor/types";
 import LoyaltyCard from "@/components/LoyaltyCard";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const AdminPage = () => {
   const { toast } = useToast();
@@ -23,6 +24,7 @@ const AdminPage = () => {
     { customer: "Jane Smith", stamps: 2, timestamp: Date.now() - 120000 },
     { customer: "Bob Johnson", stamps: 1, timestamp: Date.now() - 300000 },
   ]);
+  const isMobile = useIsMobile();
 
   // Force rerender of the preview when a configuration change happens
   const [previewKey, setPreviewKey] = useState<number>(0);
@@ -124,10 +126,10 @@ const AdminPage = () => {
                 <div className="flex flex-col lg:sticky lg:top-4">
                   <Card className="p-4 md:p-6 bg-white card-shadow">
                     <h3 className="text-xl font-semibold text-coffee-dark mb-4">Card Preview</h3>
-                    <div className="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-lg">
-                      <div className="w-full max-w-xs md:max-w-md">
+                    <div className={`flex items-center justify-center p-4 bg-slate-50 rounded-lg ${isMobile ? 'w-full max-w-[320px] mx-auto' : ''}`}>
+                      <div className={`${isMobile ? 'w-full' : 'w-full max-w-xs md:max-w-md'}`}>
                         {cardConfig ? (
-                          <LoyaltyCard key={previewKey} {...cardConfig} />
+                          <LoyaltyCard key={previewKey} {...cardConfig} isMobile={isMobile} />
                         ) : (
                           <div className="text-center p-4 text-coffee-light">
                             Edit and save the card to see a preview
