@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -284,14 +285,6 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
               >
                 {cardTitle}
               </h2>
-              {customerName && (
-                <h4 
-                  className={`font-medium ${customerNameFontSize}`} 
-                  style={{ color: textColor }}
-                >
-                  {customerName}'s Card
-                </h4>
-              )}
               <p 
                 className={descriptionFontSize} 
                 style={{ color: textColor }}
@@ -364,6 +357,17 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
         )}
 
         <div className="flex flex-col gap-3 relative z-10">{renderStamps()}</div>
+
+        {customerName && (
+          <div className="mt-5 text-center relative z-10">
+            <h4 
+              className={`font-medium ${customerNameFontSize}`} 
+              style={{ color: textColor }}
+            >
+              {customerName}'s Card
+            </h4>
+          </div>
+        )}
 
         {stamps >= maxStamps && (
           <div 
