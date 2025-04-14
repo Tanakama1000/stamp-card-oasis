@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Layout from "@/components/Layout";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
@@ -29,7 +28,6 @@ const AdminPage = () => {
       const data = JSON.parse(codeData);
       setQrCodeGenerated(prev => prev + 1);
       
-      // Add to recent scans for demonstration purposes
       const newScan = {
         customer: data.customer || "Unknown Customer",
         stamps: data.stamps,
@@ -43,7 +41,6 @@ const AdminPage = () => {
   };
   
   const handleCardUpdate = (cardConfig: LoyaltyCardConfig) => {
-    // Save the card configuration to localStorage
     localStorage.setItem('loyaltyCardStyle', JSON.stringify(cardConfig));
     setCardConfig(cardConfig);
     toast({
@@ -96,16 +93,6 @@ const AdminPage = () => {
             <TabsContent value="qr-generator">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <QRCodeGenerator onGenerate={handleQRGenerated} />
-                
-                <Card className="p-6 bg-white card-shadow">
-                  <div className="mt-2 p-4 bg-cream rounded-lg">
-                    <div className="flex items-center gap-2 text-coffee-dark">
-                      <Users size={20} />
-                      <h4 className="font-medium">QR Codes Generated</h4>
-                    </div>
-                    <p className="text-3xl font-bold text-coffee-dark mt-2">{qrCodeGenerated}</p>
-                  </div>
-                </Card>
               </div>
             </TabsContent>
             <TabsContent value="card-editor">
