@@ -1,5 +1,6 @@
-
-import { Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy } from "lucide-react";
+import { Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy, Utensils, 
+  Cake, Pizza, IceCream, Sandwich, Apple, Beer, Wine, Sparkles, Crown, 
+  BadgeCheck, Bookmark, Flower, Gem, Sun, Moon } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
 export const STAMP_ICONS: { name: string; icon: LucideIcon }[] = [
@@ -11,12 +12,25 @@ export const STAMP_ICONS: { name: string; icon: LucideIcon }[] = [
   { name: "Zap", icon: Zap },
   { name: "Gift", icon: Gift },
   { name: "Trophy", icon: Trophy },
+  { name: "Utensils", icon: Utensils },
+  { name: "Cake", icon: Cake },
+  { name: "Pizza", icon: Pizza },
+  { name: "IceCream", icon: IceCream },
+  { name: "Sandwich", icon: Sandwich },
+  { name: "Apple", icon: Apple },
+  { name: "Sparkles", icon: Sparkles },
+  { name: "Sun", icon: Sun },
 ];
 
 export const REWARD_ICONS: { name: string; icon: LucideIcon }[] = [
   { name: "Gift", icon: Gift },
   { name: "Award", icon: Award },
   { name: "Star", icon: Star },
+  { name: "Crown", icon: Crown },
+  { name: "Trophy", icon: Trophy },
+  { name: "BadgeCheck", icon: BadgeCheck },
+  { name: "Sparkles", icon: Sparkles },
+  { name: "Gem", icon: Gem },
 ];
 
 export const FONT_FAMILIES = [

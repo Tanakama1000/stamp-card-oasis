@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,7 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({
     miniRewardStampColor: "#C0C0C0",
     backgroundImage: "",
     useBackgroundImage: false,
+    backgroundOpacity: 30,
     cardTitle: "Loyalty Card",
     cardTitleColor: "#8B4513",
     fontFamily: "",
@@ -119,6 +121,7 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({
         miniRewardStampColor: formValues.miniRewardStampColor || defaultConfig.miniRewardStampColor,
         backgroundImage: formValues.backgroundImage || defaultConfig.backgroundImage,
         useBackgroundImage: formValues.useBackgroundImage ?? defaultConfig.useBackgroundImage,
+        backgroundOpacity: formValues.backgroundOpacity ?? defaultConfig.backgroundOpacity,
         cardTitle: formValues.cardTitle || defaultConfig.cardTitle,
         cardTitleColor: formValues.cardTitleColor || defaultConfig.cardTitleColor,
         fontFamily: formValues.fontFamily || defaultConfig.fontFamily,

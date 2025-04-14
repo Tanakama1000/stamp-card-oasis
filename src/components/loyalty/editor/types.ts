@@ -21,6 +21,7 @@ export interface LoyaltyCardConfig {
   miniRewardStampColor: string;
   backgroundImage?: string;
   useBackgroundImage: boolean;
+  backgroundOpacity?: number;
   cardTitle: string;
   cardTitleColor: string;
   fontFamily: string;
