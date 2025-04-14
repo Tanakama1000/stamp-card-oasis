@@ -17,6 +17,9 @@ export default {
 				'2xl': '1400px'
 			}
 		},
+		fontFamily: {
+			sans: ['Poppins', 'sans-serif'],
+		},
 		extend: {
 			colors: {
 				border: 'hsl(var(--border))',
@@ -52,6 +55,20 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+                // Coffee/bistro color palette
+                coffee: {
+                    dark: '#6F4E37',
+                    medium: '#8B4513',
+                    light: '#A67B5B',
+                },
+                cream: {
+                    DEFAULT: '#F5F5DC',
+                    light: '#FFFDD0',
+                },
+                orange: {
+                    DEFAULT: '#D2691E',
+                    light: '#FF8C00',
+                },
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',

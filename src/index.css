@@ -96,6 +96,71 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: theme('colors.cream.DEFAULT');
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: theme('colors.coffee.light');
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.coffee.medium');
+  }
+}
+
+@layer utilities {
+  .stamp-shadow {
+    box-shadow: 0 4px 6px -1px rgba(111, 78, 55, 0.1), 0 2px 4px -1px rgba(111, 78, 55, 0.06);
+  }
+  
+  .card-shadow {
+    box-shadow: 0 10px 15px -3px rgba(111, 78, 55, 0.1), 0 4px 6px -2px rgba(111, 78, 55, 0.05);
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+}
+
+@keyframes stampEffect {
+  0% {
+    transform: scale(0) rotate(-15deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(5deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.stamp-animation {
+  animation: stampEffect 0.5s ease-out forwards;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
