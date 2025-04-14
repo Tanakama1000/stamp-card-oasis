@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, Coffee } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import LoyaltyCard from "@/components/LoyaltyCard";
 
 const JoinPage = () => {
   const { businessSlug } = useParams();
@@ -16,6 +17,9 @@ const JoinPage = () => {
   const [customerName, setCustomerName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [joined, setJoined] = useState<boolean>(false);
+  const [businessData, setBusinessData] = useState<any>(null);
+  const [customer, setCustomer] = useState<any>(null);
 
   useEffect(() => {
     // In a real app, you'd fetch business details from an API using the slug
@@ -36,11 +40,24 @@ const JoinPage = () => {
       
       if (foundBusiness) {
         setBusinessName(foundBusiness.name);
+        setBusinessData(foundBusiness);
         setLoading(false);
       } else {
         // For demo purposes, we'll use a hardcoded fallback if the business isn't found
         if (businessSlug === "coffee-oasis") {
           setBusinessName("Coffee Oasis");
+          setBusinessData({
+            name: "Coffee Oasis",
+            slug: "coffee-oasis",
+            cardConfig: {
+              businessName: "Coffee Oasis",
+              cardTitle: "Loyalty Card",
+              maxStamps: 10,
+              stampIcon: "Coffee",
+              cardBgColor: "#FFFFFF",
+              textColor: "#6F4E37"
+            }
+          });
           setLoading(false);
         } else {
           setError("Business not found");
@@ -87,8 +104,8 @@ const JoinPage = () => {
         description: `You've successfully joined ${businessName}'s loyalty program!`,
       });
       
-      // Redirect to home or customer view
-      navigate("/");
+      setJoined(true);
+      setCustomer(newCustomer);
     } catch (e) {
       console.error("Error saving customer:", e);
       toast({
@@ -97,6 +114,14 @@ const JoinPage = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleCollectStamp = () => {
+    // In a real app, this would be triggered by a QR scan or staff action
+    toast({
+      title: "Not Available",
+      description: "In a real app, stamps would be added by the business via QR code scanning.",
+    });
   };
 
   if (loading) {
@@ -120,6 +145,45 @@ const JoinPage = () => {
             <Link to="/">
               <Button>Return Home</Button>
             </Link>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (joined && customer && businessData) {
+    return (
+      <Layout>
+        <div className="max-w-md mx-auto mt-8">
+          <Card className="p-6 bg-white card-shadow">
+            <div className="text-center mb-6">
+              <Coffee size={40} className="mx-auto text-coffee-dark mb-2" />
+              <h2 className="text-2xl font-bold text-coffee-dark">Welcome to {businessName}!</h2>
+              <p className="text-coffee-light mt-1">Here's your loyalty card</p>
+            </div>
+            
+            <div className="mb-6">
+              <LoyaltyCard 
+                customerName={customerName}
+                maxStamps={businessData.cardConfig?.maxStamps || 10}
+                currentStamps={customer.stamps}
+                cardStyle={businessData.cardConfig}
+                onStampCollected={handleCollectStamp}
+              />
+            </div>
+
+            <div className="text-center space-y-4">
+              <p className="text-sm text-coffee-light">
+                Show this card when you visit {businessName} to collect stamps
+              </p>
+              <Button 
+                onClick={() => navigate("/")}
+                variant="outline"
+                className="w-full"
+              >
+                Back to Home
+              </Button>
+            </div>
           </Card>
         </div>
       </Layout>
