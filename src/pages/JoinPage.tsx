@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
@@ -8,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Loader2, Coffee, QrCode } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import LoyaltyCard from "@/components/LoyaltyCard";
+import QRScannerDialog from "@/components/QRScannerDialog";
 
 const JoinPage = () => {
   const { businessSlug } = useParams();
@@ -20,12 +20,10 @@ const JoinPage = () => {
   const [joined, setJoined] = useState<boolean>(false);
   const [businessData, setBusinessData] = useState<any>(null);
   const [customer, setCustomer] = useState<any>(null);
+  const [showScannerDialog, setShowScannerDialog] = useState<boolean>(false);
 
   useEffect(() => {
-    // In a real app, you'd fetch business details from an API using the slug
-    // For now we'll simulate with localStorage and a timeout
     setTimeout(() => {
-      // Demo logic for finding business by slug
       const savedBusinesses = localStorage.getItem('businesses');
       let foundBusiness = null;
       
@@ -43,7 +41,6 @@ const JoinPage = () => {
         setBusinessData(foundBusiness);
         setLoading(false);
       } else {
-        // For demo purposes, we'll use a hardcoded fallback if the business isn't found
         if (businessSlug === "coffee-oasis") {
           setBusinessName("Coffee Oasis");
           setBusinessData({
@@ -79,9 +76,6 @@ const JoinPage = () => {
       return;
     }
 
-    // In a real app, you'd make an API call to join the business
-    // For now, we'll simulate with localStorage
-    
     const customerId = `cust_${Date.now()}`;
     const newCustomer = {
       id: customerId,
@@ -91,14 +85,12 @@ const JoinPage = () => {
       stamps: 0
     };
     
-    // Save to localStorage
     try {
       const savedCustomers = localStorage.getItem('customers') || '[]';
       const customers = JSON.parse(savedCustomers);
       customers.push(newCustomer);
       localStorage.setItem('customers', JSON.stringify(customers));
       
-      // Show success message
       toast({
         title: "Welcome!",
         description: `You've successfully joined ${businessName}'s loyalty program!`,
@@ -117,11 +109,42 @@ const JoinPage = () => {
   };
 
   const handleCollectStamp = () => {
-    // In a real app, this would be triggered by a QR scan or staff action
     toast({
       title: "Not Available",
       description: "In a real app, stamps would be added by the business via QR code scanning.",
     });
+  };
+
+  const handleSuccessfulScan = (businessId: string, timestamp: number, stampCount: number = 1) => {
+    if (customer) {
+      const updatedStamps = Math.min((customer.stamps || 0) + stampCount, businessData?.cardConfig?.maxStamps || 10);
+      
+      const updatedCustomer = { ...customer, stamps: updatedStamps };
+      setCustomer(updatedCustomer);
+      
+      try {
+        const savedCustomers = localStorage.getItem('customers') || '[]';
+        const customers = JSON.parse(savedCustomers);
+        const customerIndex = customers.findIndex((c: any) => c.id === customer.id);
+        
+        if (customerIndex !== -1) {
+          customers[customerIndex] = updatedCustomer;
+          localStorage.setItem('customers', JSON.stringify(customers));
+        }
+        
+        toast({
+          title: "Stamp Collected!",
+          description: `${stampCount} stamp${stampCount > 1 ? 's' : ''} has been added to your loyalty card.`,
+        });
+      } catch (error) {
+        console.error("Error updating customer data:", error);
+        toast({
+          title: "Error",
+          description: "Could not update your stamps. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
   };
 
   if (loading) {
@@ -168,7 +191,24 @@ const JoinPage = () => {
                 maxStamps={businessData.cardConfig?.maxStamps || 10}
                 currentStamps={customer.stamps}
                 cardStyle={businessData.cardConfig}
-                onStampCollected={handleCollectStamp}
+                onStampCollected={() => {}}
+                onReset={() => {
+                  const updatedCustomer = { ...customer, stamps: 0 };
+                  setCustomer(updatedCustomer);
+                  
+                  try {
+                    const savedCustomers = localStorage.getItem('customers') || '[]';
+                    const customers = JSON.parse(savedCustomers);
+                    const customerIndex = customers.findIndex((c: any) => c.id === customer.id);
+                    
+                    if (customerIndex !== -1) {
+                      customers[customerIndex] = updatedCustomer;
+                      localStorage.setItem('customers', JSON.stringify(customers));
+                    }
+                  } catch (error) {
+                    console.error("Error resetting customer data:", error);
+                  }
+                }}
               />
             </div>
 
@@ -187,7 +227,7 @@ const JoinPage = () => {
                 </Button>
                 
                 <Button 
-                  onClick={() => navigate("/scan")}
+                  onClick={() => setShowScannerDialog(true)}
                   className="w-full bg-orange hover:bg-orange-dark text-white flex items-center justify-center gap-2"
                 >
                   <QrCode size={18} />
@@ -197,6 +237,12 @@ const JoinPage = () => {
             </div>
           </Card>
         </div>
+        
+        <QRScannerDialog 
+          isOpen={showScannerDialog}
+          onClose={() => setShowScannerDialog(false)}
+          onSuccessfulScan={handleSuccessfulScan}
+        />
       </Layout>
     );
   }
