@@ -217,23 +217,13 @@ const JoinPage = () => {
                 Show this card when you visit {businessName} to collect stamps
               </p>
               
-              <div className="grid grid-cols-2 gap-3">
-                <Button 
-                  onClick={() => navigate("/")}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Back to Home
-                </Button>
-                
-                <Button 
-                  onClick={() => setShowScannerDialog(true)}
-                  className="w-full bg-orange hover:bg-orange-dark text-white flex items-center justify-center gap-2"
-                >
-                  <QrCode size={18} />
-                  Scan Me
-                </Button>
-              </div>
+              <Button 
+                onClick={() => setShowScannerDialog(true)}
+                className="w-full bg-orange hover:bg-orange-dark text-white flex items-center justify-center gap-2"
+              >
+                <QrCode size={18} />
+                Scan Me
+              </Button>
             </div>
           </Card>
         </div>
