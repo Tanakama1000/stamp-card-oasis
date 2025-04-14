@@ -1,16 +1,13 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
 import BusinessStats from "@/components/BusinessStats";
 import CustomerList from "@/components/CustomerList";
-import LoyaltyCardEditor from "@/components/LoyaltyCardEditor";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { QrCode, BarChart2, Users, UserCircle, Palette, RefreshCw, Link as LinkIcon, Copy } from "lucide-react";
+import { QrCode, BarChart2, Users, UserCircle, Link as LinkIcon, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { LoyaltyCardConfig } from "@/components/loyalty/editor/types";
-import LoyaltyCard from "@/components/LoyaltyCard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,13 +18,13 @@ interface BusinessData {
   name: string;
   slug: string;
   createdAt: string;
-  cardConfig?: LoyaltyCardConfig;
 }
 
 const AdminPage = () => {
   const { toast } = useToast();
   const [qrCodeGenerated, setQrCodeGenerated] = useState<number>(0);
-  const [cardConfig, setCardConfig] = useState<LoyaltyCardConfig | null>(null);
+  const isMobile = useIsMobile();
+  
   const [recentScans, setRecentScans] = useState<
     Array<{ customer: string; stamps: number; timestamp: number }>
   >([
@@ -35,8 +32,6 @@ const AdminPage = () => {
     { customer: "Jane Smith", stamps: 2, timestamp: Date.now() - 120000 },
     { customer: "Bob Johnson", stamps: 1, timestamp: Date.now() - 300000 },
   ]);
-  const isMobile = useIsMobile();
-  const [previewUpdated, setPreviewUpdated] = useState(false);
   
   const [businessData, setBusinessData] = useState<BusinessData>({
     id: "b_" + Date.now(),
@@ -48,36 +43,13 @@ const AdminPage = () => {
   const [slugEditing, setSlugEditing] = useState(false);
   const [tempSlug, setTempSlug] = useState(businessData.slug);
 
-  const [previewKey, setPreviewKey] = useState<number>(0);
-
   useEffect(() => {
-    const savedCardConfig = localStorage.getItem('loyaltyCardStyle');
-    if (savedCardConfig) {
-      try {
-        const parsedConfig = JSON.parse(savedCardConfig);
-        setCardConfig(parsedConfig);
-        
-        // Update business data with card config
-        setBusinessData(prevData => ({
-          ...prevData,
-          cardConfig: parsedConfig
-        }));
-      } catch (e) {
-        console.error("Error parsing saved card config:", e);
-      }
-    }
-    
     const savedBusinessData = localStorage.getItem('businessData');
     if (savedBusinessData) {
       try {
         const parsedData = JSON.parse(savedBusinessData);
         setBusinessData(parsedData);
         setTempSlug(parsedData.slug);
-        
-        // If saved business data has card config, use it
-        if (parsedData.cardConfig) {
-          setCardConfig(parsedData.cardConfig);
-        }
       } catch (e) {
         console.error("Error parsing business data:", e);
       }
@@ -101,28 +73,6 @@ const AdminPage = () => {
     } catch (err) {
       console.error("Error parsing QR data:", err);
     }
-  };
-
-  const handleCardUpdate = (updatedConfig: LoyaltyCardConfig) => {
-    setCardConfig(updatedConfig);
-    setPreviewKey(prev => prev + 1);
-    setPreviewUpdated(true);
-    
-    // Flash the "updating" indicator briefly
-    setTimeout(() => {
-      setPreviewUpdated(false);
-    }, 500);
-    
-    // Update business data with the new card config
-    const updatedBusinessData = {
-      ...businessData,
-      cardConfig: updatedConfig
-    };
-    
-    setBusinessData(updatedBusinessData);
-    
-    // We only save to localStorage on explicit save action, not on every update
-    // This allows for a better preview experience
   };
 
   const formatTimestamp = (timestamp: number) => {
@@ -253,17 +203,12 @@ const AdminPage = () => {
         />
 
         <div className="mt-8">
-          <Tabs defaultValue="card-editor">
-            <TabsList className="grid grid-cols-4 mb-6">
+          <Tabs defaultValue="qr-generator">
+            <TabsList className="grid grid-cols-3 mb-6">
               <TabsTrigger value="qr-generator" className="flex items-center gap-2">
                 <QrCode size={18} />
                 <span className="hidden sm:inline">QR Generator</span>
                 <span className="sm:hidden">QR</span>
-              </TabsTrigger>
-              <TabsTrigger value="card-editor" className="flex items-center gap-2">
-                <Palette size={18} />
-                <span className="hidden sm:inline">Card Editor</span>
-                <span className="sm:hidden">Editor</span>
               </TabsTrigger>
               <TabsTrigger value="recent-activity" className="flex items-center gap-2">
                 <BarChart2 size={18} />
@@ -279,47 +224,6 @@ const AdminPage = () => {
             <TabsContent value="qr-generator">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <QRCodeGenerator onGenerate={handleQRGenerated} />
-              </div>
-            </TabsContent>
-            <TabsContent value="card-editor">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <LoyaltyCardEditor 
-                  onCardUpdate={handleCardUpdate} 
-                  initialConfig={cardConfig || undefined}
-                />
-                
-                <div className="flex flex-col lg:sticky lg:top-4">
-                  <Card className="p-4 md:p-6 bg-white card-shadow">
-                    <h3 className="text-xl font-semibold text-coffee-dark mb-4 flex items-center justify-between">
-                      <span>Card Preview</span>
-                      <div className={`transition-opacity duration-300 flex items-center ${previewUpdated ? 'opacity-100' : 'opacity-0'}`}>
-                        <RefreshCw size={16} className="text-green-500 animate-spin mr-1" />
-                        <span className="text-sm text-green-500">Updating</span>
-                      </div>
-                    </h3>
-                    <div className={`flex items-center justify-center p-4 bg-slate-50 rounded-lg ${isMobile ? 'w-full max-w-[320px] mx-auto' : ''}`}>
-                      <div className={`${isMobile ? 'w-full' : 'w-full max-w-xs md:max-w-md'}`}>
-                        {cardConfig ? (
-                          <LoyaltyCard 
-                            key={previewKey} 
-                            maxStamps={cardConfig.maxStamps || 10} 
-                            currentStamps={cardConfig.currentStamps || 0}
-                            customerName={cardConfig.customerName}
-                            cardStyle={cardConfig}
-                            isMobile={isMobile} 
-                          />
-                        ) : (
-                          <div className="text-center p-4 text-coffee-light">
-                            Edit the card to see a preview
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="mt-3 text-center text-sm text-coffee-light">
-                      <p>Changes are displayed in real-time. Click Save to store your configuration.</p>
-                    </div>
-                  </Card>
-                </div>
               </div>
             </TabsContent>
             <TabsContent value="recent-activity">
