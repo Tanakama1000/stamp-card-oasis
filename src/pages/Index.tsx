@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -11,12 +10,11 @@ import { LoyaltyCardConfig } from "@/components/LoyaltyCardEditor";
 
 const Index = () => {
   const { toast } = useToast();
-  const [customerName, setCustomerName] = useState<string>("Coffee Lover");
+  const [customerName, setCustomerName] = useState<string>("");
   const [stamps, setStamps] = useState<number>(3);
   const [cardStyle, setCardStyle] = useState<LoyaltyCardConfig | null>(null);
   const maxStamps = cardStyle?.maxStamps || 10;
 
-  // Fetch card style from localStorage on component mount
   useEffect(() => {
     const savedCardStyle = localStorage.getItem('loyaltyCardStyle');
     if (savedCardStyle) {
@@ -49,14 +47,21 @@ const Index = () => {
   };
   
   const handleSaveName = () => {
-    toast({
-      title: "Name Updated",
-      description: "Your customer name has been updated.",
-      duration: 2000,
-    });
+    if (customerName.trim()) {
+      toast({
+        title: "Name Updated",
+        description: "Your customer name has been updated.",
+        duration: 2000,
+      });
+    } else {
+      toast({
+        title: "Name Cleared",
+        description: "Customer name has been removed.",
+        duration: 2000,
+      });
+    }
   };
 
-  // Get mini rewards for display
   const miniRewards = cardStyle?.rewards || [];
   const sortedRewards = [...(miniRewards || [])].sort((a, b) => a.stampNumber - b.stampNumber);
 
@@ -110,7 +115,7 @@ const Index = () => {
             <h3 className="font-semibold text-coffee-dark mb-3">Update Your Name</h3>
             <div className="flex gap-2">
               <Input
-                placeholder="Enter your name"
+                placeholder="Enter your name (optional)"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 className="border-coffee-light"

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -12,7 +11,7 @@ import useWindowSize from "@/hooks/useWindowSize";
 import { Badge } from "@/components/ui/badge";
 
 interface LoyaltyCardProps {
-  customerName: string;
+  customerName?: string;
   maxStamps: number;
   currentStamps: number;
   onStampCollected?: () => void;
@@ -33,7 +32,7 @@ const STAMP_ICONS = {
 };
 
 const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
-  customerName,
+  customerName = "",
   maxStamps = 10,
   currentStamps = 0,
   onStampCollected,
@@ -54,7 +53,6 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   useEffect(() => {
     setStamps(currentStamps);
     
-    // Set stamps collected array for animation history
     setStampsCollected(Array.from({ length: currentStamps }, (_, i) => i));
     
     if (currentStamps > previousStamps && currentStamps < maxStamps) {
@@ -97,7 +95,6 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
     if (index === stamps && stamps < maxStamps) {
       setAnimatingStamp(index);
       
-      // Add stamp collection animation and sound effect
       setTimeout(() => {
         setAnimatingStamp(null);
         setStamps(stamps + 1);
@@ -152,7 +149,6 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
           const isCollected = stampIndex < stamps;
           const isNext = stampIndex === stamps;
 
-          // Determine animation class based on stamp status
           let animationClass = "";
           if (stampIndex === animatingStamp) {
             animationClass = "stamp-animation";
@@ -288,12 +284,14 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
               >
                 {cardTitle}
               </h2>
-              <h4 
-                className={`font-medium ${customerNameFontSize}`} 
-                style={{ color: textColor }}
-              >
-                {customerName}'s Card
-              </h4>
+              {customerName && (
+                <h4 
+                  className={`font-medium ${customerNameFontSize}`} 
+                  style={{ color: textColor }}
+                >
+                  {customerName}'s Card
+                </h4>
+              )}
               <p 
                 className={descriptionFontSize} 
                 style={{ color: textColor }}
@@ -318,7 +316,6 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
               backgroundColor: progressBarColor 
             }}
           />
-          {/* Progress markers */}
           {cardStyle?.rewards && cardStyle.rewards.map((reward) => {
             const position = (reward.stampNumber / maxStamps) * 100;
             const isReached = stamps >= reward.stampNumber;

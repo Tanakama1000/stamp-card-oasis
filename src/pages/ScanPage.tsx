@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import QRScanner from "@/components/QRScanner";
@@ -10,7 +9,7 @@ import { LoyaltyCardConfig } from "@/components/LoyaltyCardEditor";
 
 const ScanPage = () => {
   const { toast } = useToast();
-  const [customerName, setCustomerName] = useState<string>("Coffee Lover");
+  const [customerName, setCustomerName] = useState<string>("");  // Default to empty string
   const [stamps, setStamps] = useState<number>(3);
   const [maxStamps, setMaxStamps] = useState<number>(10);
   const [lastScanTime, setLastScanTime] = useState<number | null>(null);
@@ -25,10 +24,6 @@ const ScanPage = () => {
         const parsedStyle = JSON.parse(savedCardStyle);
         setCardStyle(parsedStyle);
         setMaxStamps(parsedStyle.maxStamps || 10);
-        if (parsedStyle.businessName) {
-          // Set customer name to include the business name
-          setCustomerName(`${parsedStyle.businessName} Lover`);
-        }
       } catch (error) {
         console.error("Error parsing card style from localStorage", error);
       }
@@ -113,7 +108,7 @@ const ScanPage = () => {
 
         <div className="mb-8">
           <LoyaltyCard
-            customerName={customerName}
+            customerName={customerName}  // Can now be empty
             maxStamps={maxStamps}
             currentStamps={stamps}
             cardStyle={cardStyle || undefined}
