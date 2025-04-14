@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
 import BusinessStats from "@/components/BusinessStats";
@@ -22,6 +23,18 @@ const AdminPage = () => {
     { customer: "Jane Smith", stamps: 2, timestamp: Date.now() - 120000 },
     { customer: "Bob Johnson", stamps: 1, timestamp: Date.now() - 300000 },
   ]);
+
+  // Load saved card configuration on component mount
+  useEffect(() => {
+    const savedCardConfig = localStorage.getItem('loyaltyCardStyle');
+    if (savedCardConfig) {
+      try {
+        setCardConfig(JSON.parse(savedCardConfig));
+      } catch (e) {
+        console.error("Error parsing saved card config:", e);
+      }
+    }
+  }, []);
 
   const handleQRGenerated = (codeData: string) => {
     try {
