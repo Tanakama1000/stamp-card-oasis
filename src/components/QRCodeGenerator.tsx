@@ -15,21 +15,21 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
   const [qrValue, setQrValue] = useState<string>("");
 
   useEffect(() => {
-    // Generate default QR code on component mount
-    const defaultQRData = {
+    // Generate a static QR code with fixed data
+    const staticQRData = {
       customer: "Business QR",
-      stamps: 0,
-      businessId: "your-business-id",
-      timestamp: Date.now(),
+      stamps: 1,
+      businessId: "cafe-loyalty-app-123",
+      timestamp: 1680000000000, // Fixed timestamp (April 2023)
     };
 
-    const qrValue = JSON.stringify(defaultQRData);
+    const qrValue = JSON.stringify(staticQRData);
     setQrValue(qrValue);
 
     if (onGenerate) {
       onGenerate(qrValue);
     }
-  }, []);
+  }, []); // Only run once on initial mount
   
   const downloadQRCode = () => {
     const canvas = document.getElementById('qr-code-canvas');
@@ -45,7 +45,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
     const pngUrl = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
     const downloadLink = document.createElement("a");
     downloadLink.href = pngUrl;
-    downloadLink.download = `business-qrcode-${Date.now()}.png`;
+    downloadLink.download = `business-qrcode-static.png`;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
