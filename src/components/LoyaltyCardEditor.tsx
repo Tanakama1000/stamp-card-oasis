@@ -20,48 +20,63 @@ import CardColorsSection from "@/components/loyalty/editor/CardColorsSection";
 
 interface LoyaltyCardEditorProps {
   onCardUpdate?: (cardConfig: LoyaltyCardConfig) => void;
+  initialConfig?: LoyaltyCardConfig;
 }
 
-const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) => {
+const defaultCardConfig: LoyaltyCardConfig = {
+  businessName: "Coffee Oasis",
+  customerName: "",
+  maxStamps: 10,
+  currentStamps: 3,
+  cardBgColor: "#FFFFFF",
+  stampBgColor: "#F5F5DC",
+  stampActiveColor: "#8B4513",
+  textColor: "#6F4E37",
+  businessLogo: "",
+  businessNameColor: "#6F4E37",
+  rewardTextColor: "#6F4E37",
+  stampIcon: "Coffee",
+  rewardIcon: "Gift",
+  rewards: [],
+  miniRewardStampColor: "#C0C0C0",
+  backgroundImage: "",
+  useBackgroundImage: false,
+  cardTitle: "Loyalty Card",
+  cardTitleColor: "#8B4513",
+  fontFamily: "",
+  businessNameFont: "",
+  cardTitleFont: "",
+  customerNameFont: "",
+  descriptionFont: "",
+  progressRewardsFont: "",
+  businessNameFontSize: "text-sm",
+  cardTitleFontSize: "text-lg",
+  customerNameFontSize: "text-base",
+  descriptionFontSize: "text-sm",
+  progressRewardsFontSize: "text-sm",
+};
+
+const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate, initialConfig }) => {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   
-  const [cardConfig, setCardConfig] = useState<LoyaltyCardConfig>({
-    businessName: "Coffee Oasis",
-    customerName: "",
-    maxStamps: 10,
-    currentStamps: 3,
-    cardBgColor: "#FFFFFF",
-    stampBgColor: "#F5F5DC",
-    stampActiveColor: "#8B4513",
-    textColor: "#6F4E37",
-    businessLogo: "",
-    businessNameColor: "#6F4E37",
-    rewardTextColor: "#6F4E37",
-    stampIcon: "Coffee",
-    rewardIcon: "Gift",
-    rewards: [],
-    miniRewardStampColor: "#C0C0C0",
-    backgroundImage: "",
-    useBackgroundImage: false,
-    cardTitle: "Loyalty Card",
-    cardTitleColor: "#8B4513",
-    fontFamily: "",
-    businessNameFont: "",
-    cardTitleFont: "",
-    customerNameFont: "",
-    descriptionFont: "",
-    progressRewardsFont: "",
-    businessNameFontSize: "text-sm",
-    cardTitleFontSize: "text-lg",
-    customerNameFontSize: "text-base",
-    descriptionFontSize: "text-sm",
-    progressRewardsFontSize: "text-sm",
-  });
+  // Initialize with either the provided config or default values
+  const [cardConfig, setCardConfig] = useState<LoyaltyCardConfig>(
+    initialConfig || defaultCardConfig
+  );
 
   const form = useForm<LoyaltyCardConfig>({
     defaultValues: cardConfig
   });
+
+  // Update form when initialConfig changes (e.g., when loading saved config)
+  useEffect(() => {
+    if (initialConfig) {
+      // Reset form with new values
+      form.reset(initialConfig);
+      setCardConfig(initialConfig);
+    }
+  }, [initialConfig, form]);
 
   // Watch all form values for real-time preview updates
   const formValues = useWatch({

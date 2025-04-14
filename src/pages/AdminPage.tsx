@@ -52,7 +52,8 @@ const AdminPage = () => {
     const savedCardConfig = localStorage.getItem('loyaltyCardStyle');
     if (savedCardConfig) {
       try {
-        setCardConfig(JSON.parse(savedCardConfig));
+        const parsedConfig = JSON.parse(savedCardConfig);
+        setCardConfig(parsedConfig);
       } catch (e) {
         console.error("Error parsing saved card config:", e);
       }
@@ -279,7 +280,10 @@ const AdminPage = () => {
             </TabsContent>
             <TabsContent value="card-editor">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <LoyaltyCardEditor onCardUpdate={handleCardUpdate} />
+                <LoyaltyCardEditor 
+                  onCardUpdate={handleCardUpdate} 
+                  initialConfig={cardConfig || undefined}
+                />
                 
                 <div className="flex flex-col lg:sticky lg:top-4">
                   <Card className="p-4 md:p-6 bg-white card-shadow">
@@ -293,7 +297,14 @@ const AdminPage = () => {
                     <div className={`flex items-center justify-center p-4 bg-slate-50 rounded-lg ${isMobile ? 'w-full max-w-[320px] mx-auto' : ''}`}>
                       <div className={`${isMobile ? 'w-full' : 'w-full max-w-xs md:max-w-md'}`}>
                         {cardConfig ? (
-                          <LoyaltyCard key={previewKey} {...cardConfig} isMobile={isMobile} />
+                          <LoyaltyCard 
+                            key={previewKey}
+                            maxStamps={cardConfig.maxStamps}
+                            currentStamps={cardConfig.currentStamps}
+                            cardStyle={cardConfig}
+                            customerName={cardConfig.customerName}
+                            isMobile={isMobile}
+                          />
                         ) : (
                           <div className="text-center p-4 text-coffee-light">
                             Edit and save the card to see a preview
