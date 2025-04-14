@@ -130,8 +130,6 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   const descriptionFontSize = cardStyle?.descriptionFontSize || "text-sm";
   const progressRewardsFontSize = cardStyle?.progressRewardsFontSize || "text-sm";
 
-  const backgroundOpacity = cardStyle?.backgroundOpacity !== undefined ? cardStyle.backgroundOpacity : 30;
-  
   const backgroundImageStyle = cardStyle?.useBackgroundImage && cardStyle?.backgroundImage ? {
     backgroundImage: `url(${cardStyle.backgroundImage})`,
     backgroundSize: 'cover',
@@ -162,11 +160,8 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
       >
         {cardStyle?.useBackgroundImage && cardStyle?.backgroundImage && (
           <div 
-            className="absolute inset-0 bg-black"
-            style={{ 
-              opacity: backgroundOpacity / 100,
-              pointerEvents: 'none'
-            }}
+            className="absolute inset-0 bg-black opacity-30"
+            style={{ pointerEvents: 'none' }}
           ></div>
         )}
         

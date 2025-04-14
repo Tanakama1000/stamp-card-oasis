@@ -19,7 +19,6 @@ const CardIconsSection: React.FC<CardIconsSectionProps> = ({ form }) => {
             value={field.value}
             onChange={field.onChange}
             label="Stamp Icon"
-            description="Icon displayed on each stamp"
           />
         )}
       />
@@ -33,31 +32,8 @@ const CardIconsSection: React.FC<CardIconsSectionProps> = ({ form }) => {
             value={field.value}
             onChange={field.onChange}
             label="Final Reward Icon"
-            description="This icon will appear on the final reward stamp"
+            description="This icon will appear on the final stamp"
           />
-        )}
-      />
-      
-      <FormField
-        control={form.control}
-        name="miniRewardStampColor"
-        render={({ field }) => (
-          <div className="mt-4">
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium">Mini Reward Indicator Color</label>
-              <span 
-                className="w-5 h-5 rounded-full" 
-                style={{ backgroundColor: field.value }} 
-              />
-            </div>
-            <input 
-              type="color"
-              value={field.value}
-              onChange={(e) => field.onChange(e.target.value)}
-              className="h-8 w-full"
-            />
-            <p className="text-xs text-coffee-light mt-1">Color for mini reward indicators on the progress bar</p>
-          </div>
         )}
       />
     </div>
