@@ -32,7 +32,6 @@ export interface LoyaltyCardConfig {
   cardTitleFontSize?: string;
   customerNameFontSize?: string;
   descriptionFontSize?: string;
-  progressRewardsFont?: string;
   progressRewardsFontSize?: string;
   useBackgroundImage?: boolean;
   backgroundImage?: string;
