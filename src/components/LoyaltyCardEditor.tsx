@@ -5,11 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Palette, Edit, Eye, Upload, Coffee, Star, Heart, Award, Battery, Zap, Gift, Plus, Trash2, Image, Text } from "lucide-react";
+import { Palette, Edit, Upload, Coffee, Star, Heart, Award, Battery, Zap, Gift, Plus, Trash2, Image, Text } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import LoyaltyCard from "@/components/LoyaltyCard";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 
@@ -108,7 +106,6 @@ const COLOR_PRESETS = {
 
 const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<string>("edit");
   
   const [cardConfig, setCardConfig] = useState<LoyaltyCardConfig>({
     businessName: "Coffee Oasis",
@@ -240,88 +237,109 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
         Loyalty Card Editor
       </h3>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-2 mb-6">
-          <TabsTrigger value="edit" className="flex items-center gap-2">
-            <Edit size={18} />
-            Edit
-          </TabsTrigger>
-          <TabsTrigger value="preview" className="flex items-center gap-2">
-            <Eye size={18} />
-            Preview
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="edit">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="businessName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Business Name</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Enter business name" 
-                        {...field} 
-                        className="border-coffee-light"
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="businessName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Business Name</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Enter business name" 
+                    {...field} 
+                    className="border-coffee-light"
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="cardTitle"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Card Title</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Enter card title" 
+                    {...field} 
+                    className="border-coffee-light"
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="customerName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Default Customer Name</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Enter default customer name" 
+                    {...field} 
+                    className="border-coffee-light"
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          
+          <div className="space-y-4 border-t border-cream pt-4 mt-4">
+            <h4 className="font-medium text-coffee-dark">Text Typography</h4>
+            
+            <FormField
+              control={form.control}
+              name="fontFamily"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Default Font Family</FormLabel>
+                  <FormControl>
+                    <Select 
+                      value={field.value} 
+                      onValueChange={(val) => field.onChange(val)}
+                    >
+                      <SelectTrigger className="border-coffee-light">
+                        <SelectValue placeholder="Select font family" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {FONT_FAMILIES.map((font) => (
+                          <SelectItem key={font.value} value={font.value}>
+                            <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
+                              {font.name}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <p className="text-xs text-coffee-light mt-1">Default font for all text (can be overridden below)</p>
+                </FormItem>
+              )}
+            />
+            
+            <div className="border p-4 rounded-md space-y-4 bg-slate-50">
+              <h4 className="font-medium text-coffee-dark">Individual Text Fonts</h4>
               
-              <FormField
-                control={form.control}
-                name="cardTitle"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Card Title</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Enter card title" 
-                        {...field} 
-                        className="border-coffee-light"
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="customerName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Default Customer Name</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Enter default customer name" 
-                        {...field} 
-                        className="border-coffee-light"
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              
-              <div className="space-y-4 border-t border-cream pt-4 mt-4">
-                <h4 className="font-medium text-coffee-dark">Text Typography</h4>
-                
+              <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="fontFamily"
+                  name="businessNameFont"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Default Font Family</FormLabel>
+                      <FormLabel>Business Name Font</FormLabel>
                       <FormControl>
                         <Select 
                           value={field.value} 
                           onValueChange={(val) => field.onChange(val)}
                         >
                           <SelectTrigger className="border-coffee-light">
-                            <SelectValue placeholder="Select font family" />
+                            <SelectValue placeholder="Select font" />
                           </SelectTrigger>
                           <SelectContent>
                             {FONT_FAMILIES.map((font) => (
@@ -334,294 +352,30 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                           </SelectContent>
                         </Select>
                       </FormControl>
-                      <p className="text-xs text-coffee-light mt-1">Default font for all text (can be overridden below)</p>
                     </FormItem>
                   )}
                 />
                 
-                <div className="border p-4 rounded-md space-y-4 bg-slate-50">
-                  <h4 className="font-medium text-coffee-dark">Individual Text Fonts</h4>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="businessNameFont"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Business Name Font</FormLabel>
-                          <FormControl>
-                            <Select 
-                              value={field.value} 
-                              onValueChange={(val) => field.onChange(val)}
-                            >
-                              <SelectTrigger className="border-coffee-light">
-                                <SelectValue placeholder="Select font" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {FONT_FAMILIES.map((font) => (
-                                  <SelectItem key={font.value} value={font.value}>
-                                    <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
-                                      {font.name}
-                                    </span>
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="cardTitleFont"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Card Title Font</FormLabel>
-                          <FormControl>
-                            <Select 
-                              value={field.value} 
-                              onValueChange={(val) => field.onChange(val)}
-                            >
-                              <SelectTrigger className="border-coffee-light">
-                                <SelectValue placeholder="Select font" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {FONT_FAMILIES.map((font) => (
-                                  <SelectItem key={font.value} value={font.value}>
-                                    <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
-                                      {font.name}
-                                    </span>
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="customerNameFont"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Customer Name Font</FormLabel>
-                          <FormControl>
-                            <Select 
-                              value={field.value} 
-                              onValueChange={(val) => field.onChange(val)}
-                            >
-                              <SelectTrigger className="border-coffee-light">
-                                <SelectValue placeholder="Select font" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {FONT_FAMILIES.map((font) => (
-                                  <SelectItem key={font.value} value={font.value}>
-                                    <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
-                                      {font.name}
-                                    </span>
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="descriptionFont"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Description Font</FormLabel>
-                          <FormControl>
-                            <Select 
-                              value={field.value} 
-                              onValueChange={(val) => field.onChange(val)}
-                            >
-                              <SelectTrigger className="border-coffee-light">
-                                <SelectValue placeholder="Select font" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {FONT_FAMILIES.map((font) => (
-                                  <SelectItem key={font.value} value={font.value}>
-                                    <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
-                                      {font.name}
-                                    </span>
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  
-                  <FormField
-                    control={form.control}
-                    name="progressRewardsFont"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Progress Rewards Font</FormLabel>
-                        <FormControl>
-                          <Select 
-                            value={field.value} 
-                            onValueChange={(val) => field.onChange(val)}
-                          >
-                            <SelectTrigger className="border-coffee-light">
-                              <SelectValue placeholder="Select font" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {FONT_FAMILIES.map((font) => (
-                                <SelectItem key={font.value} value={font.value}>
-                                  <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
-                                    {font.name}
-                                  </span>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="businessNameFontSize"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Business Name Size</FormLabel>
-                        <FormControl>
-                          <Select 
-                            value={field.value} 
-                            onValueChange={(val) => field.onChange(val)}
-                          >
-                            <SelectTrigger className="border-coffee-light">
-                              <SelectValue placeholder="Select size" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {FONT_SIZES.map((size) => (
-                                <SelectItem key={size.value} value={size.value}>
-                                  {size.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="cardTitleFontSize"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Card Title Size</FormLabel>
-                        <FormControl>
-                          <Select 
-                            value={field.value} 
-                            onValueChange={(val) => field.onChange(val)}
-                          >
-                            <SelectTrigger className="border-coffee-light">
-                              <SelectValue placeholder="Select size" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {FONT_SIZES.map((size) => (
-                                <SelectItem key={size.value} value={size.value}>
-                                  {size.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="customerNameFontSize"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Customer Name Size</FormLabel>
-                        <FormControl>
-                          <Select 
-                            value={field.value} 
-                            onValueChange={(val) => field.onChange(val)}
-                          >
-                            <SelectTrigger className="border-coffee-light">
-                              <SelectValue placeholder="Select size" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {FONT_SIZES.map((size) => (
-                                <SelectItem key={size.value} value={size.value}>
-                                  {size.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="descriptionFontSize"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description Text Size</FormLabel>
-                        <FormControl>
-                          <Select 
-                            value={field.value} 
-                            onValueChange={(val) => field.onChange(val)}
-                          >
-                            <SelectTrigger className="border-coffee-light">
-                              <SelectValue placeholder="Select size" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {FONT_SIZES.map((size) => (
-                                <SelectItem key={size.value} value={size.value}>
-                                  {size.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
                 <FormField
                   control={form.control}
-                  name="progressRewardsFontSize"
+                  name="cardTitleFont"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Progress Rewards Text Size</FormLabel>
+                      <FormLabel>Card Title Font</FormLabel>
                       <FormControl>
                         <Select 
                           value={field.value} 
                           onValueChange={(val) => field.onChange(val)}
                         >
                           <SelectTrigger className="border-coffee-light">
-                            <SelectValue placeholder="Select size" />
+                            <SelectValue placeholder="Select font" />
                           </SelectTrigger>
                           <SelectContent>
-                            {FONT_SIZES.map((size) => (
-                              <SelectItem key={size.value} value={size.value}>
-                                  {size.name}
+                            {FONT_FAMILIES.map((font) => (
+                              <SelectItem key={font.value} value={font.value}>
+                                <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
+                                  {font.name}
+                                </span>
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -635,24 +389,26 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="maxStamps"
+                  name="customerNameFont"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Stamps Required</FormLabel>
+                      <FormLabel>Customer Name Font</FormLabel>
                       <FormControl>
                         <Select 
-                          value={field.value.toString()} 
-                          onValueChange={(val) => field.onChange(parseInt(val))}
+                          value={field.value} 
+                          onValueChange={(val) => field.onChange(val)}
                         >
                           <SelectTrigger className="border-coffee-light">
-                            <SelectValue placeholder="Select stamps required" />
+                            <SelectValue placeholder="Select font" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="5">5 Stamps</SelectItem>
-                            <SelectItem value="8">8 Stamps</SelectItem>
-                            <SelectItem value="10">10 Stamps</SelectItem>
-                            <SelectItem value="12">12 Stamps</SelectItem>
-                            <SelectItem value="15">15 Stamps</SelectItem>
+                            {FONT_FAMILIES.map((font) => (
+                              <SelectItem key={font.value} value={font.value}>
+                                <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
+                                  {font.name}
+                                </span>
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -662,24 +418,26 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                 
                 <FormField
                   control={form.control}
-                  name="currentStamps"
+                  name="descriptionFont"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Demo Stamps</FormLabel>
+                      <FormLabel>Description Font</FormLabel>
                       <FormControl>
                         <Select 
-                          value={field.value.toString()} 
-                          onValueChange={(val) => field.onChange(parseInt(val))}
+                          value={field.value} 
+                          onValueChange={(val) => field.onChange(val)}
                         >
                           <SelectTrigger className="border-coffee-light">
-                            <SelectValue placeholder="Select demo stamps" />
+                            <SelectValue placeholder="Select font" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="0">0 Stamps</SelectItem>
-                            <SelectItem value="3">3 Stamps</SelectItem>
-                            <SelectItem value="5">5 Stamps</SelectItem>
-                            <SelectItem value="8">8 Stamps</SelectItem>
-                            <SelectItem value="10">10 Stamps</SelectItem>
+                            {FONT_FAMILIES.map((font) => (
+                              <SelectItem key={font.value} value={font.value}>
+                                <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
+                                  {font.name}
+                                </span>
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -690,34 +448,57 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
               
               <FormField
                 control={form.control}
-                name="businessLogo"
+                name="progressRewardsFont"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Business Logo</FormLabel>
+                    <FormLabel>Progress Rewards Font</FormLabel>
                     <FormControl>
-                      <div className="flex items-center gap-2">
-                        <div className="relative flex-1">
-                          <Input 
-                            type="file" 
-                            accept="image/*"
-                            onChange={handleLogoUpload}
-                            className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                          />
-                          <div className="border border-dashed border-coffee-light rounded-md p-4 text-center flex items-center justify-center">
-                            <Upload size={18} className="mr-2" />
-                            <span>Upload Logo</span>
-                          </div>
-                        </div>
-                        {cardConfig.businessLogo && (
-                          <div className="h-12 w-12 bg-cream rounded-md flex items-center justify-center overflow-hidden">
-                            <img 
-                              src={cardConfig.businessLogo} 
-                              alt="Business logo" 
-                              className="max-h-full max-w-full object-contain" 
-                            />
-                          </div>
-                        )}
-                      </div>
+                      <Select 
+                        value={field.value} 
+                        onValueChange={(val) => field.onChange(val)}
+                      >
+                        <SelectTrigger className="border-coffee-light">
+                          <SelectValue placeholder="Select font" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {FONT_FAMILIES.map((font) => (
+                            <SelectItem key={font.value} value={font.value}>
+                              <span style={{ fontFamily: font.value !== "default" ? font.value : 'inherit' }}>
+                                {font.name}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="businessNameFontSize"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Business Name Size</FormLabel>
+                    <FormControl>
+                      <Select 
+                        value={field.value} 
+                        onValueChange={(val) => field.onChange(val)}
+                      >
+                        <SelectTrigger className="border-coffee-light">
+                          <SelectValue placeholder="Select size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {FONT_SIZES.map((size) => (
+                            <SelectItem key={size.value} value={size.value}>
+                              {size.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                   </FormItem>
                 )}
@@ -725,416 +506,604 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
               
               <FormField
                 control={form.control}
-                name="backgroundImage"
+                name="cardTitleFontSize"
                 render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel>Card Background Image</FormLabel>
+                  <FormItem>
+                    <FormLabel>Card Title Size</FormLabel>
                     <FormControl>
-                      <div className="flex flex-col gap-2">
-                        <div className="relative flex-1">
-                          <Input 
-                            type="file" 
-                            accept="image/*"
-                            onChange={handleBackgroundImageUpload}
-                            className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                          />
-                          <div className="border border-dashed border-coffee-light rounded-md p-4 text-center flex items-center justify-center">
-                            <Image size={18} className="mr-2" />
-                            <span>Upload Background Image</span>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <Switch
-                            checked={form.watch("useBackgroundImage")}
-                            onCheckedChange={(checked) => {
-                              form.setValue("useBackgroundImage", checked);
-                            }}
-                            id="use-bg-image"
-                          />
-                          <label htmlFor="use-bg-image" className="text-sm cursor-pointer">
-                            Use background image
-                          </label>
-                        </div>
-                        
-                        {cardConfig.backgroundImage && (
-                          <div className="h-16 bg-cream rounded-md flex items-center justify-center overflow-hidden">
-                            <img 
-                              src={cardConfig.backgroundImage} 
-                              alt="Card background" 
-                              className="max-h-full w-full object-cover" 
-                            />
-                          </div>
-                        )}
-                      </div>
+                      <Select 
+                        value={field.value} 
+                        onValueChange={(val) => field.onChange(val)}
+                      >
+                        <SelectTrigger className="border-coffee-light">
+                          <SelectValue placeholder="Select size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {FONT_SIZES.map((size) => (
+                            <SelectItem key={size.value} value={size.value}>
+                              {size.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                   </FormItem>
                 )}
               />
-
-              <div className="space-y-4 border-t border-cream pt-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-medium text-coffee-dark">Progress Rewards</h4>
-                  <Button 
-                    type="button"
-                    variant="outline" 
-                    size="sm"
-                    onClick={addReward}
-                    className="flex items-center gap-1"
-                  >
-                    <Plus size={16} />
-                    Add Reward
-                  </Button>
-                </div>
-                
-                <FormField
-                  control={form.control}
-                  name="rewards"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="space-y-2">
-                        {field.value && field.value.length > 0 ? (
-                          field.value.map((reward, index) => (
-                            <div key={index} className="flex gap-2 items-end border border-cream rounded-md p-3">
-                              <div className="flex-1 space-y-2">
-                                <div>
-                                  <label className="text-sm font-medium">Stamp Number</label>
-                                  <Select
-                                    value={reward.stampNumber.toString()}
-                                    onValueChange={(val) => {
-                                      const newRewards = [...field.value];
-                                      newRewards[index] = {
-                                        ...newRewards[index],
-                                        stampNumber: parseInt(val)
-                                      };
-                                      field.onChange(newRewards);
-                                    }}
-                                  >
-                                    <SelectTrigger className="border-coffee-light">
-                                      <SelectValue placeholder="Select stamp" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {[...Array(form.getValues("maxStamps"))].map((_, i) => (
-                                        <SelectItem 
-                                          key={i} 
-                                          value={(i + 1).toString()}
-                                          disabled={field.value.some((r, idx) => 
-                                            idx !== index && r.stampNumber === i + 1
-                                          )}
-                                        >
-                                          Stamp {i + 1}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                
-                                <div>
-                                  <label className="text-sm font-medium">Reward Description</label>
-                                  <Input
-                                    placeholder="e.g., Free Cookie"
-                                    value={reward.description}
-                                    onChange={(e) => {
-                                      const newRewards = [...field.value];
-                                      newRewards[index] = {
-                                        ...newRewards[index],
-                                        description: e.target.value
-                                      };
-                                      field.onChange(newRewards);
-                                    }}
-                                    className="border-coffee-light"
-                                  />
-                                </div>
-                                
-                                <div>
-                                  <label className="text-sm font-medium">Reward Icon</label>
-                                  <div className="grid grid-cols-4 gap-2">
-                                    {STAMP_ICONS.map((stampIcon) => {
-                                      const Icon = stampIcon.icon;
-                                      return (
-                                        <div 
-                                          key={stampIcon.name}
-                                          onClick={() => {
-                                            const newRewards = [...field.value];
-                                            newRewards[index] = {
-                                              ...newRewards[index],
-                                              icon: stampIcon.name
-                                            };
-                                            field.onChange(newRewards);
-                                          }}
-                                          className={`p-2 rounded-md cursor-pointer flex flex-col items-center justify-center gap-1 text-xs transition-all ${
-                                            reward.icon === stampIcon.name 
-                                              ? 'bg-orange text-white' 
-                                              : 'bg-cream hover:bg-cream-light'
-                                          }`}
-                                        >
-                                          <Icon size={16} />
-                                          <span>{stampIcon.name}</span>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                </div>
-                              </div>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => removeReward(index)}
-                                className="text-red-500 hover:bg-red-50 hover:text-red-600"
-                              >
-                                <Trash2 size={18} />
-                              </Button>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="text-center p-4 border border-dashed border-coffee-light rounded-md">
-                            <p className="text-sm text-coffee-light">No rewards added yet. Add a reward to offer progress-based incentives.</p>
-                          </div>
-                        )}
-                      </div>
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="space-y-4 border-t border-cream pt-4 mt-4">
-                <h4 className="font-medium text-coffee-dark">Card Icons</h4>
-                
-                <FormField
-                  control={form.control}
-                  name="stampIcon"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Stamp Icon</FormLabel>
-                      <FormControl>
-                        <div className="grid grid-cols-4 gap-2">
-                          {STAMP_ICONS.map((stampIcon) => {
-                            const Icon = stampIcon.icon;
-                            return (
-                              <div 
-                                key={stampIcon.name}
-                                onClick={() => field.onChange(stampIcon.name)}
-                                className={`p-3 rounded-md cursor-pointer flex flex-col items-center justify-center gap-1 text-xs transition-all ${
-                                  field.value === stampIcon.name ? 'ring-2 ring-offset-1 ring-orange' : ''
-                                }`}
-                              >
-                                <Icon size={18} />
-                                <span>{stampIcon.name}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="rewardIcon"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Final Reward Icon</FormLabel>
-                      <FormControl>
-                        <div className="grid grid-cols-3 gap-2">
-                          {REWARD_ICONS.map((rewardIcon) => {
-                            const Icon = rewardIcon.icon;
-                            return (
-                              <div 
-                                key={rewardIcon.name}
-                                onClick={() => field.onChange(rewardIcon.name)}
-                                className={`p-3 rounded-md cursor-pointer flex flex-col items-center justify-center gap-1 text-xs transition-all ${
-                                  field.value === rewardIcon.name ? 'ring-2 ring-offset-1 ring-orange' : ''
-                                }`}
-                              >
-                                <Icon size={18} />
-                                <span>{rewardIcon.name}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </FormControl>
-                      <p className="text-xs text-coffee-light mt-1">This icon will appear on the final stamp</p>
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="space-y-4 border-t border-cream pt-4 mt-4">
-                <h4 className="font-medium text-coffee-dark">Card Colors</h4>
-                
-                <FormField
-                  control={form.control}
-                  name="cardBgColor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center justify-between">
-                        Card Background
-                        <span 
-                          className="w-5 h-5 rounded-full" 
-                          style={{ backgroundColor: field.value }} 
-                        />
-                      </FormLabel>
-                      <FormControl>
-                        <div>
-                          <div className="flex gap-2 mb-2">
-                            {COLOR_PRESETS.cardBg.map(color => (
-                              <div
-                                key={color}
-                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
-                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
-                                }`}
-                                style={{ backgroundColor: color }}
-                                onClick={() => field.onChange(color)}
-                              />
-                            ))}
-                          </div>
-                          <Input 
-                            type="color"
-                            {...field}
-                            className="h-8 w-full"
-                          />
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="stampBgColor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center justify-between">
-                        Empty Stamp Background
-                        <span 
-                          className="w-5 h-5 rounded-full" 
-                          style={{ backgroundColor: field.value }} 
-                        />
-                      </FormLabel>
-                      <FormControl>
-                        <div>
-                          <div className="flex gap-2 mb-2">
-                            {COLOR_PRESETS.stampBg.map(color => (
-                              <div
-                                key={color}
-                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
-                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
-                                }`}
-                                style={{ backgroundColor: color }}
-                                onClick={() => field.onChange(color)}
-                              />
-                            ))}
-                          </div>
-                          <Input 
-                            type="color"
-                            {...field}
-                            className="h-8 w-full"
-                          />
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="stampActiveColor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center justify-between">
-                        Active Stamp Color
-                        <span 
-                          className="w-5 h-5 rounded-full" 
-                          style={{ backgroundColor: field.value }} 
-                        />
-                      </FormLabel>
-                      <FormControl>
-                        <div>
-                          <div className="flex gap-2 mb-2">
-                            {COLOR_PRESETS.stampActive.map(color => (
-                              <div
-                                key={color}
-                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
-                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
-                                }`}
-                                style={{ backgroundColor: color }}
-                                onClick={() => field.onChange(color)}
-                              />
-                            ))}
-                          </div>
-                          <Input 
-                            type="color"
-                            {...field}
-                            className="h-8 w-full"
-                          />
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="miniRewardStampColor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center justify-between">
-                        Mini-Reward Stamp Color (before activation)
-                        <span 
-                          className="w-5 h-5 rounded-full" 
-                          style={{ backgroundColor: field.value }} 
-                        />
-                      </FormLabel>
-                      <FormControl>
-                        <div>
-                          <div className="flex gap-2 mb-2">
-                            {COLOR_PRESETS.miniReward.map(color => (
-                              <div
-                                key={color}
-                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
-                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
-                                }`}
-                                style={{ backgroundColor: color }}
-                                onClick={() => field.onChange(color)}
-                              />
-                            ))}
-                          </div>
-                          <Input 
-                            type="color"
-                            {...field}
-                            className="h-8 w-full"
-                          />
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-              
-              <div className="border-t border-cream pt-6 mt-2">
-                <Button type="submit" className="w-full bg-orange hover:bg-orange-dark text-white">
-                  Save Card Configuration
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </TabsContent>
-
-        <TabsContent value="preview">
-          <div className="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-lg">
-            <h3 className="text-lg font-medium mb-4 text-coffee-dark">Card Preview</h3>
-            <div className="w-full max-w-md">
-              <LoyaltyCard {...cardConfig} />
             </div>
-            <p className="mt-4 text-sm text-coffee-light text-center">
-              This preview shows how the loyalty card will appear to customers.
-              Switch to the Edit tab to make changes.
-            </p>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="customerNameFontSize"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Customer Name Size</FormLabel>
+                    <FormControl>
+                      <Select 
+                        value={field.value} 
+                        onValueChange={(val) => field.onChange(val)}
+                      >
+                        <SelectTrigger className="border-coffee-light">
+                          <SelectValue placeholder="Select size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {FONT_SIZES.map((size) => (
+                            <SelectItem key={size.value} value={size.value}>
+                              {size.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="descriptionFontSize"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description Text Size</FormLabel>
+                    <FormControl>
+                      <Select 
+                        value={field.value} 
+                        onValueChange={(val) => field.onChange(val)}
+                      >
+                        <SelectTrigger className="border-coffee-light">
+                          <SelectValue placeholder="Select size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {FONT_SIZES.map((size) => (
+                            <SelectItem key={size.value} value={size.value}>
+                              {size.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <FormField
+              control={form.control}
+              name="progressRewardsFontSize"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Progress Rewards Text Size</FormLabel>
+                  <FormControl>
+                    <Select 
+                      value={field.value} 
+                      onValueChange={(val) => field.onChange(val)}
+                    >
+                      <SelectTrigger className="border-coffee-light">
+                        <SelectValue placeholder="Select size" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {FONT_SIZES.map((size) => (
+                          <SelectItem key={size.value} value={size.value}>
+                              {size.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
           </div>
-        </TabsContent>
-      </Tabs>
+
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="maxStamps"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Stamps Required</FormLabel>
+                  <FormControl>
+                    <Select 
+                      value={field.value.toString()} 
+                      onValueChange={(val) => field.onChange(parseInt(val))}
+                    >
+                      <SelectTrigger className="border-coffee-light">
+                        <SelectValue placeholder="Select stamps required" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="5">5 Stamps</SelectItem>
+                        <SelectItem value="8">8 Stamps</SelectItem>
+                        <SelectItem value="10">10 Stamps</SelectItem>
+                        <SelectItem value="12">12 Stamps</SelectItem>
+                        <SelectItem value="15">15 Stamps</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="currentStamps"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Demo Stamps</FormLabel>
+                  <FormControl>
+                    <Select 
+                      value={field.value.toString()} 
+                      onValueChange={(val) => field.onChange(parseInt(val))}
+                    >
+                      <SelectTrigger className="border-coffee-light">
+                        <SelectValue placeholder="Select demo stamps" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="0">0 Stamps</SelectItem>
+                        <SelectItem value="3">3 Stamps</SelectItem>
+                        <SelectItem value="5">5 Stamps</SelectItem>
+                        <SelectItem value="8">8 Stamps</SelectItem>
+                        <SelectItem value="10">10 Stamps</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+          
+          <FormField
+            control={form.control}
+            name="businessLogo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Business Logo</FormLabel>
+                <FormControl>
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <Input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="border border-dashed border-coffee-light rounded-md p-4 text-center flex items-center justify-center">
+                        <Upload size={18} className="mr-2" />
+                        <span>Upload Logo</span>
+                      </div>
+                    </div>
+                    {cardConfig.businessLogo && (
+                      <div className="h-12 w-12 bg-cream rounded-md flex items-center justify-center overflow-hidden">
+                        <img 
+                          src={cardConfig.businessLogo} 
+                          alt="Business logo" 
+                          className="max-h-full max-w-full object-contain" 
+                        />
+                      </div>
+                    )}
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="backgroundImage"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel>Card Background Image</FormLabel>
+                <FormControl>
+                  <div className="flex flex-col gap-2">
+                    <div className="relative flex-1">
+                      <Input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={handleBackgroundImageUpload}
+                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="border border-dashed border-coffee-light rounded-md p-4 text-center flex items-center justify-center">
+                        <Image size={18} className="mr-2" />
+                        <span>Upload Background Image</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={form.watch("useBackgroundImage")}
+                        onCheckedChange={(checked) => {
+                          form.setValue("useBackgroundImage", checked);
+                        }}
+                        id="use-bg-image"
+                      />
+                      <label htmlFor="use-bg-image" className="text-sm cursor-pointer">
+                        Use background image
+                      </label>
+                    </div>
+                    
+                    {cardConfig.backgroundImage && (
+                      <div className="h-16 bg-cream rounded-md flex items-center justify-center overflow-hidden">
+                        <img 
+                          src={cardConfig.backgroundImage} 
+                          alt="Card background" 
+                          className="max-h-full w-full object-cover" 
+                        />
+                      </div>
+                    )}
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <div className="space-y-4 border-t border-cream pt-4">
+            <div className="flex items-center justify-between">
+              <h4 className="font-medium text-coffee-dark">Progress Rewards</h4>
+              <Button 
+                type="button"
+                variant="outline" 
+                size="sm"
+                onClick={addReward}
+                className="flex items-center gap-1"
+              >
+                <Plus size={16} />
+                Add Reward
+              </Button>
+            </div>
+            
+            <FormField
+              control={form.control}
+              name="rewards"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="space-y-2">
+                    {field.value && field.value.length > 0 ? (
+                      field.value.map((reward, index) => (
+                        <div key={index} className="flex gap-2 items-end border border-cream rounded-md p-3">
+                          <div className="flex-1 space-y-2">
+                            <div>
+                              <label className="text-sm font-medium">Stamp Number</label>
+                              <Select
+                                value={reward.stampNumber.toString()}
+                                onValueChange={(val) => {
+                                  const newRewards = [...field.value];
+                                  newRewards[index] = {
+                                    ...newRewards[index],
+                                    stampNumber: parseInt(val)
+                                  };
+                                  field.onChange(newRewards);
+                                }}
+                              >
+                                <SelectTrigger className="border-coffee-light">
+                                  <SelectValue placeholder="Select stamp" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {[...Array(form.getValues("maxStamps"))].map((_, i) => (
+                                    <SelectItem 
+                                      key={i} 
+                                      value={(i + 1).toString()}
+                                      disabled={field.value.some((r, idx) => 
+                                        idx !== index && r.stampNumber === i + 1
+                                      )}
+                                    >
+                                      Stamp {i + 1}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            
+                            <div>
+                              <label className="text-sm font-medium">Reward Description</label>
+                              <Input
+                                placeholder="e.g., Free Cookie"
+                                value={reward.description}
+                                onChange={(e) => {
+                                  const newRewards = [...field.value];
+                                  newRewards[index] = {
+                                    ...newRewards[index],
+                                    description: e.target.value
+                                  };
+                                  field.onChange(newRewards);
+                                }}
+                                className="border-coffee-light"
+                              />
+                            </div>
+                            
+                            <div>
+                              <label className="text-sm font-medium">Reward Icon</label>
+                              <div className="grid grid-cols-4 gap-2">
+                                {STAMP_ICONS.map((stampIcon) => {
+                                  const Icon = stampIcon.icon;
+                                  return (
+                                    <div 
+                                      key={stampIcon.name}
+                                      onClick={() => {
+                                        const newRewards = [...field.value];
+                                        newRewards[index] = {
+                                          ...newRewards[index],
+                                          icon: stampIcon.name
+                                        };
+                                        field.onChange(newRewards);
+                                      }}
+                                      className={`p-2 rounded-md cursor-pointer flex flex-col items-center justify-center gap-1 text-xs transition-all ${
+                                        reward.icon === stampIcon.name 
+                                          ? 'bg-orange text-white' 
+                                          : 'bg-cream hover:bg-cream-light'
+                                      }`}
+                                    >
+                                      <Icon size={16} />
+                                      <span>{stampIcon.name}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeReward(index)}
+                            className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                          >
+                            <Trash2 size={18} />
+                          </Button>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center p-4 border border-dashed border-coffee-light rounded-md">
+                        <p className="text-sm text-coffee-light">No rewards added yet. Add a reward to offer progress-based incentives.</p>
+                      </div>
+                    )}
+                  </div>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="space-y-4 border-t border-cream pt-4 mt-4">
+            <h4 className="font-medium text-coffee-dark">Card Icons</h4>
+            
+            <FormField
+              control={form.control}
+              name="stampIcon"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Stamp Icon</FormLabel>
+                  <FormControl>
+                    <div className="grid grid-cols-4 gap-2">
+                      {STAMP_ICONS.map((stampIcon) => {
+                        const Icon = stampIcon.icon;
+                        return (
+                          <div 
+                            key={stampIcon.name}
+                            onClick={() => field.onChange(stampIcon.name)}
+                            className={`p-3 rounded-md cursor-pointer flex flex-col items-center justify-center gap-1 text-xs transition-all ${
+                              field.value === stampIcon.name ? 'ring-2 ring-offset-1 ring-orange' : ''
+                            }`}
+                          >
+                            <Icon size={18} />
+                            <span>{stampIcon.name}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="rewardIcon"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Final Reward Icon</FormLabel>
+                  <FormControl>
+                    <div className="grid grid-cols-3 gap-2">
+                      {REWARD_ICONS.map((rewardIcon) => {
+                        const Icon = rewardIcon.icon;
+                        return (
+                          <div 
+                            key={rewardIcon.name}
+                            onClick={() => field.onChange(rewardIcon.name)}
+                            className={`p-3 rounded-md cursor-pointer flex flex-col items-center justify-center gap-1 text-xs transition-all ${
+                              field.value === rewardIcon.name ? 'ring-2 ring-offset-1 ring-orange' : ''
+                            }`}
+                          >
+                            <Icon size={18} />
+                            <span>{rewardIcon.name}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </FormControl>
+                  <p className="text-xs text-coffee-light mt-1">This icon will appear on the final stamp</p>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="space-y-4 border-t border-cream pt-4 mt-4">
+            <h4 className="font-medium text-coffee-dark">Card Colors</h4>
+            
+            <FormField
+              control={form.control}
+              name="cardBgColor"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center justify-between">
+                    Card Background
+                    <span 
+                      className="w-5 h-5 rounded-full" 
+                      style={{ backgroundColor: field.value }} 
+                    />
+                  </FormLabel>
+                  <FormControl>
+                    <div>
+                      <div className="flex gap-2 mb-2">
+                        {COLOR_PRESETS.cardBg.map(color => (
+                          <div
+                            key={color}
+                            className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
+                              field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
+                            }`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => field.onChange(color)}
+                          />
+                        ))}
+                      </div>
+                      <Input 
+                        type="color"
+                        {...field}
+                        className="h-8 w-full"
+                      />
+                    </div>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="stampBgColor"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center justify-between">
+                    Empty Stamp Background
+                    <span 
+                      className="w-5 h-5 rounded-full" 
+                      style={{ backgroundColor: field.value }} 
+                    />
+                  </FormLabel>
+                  <FormControl>
+                    <div>
+                      <div className="flex gap-2 mb-2">
+                        {COLOR_PRESETS.stampBg.map(color => (
+                          <div
+                            key={color}
+                            className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
+                              field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
+                            }`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => field.onChange(color)}
+                          />
+                        ))}
+                      </div>
+                      <Input 
+                        type="color"
+                        {...field}
+                        className="h-8 w-full"
+                      />
+                    </div>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="stampActiveColor"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center justify-between">
+                    Active Stamp Color
+                    <span 
+                      className="w-5 h-5 rounded-full" 
+                      style={{ backgroundColor: field.value }} 
+                    />
+                  </FormLabel>
+                  <FormControl>
+                    <div>
+                      <div className="flex gap-2 mb-2">
+                        {COLOR_PRESETS.stampActive.map(color => (
+                          <div
+                            key={color}
+                            className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
+                              field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
+                            }`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => field.onChange(color)}
+                          />
+                        ))}
+                      </div>
+                      <Input 
+                        type="color"
+                        {...field}
+                        className="h-8 w-full"
+                      />
+                    </div>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="miniRewardStampColor"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center justify-between">
+                    Mini-Reward Stamp Color (before activation)
+                    <span 
+                      className="w-5 h-5 rounded-full" 
+                      style={{ backgroundColor: field.value }} 
+                    />
+                  </FormLabel>
+                  <FormControl>
+                    <div>
+                      <div className="flex gap-2 mb-2">
+                        {COLOR_PRESETS.miniReward.map(color => (
+                          <div
+                            key={color}
+                            className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
+                              field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
+                            }`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => field.onChange(color)}
+                          />
+                        ))}
+                      </div>
+                      <Input 
+                        type="color"
+                        {...field}
+                        className="h-8 w-full"
+                      />
+                    </div>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+          
+          <div className="border-t border-cream pt-6 mt-2">
+            <Button type="submit" className="w-full bg-orange hover:bg-orange-dark text-white">
+              Save Card Configuration
+            </Button>
+          </div>
+        </form>
+      </Form>
     </Card>
   );
 };
