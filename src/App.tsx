@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AdminPage from "./pages/AdminPage";
 import JoinPage from "./pages/JoinPage";
+import ScanPage from "./pages/ScanPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ const App = () => (
           <Route path="/" element={<Navigate to="/admin" replace />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/join/:businessSlug" element={<JoinPage />} />
+          <Route path="/scan" element={<ScanPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </TooltipProvider>

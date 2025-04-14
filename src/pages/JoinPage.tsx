@@ -5,7 +5,7 @@ import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Coffee } from "lucide-react";
+import { Loader2, Coffee, QrCode } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import LoyaltyCard from "@/components/LoyaltyCard";
 
@@ -176,13 +176,24 @@ const JoinPage = () => {
               <p className="text-sm text-coffee-light">
                 Show this card when you visit {businessName} to collect stamps
               </p>
-              <Button 
-                onClick={() => navigate("/")}
-                variant="outline"
-                className="w-full"
-              >
-                Back to Home
-              </Button>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <Button 
+                  onClick={() => navigate("/")}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Back to Home
+                </Button>
+                
+                <Button 
+                  onClick={() => navigate("/scan")}
+                  className="w-full bg-orange hover:bg-orange-dark text-white flex items-center justify-center gap-2"
+                >
+                  <QrCode size={18} />
+                  Scan Me
+                </Button>
+              </div>
             </div>
           </Card>
         </div>
