@@ -1,7 +1,5 @@
-
 import React from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-
 interface CardHeaderProps {
   businessLogo?: string;
   businessName?: string;
@@ -12,7 +10,7 @@ interface CardHeaderProps {
   cardTitleColor: string;
   cardTitleFont: string;
   cardTitleFontSize: string;
-  descriptionFont: string; 
+  descriptionFont: string;
   descriptionFontSize: string;
   textColor: string;
   maxStamps: number;
@@ -20,7 +18,6 @@ interface CardHeaderProps {
   progressBarColor: string;
   isMobile?: boolean;
 }
-
 const CardHeader: React.FC<CardHeaderProps> = ({
   businessLogo,
   businessName,
@@ -42,56 +39,34 @@ const CardHeader: React.FC<CardHeaderProps> = ({
   const avatarSize = isMobile ? "h-10 w-10" : "h-12 w-12";
   const counterSize = isMobile ? "h-11 w-11 text-base" : "h-14 w-14 text-lg";
   const gapSize = isMobile ? "gap-2" : "gap-3";
-  
-  return (
-    <div className={`flex items-center justify-between mb-4 md:mb-6 relative z-10 ${isMobile ? 'flex-wrap' : ''}`}>
+  return <div className={`flex items-center justify-between mb-4 md:mb-6 relative z-10 ${isMobile ? 'flex-wrap' : ''}`}>
       <div className={`flex items-center ${gapSize} ${isMobile ? 'mb-2 w-full' : ''}`}>
-        {businessLogo && (
-          <Avatar className={`${avatarSize} border-2 border-white shadow-md`}>
+        {businessLogo && <Avatar className={`${avatarSize} border-2 border-white shadow-md`}>
             <AvatarImage src={businessLogo} alt="Business logo" />
             <AvatarFallback className="bg-orange text-white">{businessName?.charAt(0) || "B"}</AvatarFallback>
-          </Avatar>
-        )}
+          </Avatar>}
         <div>
-          {businessName && (
-            <h3 
-              className={`font-medium ${businessNameFontSize}`} 
-              style={{ 
-                color: businessNameColor,
-                fontFamily: businessNameFont !== "default" ? businessNameFont : 'inherit'
-              }}
-            >
+          {businessName && <h3 className={`font-medium ${businessNameFontSize}`} style={{
+          color: businessNameColor,
+          fontFamily: businessNameFont !== "default" ? businessNameFont : 'inherit'
+        }}>
               {businessName}
-            </h3>
-          )}
-          <h2 
-            className={`font-bold ${cardTitleFontSize}`} 
-            style={{ 
-              color: cardTitleColor,
-              fontFamily: cardTitleFont !== "default" ? cardTitleFont : 'inherit'
-            }}
-          >
+            </h3>}
+          <h2 className={`font-bold ${cardTitleFontSize}`} style={{
+          color: cardTitleColor,
+          fontFamily: cardTitleFont !== "default" ? cardTitleFont : 'inherit'
+        }}>
             {cardTitle}
           </h2>
-          <p 
-            className={descriptionFontSize} 
-            style={{ 
-              color: textColor,
-              fontFamily: descriptionFont !== "default" ? descriptionFont : 'inherit'
-            }}
-          >
+          <p className={descriptionFontSize} style={{
+          color: textColor,
+          fontFamily: descriptionFont !== "default" ? descriptionFont : 'inherit'
+        }}>
             Collect {maxStamps} stamps for a free item
           </p>
         </div>
       </div>
-      <div 
-        className={`${counterSize} rounded-full flex items-center justify-center text-white font-bold shadow-md transform transition-transform hover:scale-105 ${isMobile ? 'absolute top-0 right-0' : ''}`}
-        style={{ backgroundColor: progressBarColor }}
-      >
-        <span>{stamps}/{maxStamps}</span>
-      </div>
-    </div>
-  );
+      
+    </div>;
 };
-
 export default CardHeader;
