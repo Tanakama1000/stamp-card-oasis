@@ -8,7 +8,7 @@ import { Loader2, Camera, CameraOff, CheckCircle2, XCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast";
 
 interface QRScannerProps {
-  onSuccessfulScan: (businessId: string, timestamp: number) => void;
+  onSuccessfulScan: (businessId: string, timestamp: number, stamps?: number) => void;
 }
 
 const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
@@ -76,6 +76,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
 
       // Parse the QR data
       const qrData = JSON.parse(decodedText);
+      console.log("QR data decoded:", qrData);
 
       // Validate the QR content
       if (!qrData.businessId) {
@@ -100,16 +101,20 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
       }
 
       // Success! Call the callback with data
-      onSuccessfulScan(qrData.businessId, qrData.timestamp);
+      onSuccessfulScan(
+        qrData.businessId, 
+        qrData.timestamp, 
+        qrData.stamps || 1
+      );
 
       setScanResult({
         success: true,
-        message: "Successfully scanned! Stamp added to your card.",
+        message: `Successfully scanned! ${qrData.stamps || 1} stamp(s) added to your card.`,
       });
 
       toast({
         title: "Stamp Collected!",
-        description: "A new stamp has been added to your loyalty card.",
+        description: `${qrData.stamps || 1} stamp(s) have been added to your loyalty card.`,
       });
     } catch (err) {
       console.error("Error processing QR data:", err);

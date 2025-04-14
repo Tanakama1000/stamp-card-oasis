@@ -37,7 +37,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
     
     toast({
       title: "QR Code Generated",
-      description: "Let customers scan this code to collect stamps.",
+      description: `This code will award ${stampValue} stamp${parseInt(stampValue) > 1 ? 's' : ''} when scanned.`,
     });
   };
 
@@ -62,7 +62,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
       const pngFile = canvas.toDataURL("image/png");
       
       const downloadLink = document.createElement("a");
-      downloadLink.download = `business-qrcode.png`;
+      downloadLink.download = `business-qrcode-${stampValue}-stamps.png`;
       downloadLink.href = pngFile;
       downloadLink.click();
       
@@ -134,6 +134,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
               <SelectItem value="5">5 Stamps</SelectItem>
             </SelectContent>
           </Select>
+          <p className="text-xs text-coffee-light mt-1">Number of stamps this QR code will award when scanned</p>
         </div>
 
         <Button 
@@ -156,8 +157,11 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
                 level="H"
               />
             </div>
-            <p className="text-xs text-coffee-light mt-2 text-center">
-              This QR code expires in 5 minutes for security
+            <p className="text-sm text-coffee-dark font-semibold mt-2 text-center">
+              This QR code awards {stampValue} stamp{parseInt(stampValue) > 1 ? 's' : ''}
+            </p>
+            <p className="text-xs text-coffee-light mt-1 text-center">
+              Expires in 5 minutes for security
             </p>
             <div className="mt-4 flex gap-2">
               <Button onClick={downloadQRCode} variant="outline" className="flex items-center gap-1">

@@ -13,19 +13,20 @@ const ScanPage = () => {
   const [stamps, setStamps] = useState<number>(3);
   const maxStamps = 10;
   const [lastScanTime, setLastScanTime] = useState<number | null>(null);
+  const [lastBusinessId, setLastBusinessId] = useState<string | null>(null);
 
-  const handleSuccessfulScan = (businessId: string, timestamp: number) => {
-    console.log("Successful scan:", { businessId, timestamp });
+  const handleSuccessfulScan = (businessId: string, timestamp: number, stampCount: number = 1) => {
+    console.log("Successful scan:", { businessId, timestamp, stampCount });
     
-    // Check if user has already scanned today
-    if (lastScanTime) {
+    // Check if user has already scanned this business today
+    if (lastScanTime && lastBusinessId === businessId) {
       const lastScanDate = new Date(lastScanTime).setHours(0, 0, 0, 0);
       const today = new Date().setHours(0, 0, 0, 0);
       
       if (lastScanDate === today) {
         toast({
           title: "Already Scanned Today",
-          description: "You've already collected a stamp from this business today.",
+          description: "You've already collected stamps from this business today.",
           variant: "destructive",
         });
         return;
@@ -34,12 +35,15 @@ const ScanPage = () => {
     
     // Update stamp count
     if (stamps < maxStamps) {
-      setStamps(stamps + 1);
+      // Add stamps but don't exceed the maximum
+      const newStampCount = Math.min(stamps + stampCount, maxStamps);
+      setStamps(newStampCount);
       setLastScanTime(Date.now());
+      setLastBusinessId(businessId);
       
       toast({
-        title: "Stamp Added!",
-        description: "A new stamp has been added to your loyalty card.",
+        title: "Stamps Added!",
+        description: `${stampCount} stamp${stampCount > 1 ? 's' : ''} has been added to your loyalty card.`,
       });
     } else {
       toast({
