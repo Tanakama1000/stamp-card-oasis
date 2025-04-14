@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -107,7 +106,7 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
   
   const [cardConfig, setCardConfig] = useState<LoyaltyCardConfig>({
     businessName: "Coffee Oasis",
-    customerName: "Coffee Lover",
+    customerName: "",
     maxStamps: 10,
     currentStamps: 3,
     cardBgColor: "#FFFFFF",
