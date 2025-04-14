@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import { Card } from "@/components/ui/card";
@@ -7,12 +7,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Gift, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { LoyaltyCardConfig } from "@/components/LoyaltyCardEditor";
 
 const Index = () => {
   const { toast } = useToast();
   const [customerName, setCustomerName] = useState<string>("Coffee Lover");
   const [stamps, setStamps] = useState<number>(3);
-  const maxStamps = 10;
+  const [cardStyle, setCardStyle] = useState<LoyaltyCardConfig | null>(null);
+  const maxStamps = cardStyle?.maxStamps || 10;
+
+  // Fetch card style from localStorage on component mount
+  useEffect(() => {
+    const savedCardStyle = localStorage.getItem('loyaltyCardStyle');
+    if (savedCardStyle) {
+      try {
+        const parsedStyle = JSON.parse(savedCardStyle);
+        setCardStyle(parsedStyle);
+      } catch (error) {
+        console.error("Error parsing card style from localStorage", error);
+      }
+    }
+  }, []);
 
   const handleStampCollected = () => {
     toast({
@@ -78,8 +93,9 @@ const Index = () => {
         <div className="mb-8">
           <LoyaltyCard
             customerName={customerName}
-            maxStamps={maxStamps}
+            maxStamps={cardStyle?.maxStamps || maxStamps}
             currentStamps={stamps}
+            cardStyle={cardStyle || undefined}
             onStampCollected={handleStampCollected}
           />
         </div>

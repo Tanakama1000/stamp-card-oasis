@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Palette, Edit, Eye } from "lucide-react";
+import { Palette, Edit, Eye, Upload, Coffee, Star, Heart, Award, Battery, Zap, Gift } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import LoyaltyCard from "@/components/LoyaltyCard";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 interface LoyaltyCardEditorProps {
   onCardUpdate?: (cardConfig: LoyaltyCardConfig) => void;
@@ -20,7 +21,30 @@ export interface LoyaltyCardConfig {
   customerName: string;
   maxStamps: number;
   currentStamps: number;
+  cardBgColor: string;
+  stampBgColor: string;
+  stampActiveColor: string;
+  textColor: string;
+  businessLogo?: string;
+  stampIcon: string;
 }
+
+const STAMP_ICONS = [
+  { name: "Coffee", icon: Coffee },
+  { name: "Star", icon: Star },
+  { name: "Heart", icon: Heart },
+  { name: "Award", icon: Award },
+  { name: "Battery", icon: Battery },
+  { name: "Zap", icon: Zap },
+  { name: "Gift", icon: Gift },
+];
+
+const COLOR_PRESETS = {
+  cardBg: ["#FFFFFF", "#F5F5DC", "#FEF9D7", "#E7F0FD", "#FFDEE2", "#E5DEFF"],
+  stampBg: ["#F5F5DC", "#FFFDD0", "#FFFFFF", "#F6F6F7", "#F1F0FB", "#C8C8C9"],
+  stampActive: ["#8B4513", "#D2691E", "#FF8C00", "#A67B5B", "#9b87f5", "#F97316"],
+  text: ["#6F4E37", "#222222", "#000000", "#403E43", "#1A1F2C", "#8B5CF6"],
+};
 
 const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) => {
   const { toast } = useToast();
@@ -30,7 +54,13 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
     businessName: "Coffee Oasis",
     customerName: "Coffee Lover",
     maxStamps: 10,
-    currentStamps: 3
+    currentStamps: 3,
+    cardBgColor: "#FFFFFF",
+    stampBgColor: "#F5F5DC",
+    stampActiveColor: "#8B4513",
+    textColor: "#6F4E37",
+    businessLogo: "",
+    stampIcon: "Coffee"
   });
 
   const form = useForm<LoyaltyCardConfig>({
@@ -46,6 +76,21 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
       title: "Card Updated",
       description: "Loyalty card configuration has been updated.",
     });
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          const newConfig = { ...cardConfig, businessLogo: event.target.result as string };
+          setCardConfig(newConfig);
+          form.setValue("businessLogo", event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -159,6 +204,227 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                   )}
                 />
               </div>
+              
+              {/* Business Logo Upload */}
+              <FormField
+                control={form.control}
+                name="businessLogo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Business Logo</FormLabel>
+                    <FormControl>
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <Input 
+                            type="file" 
+                            accept="image/*"
+                            onChange={handleLogoUpload}
+                            className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                          />
+                          <div className="border border-dashed border-coffee-light rounded-md p-4 text-center flex items-center justify-center">
+                            <Upload size={18} className="mr-2" />
+                            <span>Upload Logo</span>
+                          </div>
+                        </div>
+                        {cardConfig.businessLogo && (
+                          <div className="h-12 w-12 bg-cream rounded-md flex items-center justify-center overflow-hidden">
+                            <img 
+                              src={cardConfig.businessLogo} 
+                              alt="Business logo" 
+                              className="max-h-full max-w-full object-contain" 
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              {/* Stamp Icon Selection */}
+              <FormField
+                control={form.control}
+                name="stampIcon"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Stamp Icon</FormLabel>
+                    <FormControl>
+                      <div className="grid grid-cols-4 gap-2">
+                        {STAMP_ICONS.map((stampIcon) => {
+                          const Icon = stampIcon.icon;
+                          return (
+                            <div 
+                              key={stampIcon.name}
+                              onClick={() => field.onChange(stampIcon.name)}
+                              className={`p-3 rounded-md cursor-pointer flex flex-col items-center justify-center gap-1 text-xs transition-all ${
+                                field.value === stampIcon.name 
+                                  ? 'bg-orange text-white' 
+                                  : 'bg-cream hover:bg-cream-light'
+                              }`}
+                            >
+                              <Icon size={18} />
+                              <span>{stampIcon.name}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              {/* Color Pickers Section */}
+              <div className="space-y-4 border-t border-cream pt-4 mt-4">
+                <h4 className="font-medium text-coffee-dark">Card Colors</h4>
+                
+                <FormField
+                  control={form.control}
+                  name="cardBgColor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center justify-between">
+                        Card Background
+                        <span 
+                          className="w-5 h-5 rounded-full" 
+                          style={{ backgroundColor: field.value }} 
+                        />
+                      </FormLabel>
+                      <FormControl>
+                        <div>
+                          <div className="flex gap-2 mb-2">
+                            {COLOR_PRESETS.cardBg.map(color => (
+                              <div
+                                key={color}
+                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
+                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
+                                }`}
+                                style={{ backgroundColor: color }}
+                                onClick={() => field.onChange(color)}
+                              />
+                            ))}
+                          </div>
+                          <Input 
+                            type="color"
+                            {...field}
+                            className="h-8 w-full"
+                          />
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="stampBgColor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center justify-between">
+                        Empty Stamp Background
+                        <span 
+                          className="w-5 h-5 rounded-full" 
+                          style={{ backgroundColor: field.value }} 
+                        />
+                      </FormLabel>
+                      <FormControl>
+                        <div>
+                          <div className="flex gap-2 mb-2">
+                            {COLOR_PRESETS.stampBg.map(color => (
+                              <div
+                                key={color}
+                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
+                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
+                                }`}
+                                style={{ backgroundColor: color }}
+                                onClick={() => field.onChange(color)}
+                              />
+                            ))}
+                          </div>
+                          <Input 
+                            type="color"
+                            {...field}
+                            className="h-8 w-full"
+                          />
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="stampActiveColor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center justify-between">
+                        Active Stamp Color
+                        <span 
+                          className="w-5 h-5 rounded-full" 
+                          style={{ backgroundColor: field.value }} 
+                        />
+                      </FormLabel>
+                      <FormControl>
+                        <div>
+                          <div className="flex gap-2 mb-2">
+                            {COLOR_PRESETS.stampActive.map(color => (
+                              <div
+                                key={color}
+                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
+                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
+                                }`}
+                                style={{ backgroundColor: color }}
+                                onClick={() => field.onChange(color)}
+                              />
+                            ))}
+                          </div>
+                          <Input 
+                            type="color"
+                            {...field}
+                            className="h-8 w-full"
+                          />
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="textColor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center justify-between">
+                        Text Color
+                        <span 
+                          className="w-5 h-5 rounded-full" 
+                          style={{ backgroundColor: field.value }} 
+                        />
+                      </FormLabel>
+                      <FormControl>
+                        <div>
+                          <div className="flex gap-2 mb-2">
+                            {COLOR_PRESETS.text.map(color => (
+                              <div
+                                key={color}
+                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
+                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
+                                }`}
+                                style={{ backgroundColor: color }}
+                                onClick={() => field.onChange(color)}
+                              />
+                            ))}
+                          </div>
+                          <Input 
+                            type="color"
+                            {...field}
+                            className="h-8 w-full"
+                          />
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <Button 
                 type="submit"
@@ -178,9 +444,34 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                 customerName={cardConfig.customerName}
                 maxStamps={cardConfig.maxStamps}
                 currentStamps={cardConfig.currentStamps}
+                cardStyle={cardConfig}
                 onStampCollected={() => {}}
               />
             </div>
+            
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="w-full">
+                  Full Screen Preview
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="h-[90vh]">
+                <SheetHeader>
+                  <SheetTitle>Card Preview</SheetTitle>
+                </SheetHeader>
+                <div className="flex items-center justify-center h-full">
+                  <div className="max-w-md w-full">
+                    <LoyaltyCard
+                      customerName={cardConfig.customerName}
+                      maxStamps={cardConfig.maxStamps}
+                      currentStamps={cardConfig.currentStamps}
+                      cardStyle={cardConfig}
+                      onStampCollected={() => {}}
+                    />
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </TabsContent>
       </Tabs>

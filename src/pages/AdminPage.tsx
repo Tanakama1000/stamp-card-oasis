@@ -8,8 +8,11 @@ import LoyaltyCardEditor from "@/components/LoyaltyCardEditor";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QrCode, BarChart2, Users, UserCircle, Palette } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { LoyaltyCardConfig } from "@/components/LoyaltyCardEditor";
 
 const AdminPage = () => {
+  const { toast } = useToast();
   const [qrCodeGenerated, setQrCodeGenerated] = useState<number>(0);
   const [recentScans, setRecentScans] = useState<
     Array<{ customer: string; stamps: number; timestamp: number }>
@@ -35,6 +38,16 @@ const AdminPage = () => {
     } catch (err) {
       console.error("Error parsing QR data:", err);
     }
+  };
+  
+  const handleCardUpdate = (cardConfig: LoyaltyCardConfig) => {
+    // Save the card configuration to localStorage
+    localStorage.setItem('loyaltyCardStyle', JSON.stringify(cardConfig));
+    toast({
+      title: "Card Style Saved",
+      description: "The loyalty card style has been saved and will be visible to customers.",
+      duration: 2000,
+    });
   };
 
   const formatTimestamp = (timestamp: number) => {
@@ -103,20 +116,25 @@ const AdminPage = () => {
             </TabsContent>
             <TabsContent value="card-editor">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <LoyaltyCardEditor />
+                <LoyaltyCardEditor onCardUpdate={handleCardUpdate} />
                 
                 <Card className="p-6 bg-white card-shadow">
                   <h3 className="text-xl font-semibold text-coffee-dark mb-4">Card Editor Instructions</h3>
                   <ol className="list-decimal list-inside space-y-3 text-coffee-medium">
                     <li>Customize your loyalty card appearance</li>
                     <li>Set the number of stamps required for a reward</li>
+                    <li>Choose colors for the card and stamps</li>
+                    <li>Upload your business logo</li>
+                    <li>Select a stamp icon that matches your brand</li>
                     <li>Preview how the card will appear to customers</li>
-                    <li>Changes will apply to all customer cards</li>
+                    <li>Save changes to update all customer cards</li>
                   </ol>
                   
                   <div className="mt-6 p-4 bg-cream rounded-lg">
                     <p className="text-sm text-coffee-dark">
-                      The card editor allows you to customize how your loyalty card appears to customers. You can change the number of stamps required for a reward and see a preview of how it will look on customer devices.
+                      The card editor allows you to customize how your loyalty card appears to customers. 
+                      All changes will be reflected immediately in the customer view. Make sure to save 
+                      your changes before leaving this page.
                     </p>
                   </div>
                 </Card>
