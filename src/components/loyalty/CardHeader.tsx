@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
 interface CardHeaderProps {
   businessLogo?: string;
   businessName?: string;
@@ -19,6 +20,7 @@ interface CardHeaderProps {
   progressBarColor: string;
   isMobile?: boolean;
 }
+
 const CardHeader: React.FC<CardHeaderProps> = ({
   businessLogo,
   businessName,
@@ -38,11 +40,10 @@ const CardHeader: React.FC<CardHeaderProps> = ({
   isMobile
 }) => {
   const avatarSize = isMobile ? "h-10 w-10" : "h-12 w-12";
-  const counterSize = isMobile ? "h-11 w-11 text-base" : "h-14 w-14 text-lg";
-  const gapSize = isMobile ? "gap-2" : "gap-3";
+  
   return (
     <div className={`flex items-center justify-between mb-4 md:mb-6 relative z-10 ${isMobile ? 'flex-wrap' : ''}`}>
-      <div className={`flex flex-col items-center w-full ${gapSize} ${isMobile ? 'mb-2' : ''}`}>
+      <div className={`flex flex-col items-center w-full ${isMobile ? 'gap-2 mb-2' : 'gap-3'}`}>
         {businessLogo && (
           <div className="flex justify-center w-full mb-2">
             <Avatar className={`${avatarSize} border-2 border-white shadow-md`}>
@@ -88,4 +89,5 @@ const CardHeader: React.FC<CardHeaderProps> = ({
     </div>
   );
 };
+
 export default CardHeader;
