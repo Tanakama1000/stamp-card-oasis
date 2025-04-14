@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -93,18 +92,46 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({
   // Update preview in real-time
   useEffect(() => {
     if (formValues && onCardUpdate) {
-      // Create a complete card config by merging form values with defaults
+      // Create a complete card config by ensuring all required fields have values
       const updatedConfig: LoyaltyCardConfig = {
-        ...defaultConfig,  // Start with defaults to ensure all required fields
-        ...formValues as Partial<LoyaltyCardConfig>, // Apply watched form values
-        // Ensure rewards are properly sorted and have all required properties
+        // Start with all required fields from defaultConfig
+        ...defaultConfig,
+        // Apply watched form values, but ensure required fields are never undefined
+        businessName: formValues.businessName || defaultConfig.businessName,
+        customerName: formValues.customerName || defaultConfig.customerName,
+        maxStamps: formValues.maxStamps || defaultConfig.maxStamps,
+        currentStamps: formValues.currentStamps || defaultConfig.currentStamps,
+        cardBgColor: formValues.cardBgColor || defaultConfig.cardBgColor,
+        stampBgColor: formValues.stampBgColor || defaultConfig.stampBgColor,
+        stampActiveColor: formValues.stampActiveColor || defaultConfig.stampActiveColor,
+        textColor: formValues.textColor || defaultConfig.textColor,
+        businessNameColor: formValues.businessNameColor || defaultConfig.businessNameColor,
+        rewardTextColor: formValues.rewardTextColor || defaultConfig.rewardTextColor,
+        stampIcon: formValues.stampIcon || defaultConfig.stampIcon,
+        rewardIcon: formValues.rewardIcon || defaultConfig.rewardIcon,
         rewards: formValues.rewards 
           ? [...formValues.rewards].map(reward => ({
               stampNumber: reward.stampNumber || 1,
               description: reward.description || "Reward",
               icon: reward.icon || "Gift"
             })).sort((a, b) => a.stampNumber - b.stampNumber)
-          : []
+          : [],
+        miniRewardStampColor: formValues.miniRewardStampColor || defaultConfig.miniRewardStampColor,
+        backgroundImage: formValues.backgroundImage || defaultConfig.backgroundImage,
+        useBackgroundImage: formValues.useBackgroundImage ?? defaultConfig.useBackgroundImage,
+        cardTitle: formValues.cardTitle || defaultConfig.cardTitle,
+        cardTitleColor: formValues.cardTitleColor || defaultConfig.cardTitleColor,
+        fontFamily: formValues.fontFamily || defaultConfig.fontFamily,
+        businessNameFont: formValues.businessNameFont || defaultConfig.businessNameFont,
+        cardTitleFont: formValues.cardTitleFont || defaultConfig.cardTitleFont,
+        customerNameFont: formValues.customerNameFont || defaultConfig.customerNameFont,
+        descriptionFont: formValues.descriptionFont || defaultConfig.descriptionFont,
+        progressRewardsFont: formValues.progressRewardsFont || defaultConfig.progressRewardsFont,
+        businessNameFontSize: formValues.businessNameFontSize || defaultConfig.businessNameFontSize,
+        cardTitleFontSize: formValues.cardTitleFontSize || defaultConfig.cardTitleFontSize,
+        customerNameFontSize: formValues.customerNameFontSize || defaultConfig.customerNameFontSize,
+        descriptionFontSize: formValues.descriptionFontSize || defaultConfig.descriptionFontSize,
+        progressRewardsFontSize: formValues.progressRewardsFontSize || defaultConfig.progressRewardsFontSize,
       };
       
       // Update preview with current form values
@@ -172,7 +199,7 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({
           
           <BackgroundImageSection 
             form={form} 
-            cardConfig={formValues} 
+            cardConfig={formValues as LoyaltyCardConfig} 
             handleBackgroundImageUpload={handleBackgroundImageUpload} 
           />
           
