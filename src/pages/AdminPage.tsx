@@ -7,7 +7,7 @@ import CustomerList from "@/components/CustomerList";
 import LoyaltyCardEditor from "@/components/LoyaltyCardEditor";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { QrCode, BarChart2, Users, UserCircle, Palette, Eye } from "lucide-react";
+import { QrCode, BarChart2, Users, UserCircle, Palette } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LoyaltyCardConfig } from "@/components/LoyaltyCardEditor";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -122,56 +122,21 @@ const AdminPage = () => {
                 <LoyaltyCardEditor onCardUpdate={handleCardUpdate} />
                 
                 <Card className="p-6 bg-white card-shadow">
-                  <Tabs defaultValue="instructions" className="w-full">
-                    <TabsList className="grid grid-cols-2 mb-4">
-                      <TabsTrigger value="instructions">
-                        Instructions
-                      </TabsTrigger>
-                      <TabsTrigger value="preview" className="flex items-center gap-2">
-                        <Eye size={16} />
-                        Preview
-                      </TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="instructions">
-                      <h3 className="text-xl font-semibold text-coffee-dark mb-4">Card Editor Instructions</h3>
-                      <ol className="list-decimal list-inside space-y-3 text-coffee-medium">
-                        <li>Customize your loyalty card appearance</li>
-                        <li>Set the number of stamps required for a reward</li>
-                        <li>Choose colors for the card and stamps</li>
-                        <li>Upload your business logo</li>
-                        <li>Select a stamp icon that matches your brand</li>
-                        <li>Preview how the card will appear to customers</li>
-                        <li>Save changes to update all customer cards</li>
-                      </ol>
-                      
-                      <div className="mt-6 p-4 bg-cream rounded-lg">
-                        <p className="text-sm text-coffee-dark">
-                          The card editor allows you to customize how your loyalty card appears to customers. 
-                          All changes will be reflected immediately in the customer view. Make sure to save 
-                          your changes before leaving this page.
-                        </p>
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="preview">
-                      <div className="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-lg">
-                        <h3 className="text-lg font-medium mb-4 text-coffee-dark">Card Preview</h3>
-                        <div className="w-full max-w-md">
-                          {cardConfig ? (
-                            <LoyaltyCard {...cardConfig} />
-                          ) : (
-                            <div className="text-center p-4 text-coffee-light">
-                              Edit and save the card to see a preview
-                            </div>
-                          )}
+                  <h3 className="text-xl font-semibold text-coffee-dark mb-4">Card Preview</h3>
+                  <div className="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-lg">
+                    <div className="w-full max-w-md">
+                      {cardConfig ? (
+                        <LoyaltyCard {...cardConfig} />
+                      ) : (
+                        <div className="text-center p-4 text-coffee-light">
+                          Edit and save the card to see a preview
                         </div>
-                        <p className="mt-4 text-sm text-coffee-light text-center">
-                          This preview shows how the loyalty card will appear to customers.
-                        </p>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
+                      )}
+                    </div>
+                    <p className="mt-4 text-sm text-coffee-light text-center">
+                      This preview shows how the loyalty card will appear to customers.
+                    </p>
+                  </div>
                 </Card>
               </div>
             </TabsContent>
