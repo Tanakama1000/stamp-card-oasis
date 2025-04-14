@@ -8,6 +8,7 @@ import { Form } from "@/components/ui/form";
 import { useForm, useWatch } from "react-hook-form";
 import { FormField } from "@/components/ui/form";
 import { LoyaltyCardConfig } from "@/components/loyalty/editor/types";
+import { Reward } from "@/components/loyalty/types";
 
 import TypographyEditor from "@/components/loyalty/editor/TypographyEditor";
 import RewardsEditor from "@/components/loyalty/editor/RewardsEditor";
@@ -73,9 +74,13 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
       const updatedConfig: LoyaltyCardConfig = {
         ...cardConfig,  // Start with current config to ensure all required fields
         ...formValues as Partial<LoyaltyCardConfig>, // Apply watched form values
-        // Ensure rewards are properly sorted
+        // Ensure rewards are properly sorted and have all required properties
         rewards: formValues.rewards 
-          ? [...formValues.rewards].sort((a, b) => a.stampNumber - b.stampNumber) 
+          ? [...formValues.rewards].map(reward => ({
+              stampNumber: reward.stampNumber || 1,
+              description: reward.description || "Reward",
+              icon: reward.icon || "Gift"
+            })).sort((a, b) => a.stampNumber - b.stampNumber)
           : cardConfig.rewards
       };
       
