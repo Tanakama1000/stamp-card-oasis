@@ -1,11 +1,11 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Palette } from "lucide-react";
 import { Form } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { FormField } from "@/components/ui/form";
 import { LoyaltyCardConfig } from "@/components/loyalty/editor/types";
 
@@ -61,6 +61,26 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
     defaultValues: cardConfig
   });
 
+  // Watch all form values for real-time preview updates
+  const formValues = useWatch({
+    control: form.control
+  });
+
+  // Update preview in real-time
+  useEffect(() => {
+    if (formValues && onCardUpdate) {
+      // Sort rewards if they exist to maintain proper order
+      const updatedConfig = { 
+        ...formValues,
+        rewards: formValues.rewards ? [...formValues.rewards].sort((a, b) => a.stampNumber - b.stampNumber) : []
+      };
+      
+      // Update preview with current form values
+      setCardConfig(updatedConfig);
+      onCardUpdate(updatedConfig);
+    }
+  }, [formValues, onCardUpdate]);
+
   const handleSubmit = (data: LoyaltyCardConfig) => {
     const sortedRewards = [...data.rewards].sort((a, b) => a.stampNumber - b.stampNumber);
     const updatedData = {...data, rewards: sortedRewards};
@@ -69,9 +89,13 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
     if (onCardUpdate) {
       onCardUpdate(updatedData);
     }
+    
+    // Save to localStorage
+    localStorage.setItem('loyaltyCardStyle', JSON.stringify(updatedData));
+    
     toast({
       title: "Card Updated",
-      description: "Loyalty card configuration has been updated.",
+      description: "Loyalty card configuration has been saved.",
     });
   };
   
@@ -89,6 +113,11 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
           setCardConfig(newConfig);
           form.setValue("backgroundImage", event.target.result as string);
           form.setValue("useBackgroundImage", true);
+          
+          // Update preview immediately when background image changes
+          if (onCardUpdate) {
+            onCardUpdate(newConfig);
+          }
         }
       };
       reader.readAsDataURL(file);
@@ -126,7 +155,11 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                 <RewardsEditor 
                   rewards={field.value || []} 
                   maxStamps={form.getValues("maxStamps")}
-                  onChange={(rewards) => field.onChange(rewards)}
+                  onChange={(rewards) => {
+                    field.onChange(rewards);
+                    // Force reload of rewards when they change
+                    form.trigger("rewards");
+                  }}
                 />
               )}
             />

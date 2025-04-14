@@ -7,7 +7,7 @@ import CustomerList from "@/components/CustomerList";
 import LoyaltyCardEditor from "@/components/LoyaltyCardEditor";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { QrCode, BarChart2, Users, UserCircle, Palette } from "lucide-react";
+import { QrCode, BarChart2, Users, UserCircle, Palette, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LoyaltyCardConfig } from "@/components/loyalty/editor/types";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -25,6 +25,7 @@ const AdminPage = () => {
     { customer: "Bob Johnson", stamps: 1, timestamp: Date.now() - 300000 },
   ]);
   const isMobile = useIsMobile();
+  const [previewUpdated, setPreviewUpdated] = useState(false);
 
   // Force rerender of the preview when a configuration change happens
   const [previewKey, setPreviewKey] = useState<number>(0);
@@ -59,15 +60,15 @@ const AdminPage = () => {
   };
   
   const handleCardUpdate = (cardConfig: LoyaltyCardConfig) => {
-    localStorage.setItem('loyaltyCardStyle', JSON.stringify(cardConfig));
     setCardConfig(cardConfig);
     // Force a rerender of the preview by updating the key
     setPreviewKey(prev => prev + 1);
-    toast({
-      title: "Card Style Saved",
-      description: "The loyalty card style has been saved and will be visible to customers.",
-      duration: 2000,
-    });
+    
+    // Show visual indicator that preview has updated
+    setPreviewUpdated(true);
+    setTimeout(() => {
+      setPreviewUpdated(false);
+    }, 500);
   };
 
   const formatTimestamp = (timestamp: number) => {
@@ -91,7 +92,7 @@ const AdminPage = () => {
         />
 
         <div className="mt-8">
-          <Tabs defaultValue="qr-generator">
+          <Tabs defaultValue="card-editor">
             <TabsList className="grid grid-cols-4 mb-6">
               <TabsTrigger value="qr-generator" className="flex items-center gap-2">
                 <QrCode size={18} />
@@ -125,7 +126,13 @@ const AdminPage = () => {
                 
                 <div className="flex flex-col lg:sticky lg:top-4">
                   <Card className="p-4 md:p-6 bg-white card-shadow">
-                    <h3 className="text-xl font-semibold text-coffee-dark mb-4">Card Preview</h3>
+                    <h3 className="text-xl font-semibold text-coffee-dark mb-4 flex items-center justify-between">
+                      <span>Card Preview</span>
+                      <div className={`transition-opacity duration-300 flex items-center ${previewUpdated ? 'opacity-100' : 'opacity-0'}`}>
+                        <RefreshCw size={16} className="text-green-500 animate-spin mr-1" />
+                        <span className="text-sm text-green-500">Updating</span>
+                      </div>
+                    </h3>
                     <div className={`flex items-center justify-center p-4 bg-slate-50 rounded-lg ${isMobile ? 'w-full max-w-[320px] mx-auto' : ''}`}>
                       <div className={`${isMobile ? 'w-full' : 'w-full max-w-xs md:max-w-md'}`}>
                         {cardConfig ? (
@@ -136,6 +143,9 @@ const AdminPage = () => {
                           </div>
                         )}
                       </div>
+                    </div>
+                    <div className="mt-3 text-center text-sm text-coffee-light">
+                      <p>Changes are displayed in real-time. Click Save to store your configuration.</p>
                     </div>
                   </Card>
                 </div>
