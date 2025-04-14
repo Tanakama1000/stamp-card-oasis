@@ -6,31 +6,39 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { QrCode, Download, Copy, RefreshCw } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface QRCodeGeneratorProps {
   onGenerate?: (code: string) => void;
+  businessId?: string;
 }
 
-const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
+const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessId = "coffee-oasis-123" }) => {
+  const { toast } = useToast();
   const [customerName, setCustomerName] = useState<string>("");
   const [stampValue, setStampValue] = useState<string>("1");
   const [qrValue, setQrValue] = useState<string>("");
   const [qrKey, setQrKey] = useState<number>(0);
 
   const generateQRCode = () => {
-    if (!customerName) return;
-
+    // We no longer require customer name for business QR generation
     const qrData = JSON.stringify({
-      action: "collect_stamp",
-      customer: customerName,
-      stamps: parseInt(stampValue),
+      businessId: businessId,
       timestamp: new Date().getTime(),
+      stamps: parseInt(stampValue),
+      // We still include customer if provided, but it's optional now
+      ...(customerName && { customer: customerName }),
     });
 
     setQrValue(qrData);
     if (onGenerate) {
       onGenerate(qrData);
     }
+    
+    toast({
+      title: "QR Code Generated",
+      description: "Let customers scan this code to collect stamps.",
+    });
   };
 
   const regenerateQRCode = () => {
@@ -54,9 +62,14 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
       const pngFile = canvas.toDataURL("image/png");
       
       const downloadLink = document.createElement("a");
-      downloadLink.download = `${customerName}-qrcode.png`;
+      downloadLink.download = `business-qrcode.png`;
       downloadLink.href = pngFile;
       downloadLink.click();
+      
+      toast({
+        title: "QR Code Downloaded",
+        description: "You can print this image or display it on a screen."
+      });
     };
     
     img.src = "data:image/svg+xml;base64," + btoa(svgData);
@@ -65,7 +78,10 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
   const copyQRData = () => {
     if (qrValue) {
       navigator.clipboard.writeText(qrValue);
-      alert("QR code data copied to clipboard");
+      toast({
+        title: "QR Data Copied",
+        description: "QR code data copied to clipboard"
+      });
     }
   };
 
@@ -73,19 +89,32 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
     <Card className="p-6 bg-white card-shadow">
       <h3 className="text-xl font-semibold text-coffee-dark mb-4 flex items-center gap-2">
         <QrCode size={24} className="text-orange" />
-        QR Code Generator
+        Business QR Code Generator
       </h3>
 
       <div className="flex flex-col gap-4">
         <div>
+          <label htmlFor="businessId" className="block text-sm font-medium text-coffee-light mb-1">
+            Business ID
+          </label>
+          <Input
+            id="businessId"
+            value={businessId}
+            disabled
+            className="border-coffee-light bg-cream-light"
+          />
+          <p className="text-xs text-coffee-light mt-1">This is your unique business identifier</p>
+        </div>
+
+        <div>
           <label htmlFor="customerName" className="block text-sm font-medium text-coffee-light mb-1">
-            Customer Name
+            Customer Name (Optional)
           </label>
           <Input
             id="customerName"
             value={customerName}
             onChange={(e) => setCustomerName(e.target.value)}
-            placeholder="Enter customer name"
+            placeholder="Enter customer name (optional)"
             className="border-coffee-light focus:border-orange"
           />
         </div>
@@ -110,9 +139,8 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
         <Button 
           onClick={generateQRCode} 
           className="bg-orange hover:bg-orange-light transition-colors"
-          disabled={!customerName}
         >
-          Generate QR Code
+          Generate Business QR Code
         </Button>
 
         {qrValue && (
@@ -128,6 +156,9 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
                 level="H"
               />
             </div>
+            <p className="text-xs text-coffee-light mt-2 text-center">
+              This QR code expires in 5 minutes for security
+            </p>
             <div className="mt-4 flex gap-2">
               <Button onClick={downloadQRCode} variant="outline" className="flex items-center gap-1">
                 <Download size={16} />
