@@ -69,17 +69,21 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
   // Update preview in real-time
   useEffect(() => {
     if (formValues && onCardUpdate) {
-      // Sort rewards if they exist to maintain proper order
-      const updatedConfig = { 
-        ...formValues,
-        rewards: formValues.rewards ? [...formValues.rewards].sort((a, b) => a.stampNumber - b.stampNumber) : []
+      // Create a complete card config by merging form values with defaults
+      const updatedConfig: LoyaltyCardConfig = {
+        ...cardConfig,  // Start with current config to ensure all required fields
+        ...formValues as Partial<LoyaltyCardConfig>, // Apply watched form values
+        // Ensure rewards are properly sorted
+        rewards: formValues.rewards 
+          ? [...formValues.rewards].sort((a, b) => a.stampNumber - b.stampNumber) 
+          : cardConfig.rewards
       };
       
       // Update preview with current form values
       setCardConfig(updatedConfig);
       onCardUpdate(updatedConfig);
     }
-  }, [formValues, onCardUpdate]);
+  }, [formValues, onCardUpdate, cardConfig]);
 
   const handleSubmit = (data: LoyaltyCardConfig) => {
     const sortedRewards = [...data.rewards].sort((a, b) => a.stampNumber - b.stampNumber);
