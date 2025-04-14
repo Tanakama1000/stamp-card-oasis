@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Coffee, User, QrCode, ScanLine } from "lucide-react";
+import { Coffee, QrCode } from "lucide-react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -11,19 +11,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-cream-light">
       <header className="bg-coffee-dark text-white p-4 shadow-md">
         <div className="container mx-auto flex justify-between items-center">
-          <Link to="/" className="text-xl font-bold flex items-center gap-2">
+          <Link to="/admin" className="text-xl font-bold flex items-center gap-2">
             <Coffee size={24} />
             <span>Stamp Card Oasis</span>
           </Link>
           <nav className="flex gap-4">
-            <Link to="/" className="hover:text-cream flex items-center gap-1">
-              <User size={18} />
-              <span>Customer</span>
-            </Link>
-            <Link to="/scan" className="hover:text-cream flex items-center gap-1">
-              <ScanLine size={18} />
-              <span>Scan</span>
-            </Link>
             <Link to="/admin" className="hover:text-cream flex items-center gap-1">
               <QrCode size={18} />
               <span>Business</span>
