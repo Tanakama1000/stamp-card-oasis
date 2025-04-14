@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Palette, Edit, Eye, Upload, Coffee, Star, Heart, Award, Battery, Zap, Gift, Plus, Trash2, Image } from "lucide-react";
+import { Palette, Edit, Eye, Upload, Coffee, Star, Heart, Award, Battery, Zap, Gift, Plus, Trash2, Image, Text } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -40,6 +40,9 @@ export interface LoyaltyCardConfig {
   miniRewardStampColor?: string;
   backgroundImage?: string;
   useBackgroundImage?: boolean;
+  cardTitle: string;
+  cardTitleColor?: string;
+  fontFamily: string;
 }
 
 const STAMP_ICONS = [
@@ -56,6 +59,21 @@ const REWARD_ICONS = [
   { name: "Gift", icon: Gift },
   { name: "Award", icon: Award },
   { name: "Star", icon: Star },
+];
+
+const FONT_FAMILIES = [
+  { name: "Default", value: "" },
+  { name: "Arial", value: "Arial, sans-serif" },
+  { name: "Georgia", value: "Georgia, serif" },
+  { name: "Verdana", value: "Verdana, sans-serif" },
+  { name: "Tahoma", value: "Tahoma, sans-serif" },
+  { name: "Trebuchet MS", value: "Trebuchet MS, sans-serif" },
+  { name: "Times New Roman", value: "Times New Roman, serif" },
+  { name: "Courier New", value: "Courier New, monospace" },
+  { name: "Playfair Display", value: "Playfair Display, serif" },
+  { name: "Roboto", value: "Roboto, sans-serif" },
+  { name: "Open Sans", value: "Open Sans, sans-serif" },
+  { name: "Lato", value: "Lato, sans-serif" },
 ];
 
 const COLOR_PRESETS = {
@@ -87,7 +105,10 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
     rewards: [],
     miniRewardStampColor: "#C0C0C0",
     backgroundImage: "",
-    useBackgroundImage: false
+    useBackgroundImage: false,
+    cardTitle: "Loyalty Card",
+    cardTitleColor: "#8B4513",
+    fontFamily: "",
   });
 
   const form = useForm<LoyaltyCardConfig>({
@@ -221,6 +242,23 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
               
               <FormField
                 control={form.control}
+                name="cardTitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Card Title</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Enter card title" 
+                        {...field} 
+                        className="border-coffee-light"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
                 name="customerName"
                 render={({ field }) => (
                   <FormItem>
@@ -232,6 +270,36 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                         className="border-coffee-light"
                       />
                     </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="fontFamily"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Font Family</FormLabel>
+                    <FormControl>
+                      <Select 
+                        value={field.value} 
+                        onValueChange={(val) => field.onChange(val)}
+                      >
+                        <SelectTrigger className="border-coffee-light">
+                          <SelectValue placeholder="Select font family" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {FONT_FAMILIES.map((font) => (
+                            <SelectItem key={font.value} value={font.value}>
+                              <span style={{ fontFamily: font.value || 'inherit' }}>
+                                {font.name}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <p className="text-xs text-coffee-light mt-1">Select a font for all text on the card</p>
                   </FormItem>
                 )}
               />
@@ -520,9 +588,7 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                                 key={stampIcon.name}
                                 onClick={() => field.onChange(stampIcon.name)}
                                 className={`p-3 rounded-md cursor-pointer flex flex-col items-center justify-center gap-1 text-xs transition-all ${
-                                  field.value === stampIcon.name 
-                                    ? 'bg-orange text-white' 
-                                    : 'bg-cream hover:bg-cream-light'
+                                  field.value === stampIcon.name ? 'ring-2 ring-offset-1 ring-orange' : ''
                                 }`}
                               >
                                 <Icon size={18} />
@@ -551,9 +617,7 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                                 key={rewardIcon.name}
                                 onClick={() => field.onChange(rewardIcon.name)}
                                 className={`p-3 rounded-md cursor-pointer flex flex-col items-center justify-center gap-1 text-xs transition-all ${
-                                  field.value === rewardIcon.name 
-                                    ? 'bg-orange text-white' 
-                                    : 'bg-cream hover:bg-cream-light'
+                                  field.value === rewardIcon.name ? 'ring-2 ring-offset-1 ring-orange' : ''
                                 }`}
                               >
                                 <Icon size={18} />
@@ -801,6 +865,43 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                     <FormItem>
                       <FormLabel className="flex items-center justify-between">
                         Reward Text Color
+                        <span 
+                          className="w-5 h-5 rounded-full" 
+                          style={{ backgroundColor: field.value }} 
+                        />
+                      </FormLabel>
+                      <FormControl>
+                        <div>
+                          <div className="flex gap-2 mb-2">
+                            {COLOR_PRESETS.text.map(color => (
+                              <div
+                                key={color}
+                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
+                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
+                                }`}
+                                style={{ backgroundColor: color }}
+                                onClick={() => field.onChange(color)}
+                              />
+                            ))}
+                          </div>
+                          <Input 
+                            type="color"
+                            {...field}
+                            className="h-8 w-full"
+                          />
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="cardTitleColor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center justify-between">
+                        Card Title Color
                         <span 
                           className="w-5 h-5 rounded-full" 
                           style={{ backgroundColor: field.value }} 

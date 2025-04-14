@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Coffee, Star, Heart, Award, Battery, Zap, Gift } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -50,10 +49,9 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   useEffect(() => {
     setStamps(currentStamps);
     
-    // Check if stamps increased and we're getting closer to reward
     if (currentStamps > previousStamps && currentStamps < maxStamps) {
       const remaining = maxStamps - currentStamps;
-      if (remaining <= 3) { // Show notification when 3 or fewer stamps are remaining
+      if (remaining <= 3) {
         toast({
           title: `Almost There!`,
           description: `You're only ${remaining} stamp${remaining !== 1 ? 's' : ''} away from your reward!`,
@@ -61,13 +59,11 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
         });
       }
       
-      // Check if the current stamp count triggers a mini-reward
       if (cardStyle?.rewards && cardStyle.rewards.length > 0) {
         const miniReward = cardStyle.rewards.find(r => r.stampNumber === currentStamps);
         if (miniReward) {
           setCurrentReward(miniReward);
           setShowRewardDialog(true);
-          // Show a small confetti for mini rewards as well
           setShowConfetti(true);
           setTimeout(() => {
             setShowConfetti(false);
@@ -76,7 +72,6 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
       }
     }
     
-    // Check if card just completed
     if (currentStamps === maxStamps && previousStamps < maxStamps) {
       setShowConfetti(true);
       setTimeout(() => {
@@ -110,12 +105,10 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
     }
   };
   
-  // Select the stamp icon component based on cardStyle or default to Coffee
   const StampIcon = cardStyle?.stampIcon ? 
     STAMP_ICONS[cardStyle.stampIcon as keyof typeof STAMP_ICONS] : 
     Coffee;
     
-  // Select the reward icon component
   const RewardIcon = cardStyle?.rewardIcon ? 
     STAMP_ICONS[cardStyle.rewardIcon as keyof typeof STAMP_ICONS] : 
     Gift;
@@ -131,14 +124,10 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
       for (let j = 0; j < stampsPerRow; j++) {
         const stampIndex = i * stampsPerRow + j;
         if (stampIndex < maxStamps) {
-          // Determine if this is the last stamp (which will show the reward icon)
           const isLastStamp = stampIndex === maxStamps - 1;
-          
-          // Check if this is a mini-reward stamp
           const miniReward = miniRewards.find(r => r.stampNumber === stampIndex + 1);
           const isMiniRewardStamp = !!miniReward;
           
-          // Choose the proper icon for the stamp
           let CurrentIcon;
           if (isLastStamp) {
             CurrentIcon = RewardIcon;
@@ -183,7 +172,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
               style={{
                 backgroundColor: stampIndex < stamps 
                   ? (isMiniRewardStamp ? 
-                      '#F97316' : // Special color for mini rewards
+                      '#F97316' : 
                       cardStyle?.stampActiveColor || '#8B4513')
                   : (isMiniRewardStamp && cardStyle?.miniRewardStampColor ? 
                       cardStyle.miniRewardStampColor : 
@@ -217,15 +206,16 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
 
   const rewardProgress = Math.min((stamps / maxStamps) * 100, 100);
   
-  // Define styles based on cardStyle prop or fallback to defaults
   const cardBgColor = cardStyle?.cardBgColor || "#FFFFFF";
   const textColor = cardStyle?.textColor || "#6F4E37";
   const businessNameColor = cardStyle?.businessNameColor || textColor;
+  const cardTitleColor = cardStyle?.cardTitleColor || "#8B4513";
   const rewardTextColor = cardStyle?.rewardTextColor || textColor;
   const progressBarColor = cardStyle?.stampActiveColor || "#8B4513";
   const progressBarBgColor = cardStyle?.stampBgColor || "#F5F5DC";
+  const fontFamily = cardStyle?.fontFamily || "";
+  const cardTitle = cardStyle?.cardTitle || "Loyalty Card";
 
-  // Background image styles
   const backgroundImageStyle = cardStyle?.useBackgroundImage && cardStyle?.backgroundImage ? {
     backgroundImage: `url(${cardStyle.backgroundImage})`,
     backgroundSize: 'cover',
@@ -248,10 +238,10 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
         className="p-6 card-shadow overflow-hidden relative"
         style={{ 
           backgroundColor: cardBgColor,
+          fontFamily: fontFamily,
           ...backgroundImageStyle
         }}
       >
-        {/* Overlay for image background to ensure text readability */}
         {cardStyle?.useBackgroundImage && cardStyle?.backgroundImage && (
           <div 
             className="absolute inset-0 bg-black opacity-30"
@@ -269,8 +259,9 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
             )}
             <div>
               {cardStyle?.businessName && (
-                <h3 className="font-medium" style={{ color: businessNameColor }}>{cardStyle.businessName}</h3>
+                <h3 className="text-sm font-medium" style={{ color: businessNameColor }}>{cardStyle.businessName}</h3>
               )}
+              <h2 className="text-lg font-bold" style={{ color: cardTitleColor }}>{cardTitle}</h2>
               <h4 className="font-medium" style={{ color: textColor }}>{customerName}'s Card</h4>
               <p className="text-sm" style={{ color: textColor }}>
                 Collect {maxStamps} stamps for a free item
@@ -295,7 +286,6 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
           />
         </div>
         
-        {/* Mini-rewards summary section */}
         {cardStyle?.rewards && cardStyle.rewards.length > 0 && (
           <div className="mb-4 p-3 bg-cream bg-opacity-80 rounded-lg relative z-10">
             <h4 className="text-sm font-medium mb-2" style={{ color: textColor }}>Progress Rewards:</h4>
@@ -333,7 +323,6 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
         )}
       </Card>
       
-      {/* Dialog for main reward (complete card) */}
       <Dialog open={showCompletionDialog} onOpenChange={setShowCompletionDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -357,7 +346,6 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
         </DialogContent>
       </Dialog>
       
-      {/* Dialog for mini rewards */}
       <Dialog open={showRewardDialog} onOpenChange={setShowRewardDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
