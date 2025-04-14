@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,31 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
   const [customerName, setCustomerName] = useState<string>("");
   const [stampCount, setStampCount] = useState<number>(1);
   const [qrValue, setQrValue] = useState<string>("");
-  const [qrGenerated, setQrGenerated] = useState<boolean>(false);
+  const [qrGenerated, setQrGenerated] = useState<boolean>(true);
+
+  useEffect(() => {
+    // Generate default QR code on component mount
+    const defaultName = "New Customer";
+    const defaultStamps = 1;
+    generateQRCode(defaultName, defaultStamps);
+  }, []);
+
+  const generateQRCode = (name: string, stamps: number) => {
+    const qrData = {
+      customer: name.trim() || "New Customer",
+      stamps: stamps,
+      businessId: "your-business-id", // This would normally come from auth or context
+      timestamp: Date.now(),
+    };
+
+    const qrValue = JSON.stringify(qrData);
+    setQrValue(qrValue);
+    setQrGenerated(true);
+
+    if (onGenerate) {
+      onGenerate(qrValue);
+    }
+  };
 
   const handleGenerate = () => {
     if (!customerName.trim()) {
@@ -29,25 +53,12 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
       return;
     }
 
-    const qrData = {
-      customer: customerName.trim(),
-      stamps: stampCount,
-      businessId: "your-business-id", // This would normally come from auth or context
-      timestamp: Date.now(),
-    };
-
-    const qrValue = JSON.stringify(qrData);
-    setQrValue(qrValue);
-    setQrGenerated(true);
-
+    generateQRCode(customerName, stampCount);
+    
     toast({
       title: "QR Code Generated",
       description: `QR code for ${customerName} created. Scan with the customer app to add ${stampCount} stamp${stampCount > 1 ? 's' : ''}.`,
     });
-
-    if (onGenerate) {
-      onGenerate(qrValue);
-    }
   };
   
   const downloadQRCode = () => {
@@ -64,7 +75,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
     const pngUrl = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
     const downloadLink = document.createElement("a");
     downloadLink.href = pngUrl;
-    downloadLink.download = `qrcode-${customerName.replace(/\s+/g, '-')}-${Date.now()}.png`;
+    downloadLink.download = `qrcode-${customerName.replace(/\s+/g, '-') || 'customer'}-${Date.now()}.png`;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);

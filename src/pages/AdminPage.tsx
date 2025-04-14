@@ -98,16 +98,7 @@ const AdminPage = () => {
                 <QRCodeGenerator onGenerate={handleQRGenerated} />
                 
                 <Card className="p-6 bg-white card-shadow">
-                  <h3 className="text-xl font-semibold text-coffee-dark mb-4">Instructions</h3>
-                  <ol className="list-decimal list-inside space-y-3 text-coffee-medium">
-                    <li>Enter the customer's name</li>
-                    <li>Select how many stamps to award</li>
-                    <li>Generate the QR code</li>
-                    <li>Let the customer scan it with their phone</li>
-                    <li>Or download the QR code to print</li>
-                  </ol>
-                  
-                  <div className="mt-6 p-4 bg-cream rounded-lg">
+                  <div className="mt-2 p-4 bg-cream rounded-lg">
                     <div className="flex items-center gap-2 text-coffee-dark">
                       <Users size={20} />
                       <h4 className="font-medium">QR Codes Generated</h4>
@@ -133,9 +124,6 @@ const AdminPage = () => {
                         </div>
                       )}
                     </div>
-                    <p className="mt-4 text-sm text-coffee-light text-center">
-                      This preview shows how the loyalty card will appear to customers.
-                    </p>
                   </div>
                 </Card>
               </div>
