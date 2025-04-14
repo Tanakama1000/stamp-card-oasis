@@ -7,11 +7,22 @@ import CustomerList from "@/components/CustomerList";
 import LoyaltyCardEditor from "@/components/LoyaltyCardEditor";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { QrCode, BarChart2, Users, UserCircle, Palette, RefreshCw } from "lucide-react";
+import { QrCode, BarChart2, Users, UserCircle, Palette, RefreshCw, Link as LinkIcon, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LoyaltyCardConfig } from "@/components/loyalty/editor/types";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
+// Types for business data
+interface BusinessData {
+  id: string;
+  name: string;
+  slug: string;
+  createdAt: string;
+}
 
 const AdminPage = () => {
   const { toast } = useToast();
@@ -26,6 +37,17 @@ const AdminPage = () => {
   ]);
   const isMobile = useIsMobile();
   const [previewUpdated, setPreviewUpdated] = useState(false);
+  
+  // Business data state
+  const [businessData, setBusinessData] = useState<BusinessData>({
+    id: "b_" + Date.now(),
+    name: "Coffee Oasis",
+    slug: "coffee-oasis",
+    createdAt: new Date().toISOString()
+  });
+  
+  const [slugEditing, setSlugEditing] = useState(false);
+  const [tempSlug, setTempSlug] = useState(businessData.slug);
 
   // Force rerender of the preview when a configuration change happens
   const [previewKey, setPreviewKey] = useState<number>(0);
@@ -39,6 +61,20 @@ const AdminPage = () => {
       } catch (e) {
         console.error("Error parsing saved card config:", e);
       }
+    }
+    
+    // Load business data if available
+    const savedBusinessData = localStorage.getItem('businessData');
+    if (savedBusinessData) {
+      try {
+        setBusinessData(JSON.parse(savedBusinessData));
+        setTempSlug(JSON.parse(savedBusinessData).slug);
+      } catch (e) {
+        console.error("Error parsing business data:", e);
+      }
+    } else {
+      // Store initial business data
+      localStorage.setItem('businessData', JSON.stringify(businessData));
     }
   }, []);
 
@@ -75,6 +111,52 @@ const AdminPage = () => {
     const date = new Date(timestamp);
     return date.toLocaleString();
   };
+  
+  // Handle slug editing
+  const handleSlugChange = () => {
+    if (!tempSlug.trim()) {
+      toast({
+        title: "Invalid Slug",
+        description: "Business URL cannot be empty",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Generate a valid slug - lowercase, replace spaces with hyphens, remove special chars
+    const validSlug = tempSlug.trim()
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '');
+    
+    const updatedBusinessData = {
+      ...businessData,
+      slug: validSlug
+    };
+    
+    setBusinessData(updatedBusinessData);
+    setTempSlug(validSlug);
+    setSlugEditing(false);
+    
+    // Save to localStorage
+    localStorage.setItem('businessData', JSON.stringify(updatedBusinessData));
+    
+    toast({
+      title: "URL Updated",
+      description: "Your business join link has been updated."
+    });
+  };
+  
+  // Copy join link to clipboard
+  const copyJoinLink = () => {
+    const joinLink = `${window.location.origin}/join/${businessData.slug}`;
+    navigator.clipboard.writeText(joinLink);
+    
+    toast({
+      title: "Link Copied",
+      description: "Join link copied to clipboard"
+    });
+  };
 
   return (
     <Layout>
@@ -83,6 +165,72 @@ const AdminPage = () => {
           <h1 className="text-3xl font-bold text-coffee-dark mb-2">Business Admin Panel</h1>
           <p className="text-coffee-light">Manage your loyalty program and generate QR codes</p>
         </div>
+        
+        {/* Join Link Card */}
+        <Card className="p-4 mb-6 bg-white card-shadow">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+              <h3 className="font-semibold text-coffee-dark flex items-center gap-2">
+                <LinkIcon size={18} className="text-orange" />
+                Customer Join Link
+              </h3>
+              <p className="text-coffee-light text-sm mt-1">
+                Share this link with customers to join your loyalty program
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+              {slugEditing ? (
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <Input 
+                    value={tempSlug}
+                    onChange={(e) => setTempSlug(e.target.value)}
+                    className="min-w-0 w-full"
+                    placeholder="business-url"
+                  />
+                  <Button size="sm" onClick={handleSlugChange}>Save</Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={() => {
+                      setTempSlug(businessData.slug);
+                      setSlugEditing(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button className="gap-1" variant="outline">
+                        <span className="truncate max-w-[200px]">
+                          {window.location.origin}/join/{businessData.slug}
+                        </span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2">
+                      <div className="text-sm font-medium">
+                        {window.location.origin}/join/{businessData.slug}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  <Button onClick={copyJoinLink} size="icon" variant="ghost">
+                    <Copy size={18} />
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={() => setSlugEditing(true)}
+                  >
+                    Edit URL
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        </Card>
 
         <BusinessStats 
           customerCount={26}
