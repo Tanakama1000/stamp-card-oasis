@@ -43,6 +43,11 @@ export interface LoyaltyCardConfig {
   cardTitle: string;
   cardTitleColor?: string;
   fontFamily: string;
+  businessNameFontSize?: string;
+  cardTitleFontSize?: string;
+  customerNameFontSize?: string;
+  descriptionFontSize?: string;
+  progressRewardsFontSize?: string;
 }
 
 const STAMP_ICONS = [
@@ -74,6 +79,17 @@ const FONT_FAMILIES = [
   { name: "Roboto", value: "Roboto, sans-serif" },
   { name: "Open Sans", value: "Open Sans, sans-serif" },
   { name: "Lato", value: "Lato, sans-serif" },
+];
+
+const FONT_SIZES = [
+  { name: "Default", value: "" },
+  { name: "Extra Small", value: "text-xs" },
+  { name: "Small", value: "text-sm" },
+  { name: "Medium", value: "text-base" },
+  { name: "Large", value: "text-lg" },
+  { name: "Extra Large", value: "text-xl" },
+  { name: "2X Large", value: "text-2xl" },
+  { name: "3X Large", value: "text-3xl" },
 ];
 
 const COLOR_PRESETS = {
@@ -109,6 +125,11 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
     cardTitle: "Loyalty Card",
     cardTitleColor: "#8B4513",
     fontFamily: "",
+    businessNameFontSize: "text-sm",
+    cardTitleFontSize: "text-lg",
+    customerNameFontSize: "text-base",
+    descriptionFontSize: "text-sm",
+    progressRewardsFontSize: "text-sm",
   });
 
   const form = useForm<LoyaltyCardConfig>({
@@ -274,35 +295,178 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                 )}
               />
               
-              <FormField
-                control={form.control}
-                name="fontFamily"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Font Family</FormLabel>
-                    <FormControl>
-                      <Select 
-                        value={field.value} 
-                        onValueChange={(val) => field.onChange(val)}
-                      >
-                        <SelectTrigger className="border-coffee-light">
-                          <SelectValue placeholder="Select font family" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {FONT_FAMILIES.map((font) => (
-                            <SelectItem key={font.value} value={font.value}>
-                              <span style={{ fontFamily: font.value || 'inherit' }}>
-                                {font.name}
-                              </span>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <p className="text-xs text-coffee-light mt-1">Select a font for all text on the card</p>
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-4 border-t border-cream pt-4 mt-4">
+                <h4 className="font-medium text-coffee-dark">Text Typography</h4>
+                
+                <FormField
+                  control={form.control}
+                  name="fontFamily"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Font Family</FormLabel>
+                      <FormControl>
+                        <Select 
+                          value={field.value} 
+                          onValueChange={(val) => field.onChange(val)}
+                        >
+                          <SelectTrigger className="border-coffee-light">
+                            <SelectValue placeholder="Select font family" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {FONT_FAMILIES.map((font) => (
+                              <SelectItem key={font.value} value={font.value}>
+                                <span style={{ fontFamily: font.value || 'inherit' }}>
+                                  {font.name}
+                                </span>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <p className="text-xs text-coffee-light mt-1">Select a font for all text on the card</p>
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="businessNameFontSize"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Business Name Size</FormLabel>
+                        <FormControl>
+                          <Select 
+                            value={field.value} 
+                            onValueChange={(val) => field.onChange(val)}
+                          >
+                            <SelectTrigger className="border-coffee-light">
+                              <SelectValue placeholder="Select size" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {FONT_SIZES.map((size) => (
+                                <SelectItem key={size.value || 'default'} value={size.value}>
+                                  {size.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="cardTitleFontSize"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Card Title Size</FormLabel>
+                        <FormControl>
+                          <Select 
+                            value={field.value} 
+                            onValueChange={(val) => field.onChange(val)}
+                          >
+                            <SelectTrigger className="border-coffee-light">
+                              <SelectValue placeholder="Select size" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {FONT_SIZES.map((size) => (
+                                <SelectItem key={size.value || 'default'} value={size.value}>
+                                  {size.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="customerNameFontSize"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Customer Name Size</FormLabel>
+                        <FormControl>
+                          <Select 
+                            value={field.value} 
+                            onValueChange={(val) => field.onChange(val)}
+                          >
+                            <SelectTrigger className="border-coffee-light">
+                              <SelectValue placeholder="Select size" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {FONT_SIZES.map((size) => (
+                                <SelectItem key={size.value || 'default'} value={size.value}>
+                                  {size.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="descriptionFontSize"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description Text Size</FormLabel>
+                        <FormControl>
+                          <Select 
+                            value={field.value} 
+                            onValueChange={(val) => field.onChange(val)}
+                          >
+                            <SelectTrigger className="border-coffee-light">
+                              <SelectValue placeholder="Select size" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {FONT_SIZES.map((size) => (
+                                <SelectItem key={size.value || 'default'} value={size.value}>
+                                  {size.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <FormField
+                  control={form.control}
+                  name="progressRewardsFontSize"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Progress Rewards Text Size</FormLabel>
+                      <FormControl>
+                        <Select 
+                          value={field.value} 
+                          onValueChange={(val) => field.onChange(val)}
+                        >
+                          <SelectTrigger className="border-coffee-light">
+                            <SelectValue placeholder="Select size" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {FONT_SIZES.map((size) => (
+                              <SelectItem key={size.value || 'default'} value={size.value}>
+                                  {size.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -782,208 +946,3 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                       </FormControl>
                     </FormItem>
                   )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="textColor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center justify-between">
-                        Text Color
-                        <span 
-                          className="w-5 h-5 rounded-full" 
-                          style={{ backgroundColor: field.value }} 
-                        />
-                      </FormLabel>
-                      <FormControl>
-                        <div>
-                          <div className="flex gap-2 mb-2">
-                            {COLOR_PRESETS.text.map(color => (
-                              <div
-                                key={color}
-                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
-                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
-                                }`}
-                                style={{ backgroundColor: color }}
-                                onClick={() => field.onChange(color)}
-                              />
-                            ))}
-                          </div>
-                          <Input 
-                            type="color"
-                            {...field}
-                            className="h-8 w-full"
-                          />
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="businessNameColor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center justify-between">
-                        Business Name Color
-                        <span 
-                          className="w-5 h-5 rounded-full" 
-                          style={{ backgroundColor: field.value }} 
-                        />
-                      </FormLabel>
-                      <FormControl>
-                        <div>
-                          <div className="flex gap-2 mb-2">
-                            {COLOR_PRESETS.text.map(color => (
-                              <div
-                                key={color}
-                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
-                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
-                                }`}
-                                style={{ backgroundColor: color }}
-                                onClick={() => field.onChange(color)}
-                              />
-                            ))}
-                          </div>
-                          <Input 
-                            type="color"
-                            {...field}
-                            className="h-8 w-full"
-                          />
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="rewardTextColor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center justify-between">
-                        Reward Text Color
-                        <span 
-                          className="w-5 h-5 rounded-full" 
-                          style={{ backgroundColor: field.value }} 
-                        />
-                      </FormLabel>
-                      <FormControl>
-                        <div>
-                          <div className="flex gap-2 mb-2">
-                            {COLOR_PRESETS.text.map(color => (
-                              <div
-                                key={color}
-                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
-                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
-                                }`}
-                                style={{ backgroundColor: color }}
-                                onClick={() => field.onChange(color)}
-                              />
-                            ))}
-                          </div>
-                          <Input 
-                            type="color"
-                            {...field}
-                            className="h-8 w-full"
-                          />
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="cardTitleColor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center justify-between">
-                        Card Title Color
-                        <span 
-                          className="w-5 h-5 rounded-full" 
-                          style={{ backgroundColor: field.value }} 
-                        />
-                      </FormLabel>
-                      <FormControl>
-                        <div>
-                          <div className="flex gap-2 mb-2">
-                            {COLOR_PRESETS.text.map(color => (
-                              <div
-                                key={color}
-                                className={`w-6 h-6 rounded-full cursor-pointer transition-all ${
-                                  field.value === color ? 'ring-2 ring-offset-1 ring-orange' : ''
-                                }`}
-                                style={{ backgroundColor: color }}
-                                onClick={() => field.onChange(color)}
-                              />
-                            ))}
-                          </div>
-                          <Input 
-                            type="color"
-                            {...field}
-                            className="h-8 w-full"
-                          />
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <Button 
-                type="submit"
-                className="bg-orange hover:bg-orange-light transition-colors w-full mt-2"
-              >
-                Update Card
-              </Button>
-            </form>
-          </Form>
-        </TabsContent>
-
-        <TabsContent value="preview">
-          <div className="flex flex-col gap-4">
-            <div className="bg-cream-light p-4 rounded-lg">
-              <p className="text-sm text-coffee-light mb-2">Card Preview</p>
-              <LoyaltyCard
-                customerName={cardConfig.customerName}
-                maxStamps={cardConfig.maxStamps}
-                currentStamps={cardConfig.currentStamps}
-                cardStyle={cardConfig}
-                onStampCollected={() => {}}
-              />
-            </div>
-            
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" className="w-full">
-                  Full Screen Preview
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="bottom" className="h-[90vh]">
-                <SheetHeader>
-                  <SheetTitle>Card Preview</SheetTitle>
-                </SheetHeader>
-                <div className="flex items-center justify-center h-full">
-                  <div className="max-w-md w-full">
-                    <LoyaltyCard
-                      customerName={cardConfig.customerName}
-                      maxStamps={cardConfig.maxStamps}
-                      currentStamps={cardConfig.currentStamps}
-                      cardStyle={cardConfig}
-                      onStampCollected={() => {}}
-                    />
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </Card>
-  );
-};
-
-export default LoyaltyCardEditor;
