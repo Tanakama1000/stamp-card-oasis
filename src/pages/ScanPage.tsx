@@ -5,7 +5,7 @@ import LoyaltyCard from "@/components/LoyaltyCard";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ScanLine, BadgeCheck } from "lucide-react";
-import { LoyaltyCardConfig } from "@/components/LoyaltyCardEditor";
+import { LoyaltyCardConfig } from "@/components/loyalty/editor/types";
 
 const ScanPage = () => {
   const { toast } = useToast();

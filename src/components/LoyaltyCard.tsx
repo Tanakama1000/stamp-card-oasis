@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import Confetti from 'react-confetti';
 import useWindowSize from "@/hooks/useWindowSize";
-import { LoyaltyCardConfig } from "./LoyaltyCardEditor";
+import { LoyaltyCardConfig } from "./loyalty/editor/types";
 
 // Import refactored components
 import StampGrid from "./loyalty/StampGrid";

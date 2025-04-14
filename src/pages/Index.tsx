@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Gift, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { LoyaltyCardConfig } from "@/components/LoyaltyCardEditor";
+import { LoyaltyCardConfig } from "@/components/loyalty/editor/types";
 
 const Index = () => {
   const { toast } = useToast();

@@ -1,8 +1,14 @@
 
-import { LoyaltyCardConfig, Reward } from "../types";
+import { LucideIcon } from "lucide-react";
+import { Reward } from "../types";
 
-export interface LoyaltyCardEditorProps {
-  onCardUpdate?: (cardConfig: LoyaltyCardConfig) => void;
+// Editor section props
+export interface IconSelectionProps {
+  icons: Array<{ name: string; icon: React.ElementType }>;
+  selectedIcon: string;
+  onSelectIcon: (iconName: string) => void;
+  label?: string;
+  description?: string;
 }
 
 export interface ColorSelectionProps {
@@ -10,14 +16,6 @@ export interface ColorSelectionProps {
   onChange: (value: string) => void;
   label: string;
   presets: string[];
-}
-
-export interface IconSelectionProps {
-  icons: Array<{ name: string; icon: React.ElementType }>;
-  selectedIcon: string;
-  onSelectIcon: (iconName: string) => void;
-  label?: string;
-  description?: string;
 }
 
 export interface RewardsEditorProps {
@@ -67,4 +65,41 @@ export interface CardColorsSectionProps {
 
 export interface StampConfigSectionProps {
   form: any;
+}
+
+export interface LoyaltyCardConfig {
+  businessName: string;
+  customerName: string;
+  maxStamps: number;
+  currentStamps: number;
+  cardBgColor: string;
+  stampBgColor: string;
+  stampActiveColor: string;
+  textColor: string;
+  businessLogo: string;
+  businessNameColor: string;
+  rewardTextColor: string;
+  stampIcon: string;
+  rewardIcon: string;
+  rewards: Reward[];
+  miniRewardStampColor: string;
+  backgroundImage: string;
+  useBackgroundImage: boolean;
+  cardTitle: string;
+  cardTitleColor: string;
+  fontFamily: string;
+  businessNameFont: string;
+  cardTitleFont: string;
+  customerNameFont: string;
+  descriptionFont: string;
+  progressRewardsFont: string;
+  businessNameFontSize: string;
+  cardTitleFontSize: string;
+  customerNameFontSize: string;
+  descriptionFontSize: string;
+  progressRewardsFontSize: string;
+}
+
+export interface LoyaltyCardEditorProps {
+  onCardUpdate?: (cardConfig: LoyaltyCardConfig) => void;
 }

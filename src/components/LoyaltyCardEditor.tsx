@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Palette } from "lucide-react";
 import { Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { LoyaltyCardConfig } from "@/components/loyalty/types";
+import { FormField } from "@/components/ui/form";
+import { LoyaltyCardConfig } from "@/components/loyalty/editor/types";
 
 import TypographyEditor from "@/components/loyalty/editor/TypographyEditor";
 import RewardsEditor from "@/components/loyalty/editor/RewardsEditor";

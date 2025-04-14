@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QrCode, BarChart2, Users, UserCircle, Palette } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { LoyaltyCardConfig } from "@/components/LoyaltyCardEditor";
+import { LoyaltyCardConfig } from "@/components/loyalty/editor/types";
 import LoyaltyCard from "@/components/LoyaltyCard";
 
 const AdminPage = () => {
