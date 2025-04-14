@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Coffee, Star, Heart, Award, Battery, Zap, Gift } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { LoyaltyCardConfig } from "./LoyaltyCardEditor";
+import { LoyaltyCardConfig, Reward } from "./LoyaltyCardEditor";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -44,6 +44,8 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
   const [showCompletionDialog, setShowCompletionDialog] = useState<boolean>(false);
   const [previousStamps, setPreviousStamps] = useState<number>(currentStamps);
+  const [showRewardDialog, setShowRewardDialog] = useState<boolean>(false);
+  const [currentReward, setCurrentReward] = useState<Reward | null>(null);
 
   useEffect(() => {
     setStamps(currentStamps);
@@ -57,6 +59,20 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
           description: `You're only ${remaining} stamp${remaining !== 1 ? 's' : ''} away from your reward!`,
           duration: 4000,
         });
+      }
+      
+      // Check if the current stamp count triggers a mini-reward
+      if (cardStyle?.rewards && cardStyle.rewards.length > 0) {
+        const miniReward = cardStyle.rewards.find(r => r.stampNumber === currentStamps);
+        if (miniReward) {
+          setCurrentReward(miniReward);
+          setShowRewardDialog(true);
+          // Show a small confetti for mini rewards as well
+          setShowConfetti(true);
+          setTimeout(() => {
+            setShowConfetti(false);
+          }, 3000);
+        }
       }
     }
     
@@ -72,7 +88,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
     }
     
     setPreviousStamps(currentStamps);
-  }, [currentStamps, maxStamps, previousStamps, toast]);
+  }, [currentStamps, maxStamps, previousStamps, toast, cardStyle]);
 
   const handleStampClick = (index: number) => {
     if (index === stamps && stamps < maxStamps) {
@@ -108,6 +124,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
     const rows = [];
     const stampsPerRow = 5;
     const rowCount = Math.ceil(maxStamps / stampsPerRow);
+    const miniRewards = cardStyle?.rewards || [];
 
     for (let i = 0; i < rowCount; i++) {
       const stampRow = [];
@@ -116,7 +133,20 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
         if (stampIndex < maxStamps) {
           // Determine if this is the last stamp (which will show the reward icon)
           const isLastStamp = stampIndex === maxStamps - 1;
-          const CurrentIcon = isLastStamp ? RewardIcon : StampIcon;
+          
+          // Check if this is a mini-reward stamp
+          const miniReward = miniRewards.find(r => r.stampNumber === stampIndex + 1);
+          const isMiniRewardStamp = !!miniReward;
+          
+          // Choose the proper icon for the stamp
+          let CurrentIcon;
+          if (isLastStamp) {
+            CurrentIcon = RewardIcon;
+          } else if (isMiniRewardStamp) {
+            CurrentIcon = STAMP_ICONS[miniReward.icon as keyof typeof STAMP_ICONS] || StampIcon;
+          } else {
+            CurrentIcon = StampIcon;
+          }
           
           stampRow.push(
             <div
@@ -138,19 +168,26 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
                     : ""
                 }
                 ${
-                  isLastStamp && stampIndex >= stamps
+                  (isLastStamp || isMiniRewardStamp) && stampIndex >= stamps
                     ? "border-dashed"
                     : ""
                 }
               `}
               onClick={() => handleStampClick(stampIndex)}
-              title={isLastStamp ? "Reward stamp" : (stampIndex < stamps ? "Collected" : stampIndex === stamps ? "Collect stamp" : "Future stamp")}
+              title={
+                isLastStamp ? "Reward stamp" : 
+                (isMiniRewardStamp ? `Mini reward: ${miniReward.description}` : 
+                (stampIndex < stamps ? "Collected" : 
+                stampIndex === stamps ? "Collect stamp" : "Future stamp"))
+              }
               style={{
                 backgroundColor: stampIndex < stamps 
-                  ? cardStyle?.stampActiveColor || '#8B4513' 
+                  ? (isMiniRewardStamp ? 
+                      '#F97316' : // Special color for mini rewards
+                      cardStyle?.stampActiveColor || '#8B4513')
                   : cardStyle?.stampBgColor || '#F5F5DC',
-                borderColor: isLastStamp 
-                  ? (stampIndex < stamps ? cardStyle?.stampActiveColor || '#8B4513' : '#F97316')
+                borderColor: (isLastStamp || isMiniRewardStamp)
+                  ? (stampIndex < stamps ? '#F97316' : '#F97316')
                   : cardStyle?.stampActiveColor || '#8B4513',
                 color: stampIndex < stamps 
                   ? '#FFFFFF' 
@@ -158,6 +195,11 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
               }}
             >
               <CurrentIcon size={24} />
+              {isMiniRewardStamp && (
+                <span className="absolute -top-1 -right-1 bg-orange text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                  {stampIndex + 1}
+                </span>
+              )}
             </div>
           );
         }
@@ -227,6 +269,31 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
             }}
           />
         </div>
+        
+        {/* Mini-rewards summary section */}
+        {cardStyle?.rewards && cardStyle.rewards.length > 0 && (
+          <div className="mb-4 p-3 bg-cream rounded-lg">
+            <h4 className="text-sm font-medium mb-2" style={{ color: textColor }}>Progress Rewards:</h4>
+            <div className="flex flex-wrap gap-2">
+              {cardStyle.rewards.map((reward, index) => {
+                const RewardIcon = STAMP_ICONS[reward.icon as keyof typeof STAMP_ICONS] || Gift;
+                return (
+                  <div 
+                    key={index}
+                    className={`px-2 py-1 rounded-full text-xs flex items-center gap-1 ${
+                      stamps >= reward.stampNumber 
+                        ? 'bg-orange text-white' 
+                        : 'bg-cream-light text-coffee-dark'
+                    }`}
+                  >
+                    <RewardIcon size={12} />
+                    <span>Stamp {reward.stampNumber}: {reward.description}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col gap-3">{renderStamps()}</div>
 
@@ -241,6 +308,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
         )}
       </Card>
       
+      {/* Dialog for main reward (complete card) */}
       <Dialog open={showCompletionDialog} onOpenChange={setShowCompletionDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -259,6 +327,41 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
               onClick={handleNewCard}
             >
               Start a New Card
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Dialog for mini rewards */}
+      <Dialog open={showRewardDialog} onOpenChange={setShowRewardDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl">Reward Unlocked! 🎉</DialogTitle>
+            <DialogDescription className="text-center">
+              Congratulations! You've earned a special reward at stamp #{currentReward?.stampNumber}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center my-4 space-y-3">
+            {currentReward && (
+              <>
+                {(() => {
+                  const RewardIcon = STAMP_ICONS[currentReward.icon as keyof typeof STAMP_ICONS] || Gift;
+                  return <RewardIcon size={48} className="text-orange" />;
+                })()}
+                <h3 className="text-xl font-semibold text-orange">{currentReward.description}</h3>
+                <p className="text-sm text-center text-coffee-light">
+                  Show this to a staff member to claim your reward.
+                  Keep collecting stamps to earn more rewards!
+                </p>
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              className="w-full bg-orange hover:bg-orange-light"
+              onClick={() => setShowRewardDialog(false)}
+            >
+              Keep Collecting!
             </Button>
           </DialogFooter>
         </DialogContent>

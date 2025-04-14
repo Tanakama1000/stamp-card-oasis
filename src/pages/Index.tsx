@@ -56,6 +56,10 @@ const Index = () => {
     });
   };
 
+  // Get mini rewards for display
+  const miniRewards = cardStyle?.rewards || [];
+  const sortedRewards = [...(miniRewards || [])].sort((a, b) => a.stampNumber - b.stampNumber);
+
   return (
     <Layout>
       <div className="max-w-3xl mx-auto">
@@ -70,6 +74,24 @@ const Index = () => {
             <h2 className="text-xl font-semibold">Your Loyalty Rewards</h2>
           </div>
           <p className="mb-4">Collect {maxStamps} stamps to earn a free item of your choice!</p>
+          
+          {sortedRewards.length > 0 && (
+            <div className="mb-4 p-3 bg-white/10 rounded-lg">
+              <h3 className="text-sm font-medium mb-2">Progress Rewards:</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {sortedRewards.map((reward, idx) => (
+                  <div key={idx} className="flex items-center gap-1 text-sm">
+                    <Gift size={14} className={stamps >= reward.stampNumber ? "text-yellow-300" : ""} />
+                    <span>
+                      Stamp {reward.stampNumber}: {reward.description}
+                      {stamps >= reward.stampNumber && " (Unlocked!)"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
           <div className="flex items-center gap-2">
             <div className="text-sm bg-white/20 px-3 py-1 rounded-full">
               {maxStamps - stamps} stamps to go!

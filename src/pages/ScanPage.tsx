@@ -1,19 +1,35 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import QRScanner from "@/components/QRScanner";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ScanLine, BadgeCheck } from "lucide-react";
+import { LoyaltyCardConfig } from "@/components/LoyaltyCardEditor";
 
 const ScanPage = () => {
   const { toast } = useToast();
   const [customerName, setCustomerName] = useState<string>("Coffee Lover");
   const [stamps, setStamps] = useState<number>(3);
-  const maxStamps = 10;
+  const [maxStamps, setMaxStamps] = useState<number>(10);
   const [lastScanTime, setLastScanTime] = useState<number | null>(null);
   const [lastBusinessId, setLastBusinessId] = useState<string | null>(null);
+  const [cardStyle, setCardStyle] = useState<LoyaltyCardConfig | null>(null);
+
+  // Fetch card style from localStorage on component mount
+  useEffect(() => {
+    const savedCardStyle = localStorage.getItem('loyaltyCardStyle');
+    if (savedCardStyle) {
+      try {
+        const parsedStyle = JSON.parse(savedCardStyle);
+        setCardStyle(parsedStyle);
+        setMaxStamps(parsedStyle.maxStamps || 10);
+      } catch (error) {
+        console.error("Error parsing card style from localStorage", error);
+      }
+    }
+  }, []);
 
   const handleSuccessfulScan = (businessId: string, timestamp: number, stampCount: number = 1) => {
     console.log("Successful scan:", { businessId, timestamp, stampCount });
@@ -52,6 +68,15 @@ const ScanPage = () => {
       });
     }
   };
+  
+  const handleCardReset = () => {
+    setStamps(0);
+    toast({
+      title: "New Card Started",
+      description: "Your loyalty card has been reset. Start collecting stamps!",
+      duration: 3000,
+    });
+  };
 
   return (
     <Layout>
@@ -87,7 +112,9 @@ const ScanPage = () => {
             customerName={customerName}
             maxStamps={maxStamps}
             currentStamps={stamps}
+            cardStyle={cardStyle || undefined}
             onStampCollected={() => {}}
+            onReset={handleCardReset}
           />
         </div>
       </div>

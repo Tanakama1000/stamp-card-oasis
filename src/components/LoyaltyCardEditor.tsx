@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Palette, Edit, Eye, Upload, Coffee, Star, Heart, Award, Battery, Zap, Gift } from "lucide-react";
+import { Palette, Edit, Eye, Upload, Coffee, Star, Heart, Award, Battery, Zap, Gift, Plus, Trash2 } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -14,6 +14,12 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 
 interface LoyaltyCardEditorProps {
   onCardUpdate?: (cardConfig: LoyaltyCardConfig) => void;
+}
+
+export interface Reward {
+  stampNumber: number;
+  description: string;
+  icon: string;
 }
 
 export interface LoyaltyCardConfig {
@@ -28,6 +34,7 @@ export interface LoyaltyCardConfig {
   businessLogo?: string;
   stampIcon: string;
   rewardIcon?: string;
+  rewards: Reward[];
 }
 
 const STAMP_ICONS = [
@@ -68,7 +75,8 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
     textColor: "#6F4E37",
     businessLogo: "",
     stampIcon: "Coffee",
-    rewardIcon: "Gift"
+    rewardIcon: "Gift",
+    rewards: []
   });
 
   const form = useForm<LoyaltyCardConfig>({
@@ -76,9 +84,13 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
   });
 
   const handleSubmit = (data: LoyaltyCardConfig) => {
-    setCardConfig(data);
+    // Sort rewards by stampNumber
+    const sortedRewards = [...data.rewards].sort((a, b) => a.stampNumber - b.stampNumber);
+    const updatedData = {...data, rewards: sortedRewards};
+    
+    setCardConfig(updatedData);
     if (onCardUpdate) {
-      onCardUpdate(data);
+      onCardUpdate(updatedData);
     }
     toast({
       title: "Card Updated",
@@ -99,6 +111,43 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
       };
       reader.readAsDataURL(file);
     }
+  };
+  
+  const addReward = () => {
+    const maxStamps = form.getValues("maxStamps");
+    const currentRewards = form.getValues("rewards") || [];
+    
+    // Find the next available stamp number
+    const usedStampNumbers = currentRewards.map(r => r.stampNumber);
+    let nextStampNumber = 1;
+    while (usedStampNumbers.includes(nextStampNumber) && nextStampNumber < maxStamps) {
+      nextStampNumber++;
+    }
+    
+    // If all stamps are used, don't add more
+    if (nextStampNumber >= maxStamps) {
+      toast({
+        title: "Cannot Add More Rewards",
+        description: "You've reached the maximum number of stamps for rewards.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const newReward: Reward = {
+      stampNumber: nextStampNumber,
+      description: "Free Item",
+      icon: "Gift"
+    };
+    
+    const updatedRewards = [...currentRewards, newReward];
+    form.setValue("rewards", updatedRewards);
+  };
+  
+  const removeReward = (index: number) => {
+    const currentRewards = form.getValues("rewards") || [];
+    const updatedRewards = currentRewards.filter((_, i) => i !== index);
+    form.setValue("rewards", updatedRewards);
   };
 
   return (
@@ -248,6 +297,133 @@ const LoyaltyCardEditor: React.FC<LoyaltyCardEditorProps> = ({ onCardUpdate }) =
                   </FormItem>
                 )}
               />
+
+              {/* Custom Rewards Section */}
+              <div className="space-y-4 border-t border-cream pt-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium text-coffee-dark">Progress Rewards</h4>
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    size="sm"
+                    onClick={addReward}
+                    className="flex items-center gap-1"
+                  >
+                    <Plus size={16} />
+                    Add Reward
+                  </Button>
+                </div>
+                
+                <FormField
+                  control={form.control}
+                  name="rewards"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="space-y-2">
+                        {field.value && field.value.length > 0 ? (
+                          field.value.map((reward, index) => (
+                            <div key={index} className="flex gap-2 items-end border border-cream rounded-md p-3">
+                              <div className="flex-1 space-y-2">
+                                <div>
+                                  <label className="text-sm font-medium">Stamp Number</label>
+                                  <Select
+                                    value={reward.stampNumber.toString()}
+                                    onValueChange={(val) => {
+                                      const newRewards = [...field.value];
+                                      newRewards[index] = {
+                                        ...newRewards[index],
+                                        stampNumber: parseInt(val)
+                                      };
+                                      field.onChange(newRewards);
+                                    }}
+                                  >
+                                    <SelectTrigger className="border-coffee-light">
+                                      <SelectValue placeholder="Select stamp" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {[...Array(form.getValues("maxStamps"))].map((_, i) => (
+                                        <SelectItem 
+                                          key={i} 
+                                          value={(i + 1).toString()}
+                                          disabled={field.value.some((r, idx) => 
+                                            idx !== index && r.stampNumber === i + 1
+                                          )}
+                                        >
+                                          Stamp {i + 1}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium">Reward Description</label>
+                                  <Input
+                                    placeholder="e.g., Free Cookie"
+                                    value={reward.description}
+                                    onChange={(e) => {
+                                      const newRewards = [...field.value];
+                                      newRewards[index] = {
+                                        ...newRewards[index],
+                                        description: e.target.value
+                                      };
+                                      field.onChange(newRewards);
+                                    }}
+                                    className="border-coffee-light"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium">Reward Icon</label>
+                                  <div className="grid grid-cols-4 gap-2">
+                                    {STAMP_ICONS.map((stampIcon) => {
+                                      const Icon = stampIcon.icon;
+                                      return (
+                                        <div 
+                                          key={stampIcon.name}
+                                          onClick={() => {
+                                            const newRewards = [...field.value];
+                                            newRewards[index] = {
+                                              ...newRewards[index],
+                                              icon: stampIcon.name
+                                            };
+                                            field.onChange(newRewards);
+                                          }}
+                                          className={`p-2 rounded-md cursor-pointer flex flex-col items-center justify-center gap-1 text-xs transition-all ${
+                                            reward.icon === stampIcon.name 
+                                              ? 'bg-orange text-white' 
+                                              : 'bg-cream hover:bg-cream-light'
+                                          }`}
+                                        >
+                                          <Icon size={16} />
+                                          <span>{stampIcon.name}</span>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => removeReward(index)}
+                                className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                              >
+                                <Trash2 size={18} />
+                              </Button>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center p-4 border border-dashed border-coffee-light rounded-md">
+                            <p className="text-sm text-coffee-light">No rewards added yet. Add a reward to offer progress-based incentives.</p>
+                          </div>
+                        )}
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               {/* Icons Selection */}
               <div className="space-y-4 border-t border-cream pt-4 mt-4">
