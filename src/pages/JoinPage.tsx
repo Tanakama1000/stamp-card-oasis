@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Coffee, QrCode } from "lucide-react";
+import { Loader2, Coffee, QrCode, UserPlus, LogIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -27,6 +26,13 @@ const JoinPage = () => {
   const [loyaltyCardConfig, setLoyaltyCardConfig] = useState<any>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [memberId, setMemberId] = useState<string | null>(null);
+  
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [isAuthMode, setIsAuthMode] = useState<boolean>(false);
+  const [isSignup, setIsSignup] = useState<boolean>(true);
+  const [authLoading, setAuthLoading] = useState<boolean>(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -40,7 +46,6 @@ const JoinPage = () => {
     
     const fetchBusinessData = async () => {
       try {
-        // Use case insensitive comparison for the business slug
         const { data: businesses, error } = await supabase
           .from("businesses")
           .select("*")
@@ -85,7 +90,6 @@ const JoinPage = () => {
           await fetchLoyaltyCardConfig(businesses.id);
           
           if (userId) {
-            // Check if authenticated user is already a member
             const { data: membership } = await supabase
               .from("business_members")
               .select("*")
@@ -105,7 +109,6 @@ const JoinPage = () => {
               setStamps(membership.stamps || 0);
             }
           } else {
-            // Check for anonymous membership in localStorage
             const savedMemberships = localStorage.getItem('memberships');
             if (savedMemberships) {
               try {
@@ -212,7 +215,6 @@ const JoinPage = () => {
       try {
         let membershipId;
         
-        // Create a membership record in the database
         if (businessData.id) {
           const memberData = {
             business_id: businessData.id,
@@ -221,7 +223,6 @@ const JoinPage = () => {
             is_anonymous: !userId
           };
           
-          // Add user_id only if authenticated
           if (userId) {
             memberData['user_id'] = userId;
           }
@@ -246,7 +247,6 @@ const JoinPage = () => {
           setMemberId(membershipId);
         }
         
-        // Store membership in localStorage for anonymous users
         if (!userId) {
           try {
             const membershipData = {
@@ -290,6 +290,70 @@ const JoinPage = () => {
     }
   };
 
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError(null);
+    
+    try {
+      if (isSignup) {
+        const { data, error } = await supabase.auth.signUp({ 
+          email, 
+          password,
+          options: {
+            data: {
+              full_name: customerName,
+              user_type: 'customer'
+            }
+          }
+        });
+        
+        if (error) {
+          setAuthError(error.message);
+          setAuthLoading(false);
+          return;
+        }
+        
+        toast({
+          title: "Account Created",
+          description: "Your account has been created successfully!",
+        });
+        
+        if (data.user) {
+          setUserId(data.user.id);
+          setIsAuthMode(false);
+        }
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({ 
+          email, 
+          password 
+        });
+        
+        if (error) {
+          setAuthError(error.message);
+          setAuthLoading(false);
+          return;
+        }
+        
+        toast({
+          title: "Login Successful",
+          description: "You've been logged in successfully!",
+        });
+        
+        if (data.user) {
+          setUserId(data.user.id);
+          setIsAuthMode(false);
+        }
+      }
+      
+      setAuthLoading(false);
+    } catch (error) {
+      console.error('Authentication error:', error);
+      setAuthError('An unexpected error occurred. Please try again.');
+      setAuthLoading(false);
+    }
+  };
+
   const handleCollectStamp = () => {
     setScannerOpen(true);
   };
@@ -319,7 +383,6 @@ const JoinPage = () => {
       description: `You've collected ${stampCount} stamp${stampCount > 1 ? 's' : ''}.`,
     });
     
-    // Update stamps in database if we have a business ID
     if (businessData?.id && memberId) {
       supabase
         .from('business_members')
@@ -331,7 +394,6 @@ const JoinPage = () => {
           }
         });
         
-      // Also update localStorage for anonymous users
       if (!userId) {
         try {
           const savedMemberships = localStorage.getItem('memberships') || '[]';
@@ -347,6 +409,10 @@ const JoinPage = () => {
         }
       }
     }
+  };
+
+  const toggleAuthMode = () => {
+    setIsAuthMode(!isAuthMode);
   };
 
   if (loading) {
@@ -370,6 +436,111 @@ const JoinPage = () => {
             <Link to="/">
               <Button>Return Home</Button>
             </Link>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (isAuthMode) {
+    return (
+      <Layout>
+        <div className="max-w-md mx-auto mt-8">
+          <Card className="p-6 bg-white card-shadow">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold mb-1">
+                {isSignup ? 'Create an Account' : 'Login'}
+              </h2>
+              <p className="text-gray-600">
+                {isSignup 
+                  ? 'Join with an account to track your loyalty cards across devices' 
+                  : 'Welcome back! Login to access your loyalty cards'}
+              </p>
+            </div>
+            
+            {authError && (
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
+                {authError}
+              </div>
+            )}
+            
+            <form onSubmit={handleAuthSubmit} className="space-y-4">
+              {isSignup && (
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium mb-1">
+                    Your Name
+                  </label>
+                  <Input
+                    id="name"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Enter your name"
+                    required
+                  />
+                </div>
+              )}
+              
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium mb-1">
+                  Email Address
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium mb-1">
+                  Password
+                </label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                />
+              </div>
+              
+              <Button 
+                type="submit" 
+                className="w-full"
+                disabled={authLoading}
+              >
+                {authLoading 
+                  ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
+                  : isSignup ? 'Create Account' : 'Login'}
+              </Button>
+              
+              <div className="text-center mt-4">
+                <Button 
+                  type="button" 
+                  variant="link"
+                  onClick={() => setIsSignup(!isSignup)}
+                >
+                  {isSignup 
+                    ? 'Already have an account? Login' 
+                    : "Don't have an account? Sign Up"}
+                </Button>
+              </div>
+              
+              <div className="pt-2 text-center">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsAuthMode(false)}
+                >
+                  Continue as Guest
+                </Button>
+              </div>
+            </form>
           </Card>
         </div>
       </Layout>
@@ -402,6 +573,17 @@ const JoinPage = () => {
               >
                 Here's your loyalty card
               </p>
+              
+              {userId ? (
+                <div className="mt-2 text-sm text-green-600 flex items-center justify-center gap-1">
+                  <span className="w-2 h-2 bg-green-600 rounded-full"></span>
+                  Signed in as member
+                </div>
+              ) : (
+                <div className="mt-2 text-sm text-gray-500">
+                  Guest mode - card stored on this device only
+                </div>
+              )}
             </div>
             
             <div className="mb-6">
@@ -430,6 +612,17 @@ const JoinPage = () => {
                 <QrCode size={20} />
                 Scan QR Code to Collect Stamp
               </Button>
+              
+              {!userId && (
+                <Button
+                  onClick={toggleAuthMode}
+                  variant="outline"
+                  className="w-full flex items-center justify-center gap-2"
+                >
+                  <UserPlus size={20} />
+                  Create Account to Save Card
+                </Button>
+              )}
             </div>
           </Card>
         </div>
@@ -498,16 +691,48 @@ const JoinPage = () => {
               />
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full text-white"
-              style={{ 
-                backgroundColor: loyaltyCardConfig?.stampActiveColor || "#F97316",
-                borderColor: loyaltyCardConfig?.stampActiveColor || "#F97316"
-              }}
-            >
-              Join Loyalty Program
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button 
+                type="submit" 
+                className="w-full text-white"
+                style={{ 
+                  backgroundColor: loyaltyCardConfig?.stampActiveColor || "#F97316",
+                  borderColor: loyaltyCardConfig?.stampActiveColor || "#F97316"
+                }}
+              >
+                Join Loyalty Program
+              </Button>
+              
+              <div className="flex items-center justify-center my-2">
+                <div className="flex-1 h-px bg-gray-200"></div>
+                <span className="px-4 text-sm text-gray-500">or</span>
+                <div className="flex-1 h-px bg-gray-200"></div>
+              </div>
+              
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={toggleAuthMode}
+              >
+                <UserPlus size={18} />
+                Join with Account
+              </Button>
+              
+              {!userId && (
+                <Button
+                  type="button"
+                  variant="link"
+                  className="text-sm"
+                  onClick={() => {
+                    setIsSignup(false);
+                    setIsAuthMode(true);
+                  }}
+                >
+                  Already have an account? <span className="underline ml-1">Login</span>
+                </Button>
+              )}
+            </div>
           </form>
         </Card>
       </div>
