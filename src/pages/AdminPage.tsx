@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BusinessData {
   id: string;
@@ -47,18 +48,42 @@ const AdminPage = () => {
   const [cardConfig, setCardConfig] = useState<LoyaltyCardConfig | null>(null);
 
   useEffect(() => {
-    const savedBusinessData = localStorage.getItem('businessData');
-    if (savedBusinessData) {
+    const fetchBusinessData = async () => {
       try {
-        const parsedData = JSON.parse(savedBusinessData);
-        setBusinessData(parsedData);
-        setTempSlug(parsedData.slug);
+        // Try to get data from Supabase first
+        const { data: businesses, error } = await supabase
+          .from("businesses")
+          .select("*")
+          .limit(1);
+          
+        if (!error && businesses && businesses.length > 0) {
+          setBusinessData({
+            id: businesses[0].id,
+            name: businesses[0].name,
+            slug: businesses[0].slug,
+            createdAt: businesses[0].created_at
+          });
+          setTempSlug(businesses[0].slug);
+        } else {
+          // Fallback to localStorage
+          const savedBusinessData = localStorage.getItem('businessData');
+          if (savedBusinessData) {
+            try {
+              const parsedData = JSON.parse(savedBusinessData);
+              setBusinessData(parsedData);
+              setTempSlug(parsedData.slug);
+            } catch (e) {
+              console.error("Error parsing business data:", e);
+            }
+          } else {
+            // Create default business data in localStorage
+            localStorage.setItem('businessData', JSON.stringify(businessData));
+          }
+        }
       } catch (e) {
-        console.error("Error parsing business data:", e);
+        console.error("Error fetching business data:", e);
       }
-    } else {
-      localStorage.setItem('businessData', JSON.stringify(businessData));
-    }
+    };
     
     // Load card configuration
     const savedCardConfig = localStorage.getItem('loyaltyCardConfig');
@@ -70,6 +95,8 @@ const AdminPage = () => {
         console.error("Error parsing card config:", e);
       }
     }
+    
+    fetchBusinessData();
   }, []);
 
   const handleQRGenerated = (codeData: string) => {
@@ -94,7 +121,7 @@ const AdminPage = () => {
     return date.toLocaleString();
   };
 
-  const handleSlugChange = () => {
+  const handleSlugChange = async () => {
     if (!tempSlug.trim()) {
       toast({
         title: "Invalid Slug",
@@ -113,6 +140,28 @@ const AdminPage = () => {
       ...businessData,
       slug: validSlug
     };
+    
+    // Try to update in Supabase if we have an ID
+    if (businessData.id && businessData.id.includes("b_") === false) {
+      try {
+        const { error } = await supabase
+          .from("businesses")
+          .update({ slug: validSlug })
+          .eq("id", businessData.id);
+          
+        if (error) {
+          console.error("Error updating business slug:", error);
+          toast({
+            title: "Error",
+            description: "Could not update business URL. It may already be taken.",
+            variant: "destructive"
+          });
+          return;
+        }
+      } catch (e) {
+        console.error("Error updating business slug:", e);
+      }
+    }
     
     setBusinessData(updatedBusinessData);
     setTempSlug(validSlug);

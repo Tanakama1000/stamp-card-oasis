@@ -5,10 +5,10 @@ import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Coffee, QrCode } from "lucide-react";
+import { Loader2, Coffee } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import LoyaltyCard from "@/components/LoyaltyCard";
-import QRScannerDialog from "@/components/QRScannerDialog";
 
 const JoinPage = () => {
   const { businessSlug } = useParams();
@@ -21,54 +21,75 @@ const JoinPage = () => {
   const [joined, setJoined] = useState<boolean>(false);
   const [businessData, setBusinessData] = useState<any>(null);
   const [customer, setCustomer] = useState<any>(null);
-  const [showScannerDialog, setShowScannerDialog] = useState<boolean>(false);
 
   useEffect(() => {
-    setTimeout(() => {
-      const savedBusinesses = localStorage.getItem('businesses');
-      let foundBusiness = null;
-      
-      if (savedBusinesses) {
-        try {
-          const businesses = JSON.parse(savedBusinesses);
-          foundBusiness = businesses.find((b: any) => b.slug === businessSlug);
-        } catch (e) {
-          console.error("Error parsing businesses:", e);
-        }
-      }
-      
-      if (foundBusiness) {
-        setBusinessName(foundBusiness.name);
-        setBusinessData(foundBusiness);
-        setLoading(false);
-      } else {
-        if (businessSlug === "coffee-oasis") {
-          setBusinessName("Coffee Oasis");
-          setBusinessData({
-            name: "Coffee Oasis",
-            slug: "coffee-oasis",
-            cardConfig: {
-              businessName: "Coffee Oasis",
-              cardTitle: "Loyalty Card",
-              maxStamps: 10,
-              stampIcon: "Coffee",
-              cardBgColor: "#FFFFFF",
-              textColor: "#6F4E37",
-              businessNameColor: "#2563EB", // Default blue color for business name
-              cardTitleColor: "#2563EB", // Default blue color for card title
-              rewardTextColor: "#2563EB", // Default blue color for card description
+    const fetchBusinessData = async () => {
+      try {
+        // For development, we'll check if we have Supabase data
+        const { data: businesses, error } = await supabase
+          .from("businesses")
+          .select("*")
+          .eq("slug", businessSlug)
+          .single();
+        
+        if (error) {
+          console.error("Error fetching business:", error);
+          // Fallback to local storage for development
+          const savedBusinesses = localStorage.getItem('businesses');
+          let foundBusiness = null;
+          
+          if (savedBusinesses) {
+            try {
+              const businesses = JSON.parse(savedBusinesses);
+              foundBusiness = businesses.find((b: any) => b.slug === businessSlug);
+            } catch (e) {
+              console.error("Error parsing businesses:", e);
             }
-          });
-          setLoading(false);
+          }
+          
+          if (foundBusiness) {
+            setBusinessName(foundBusiness.name);
+            setBusinessData(foundBusiness);
+          } else if (businessSlug === "coffee-oasis") {
+            // Fallback for demo
+            setBusinessName("Coffee Oasis");
+            setBusinessData({
+              name: "Coffee Oasis",
+              slug: "coffee-oasis",
+              cardConfig: {
+                businessName: "Coffee Oasis",
+                cardTitle: "Loyalty Card",
+                maxStamps: 10,
+                stampIcon: "Coffee",
+                cardBgColor: "#FFFFFF",
+                textColor: "#6F4E37",
+                businessNameColor: "#2563EB",
+                cardTitleColor: "#2563EB",
+                rewardTextColor: "#2563EB",
+              }
+            });
+          } else {
+            setError("Business not found");
+          }
+        } else if (businesses) {
+          setBusinessName(businesses.name);
+          setBusinessData(businesses);
         } else {
           setError("Business not found");
-          setLoading(false);
         }
+        
+        setLoading(false);
+      } catch (e) {
+        console.error("Error in fetchBusinessData:", e);
+        setError("Failed to load business data");
+        setLoading(false);
       }
-    }, 1000);
+    };
+    
+    fetchBusinessData();
   }, [businessSlug]);
 
-  const handleJoin = (e: React.FormEvent) => {
+  const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!customerName.trim()) {
@@ -80,35 +101,57 @@ const JoinPage = () => {
       return;
     }
 
-    const customerId = `cust_${Date.now()}`;
-    const newCustomer = {
-      id: customerId,
-      name: customerName,
-      businessSlug: businessSlug,
-      joinedAt: new Date().toISOString(),
-      stamps: 0
-    };
-    
-    try {
-      const savedCustomers = localStorage.getItem('customers') || '[]';
-      const customers = JSON.parse(savedCustomers);
-      customers.push(newCustomer);
-      localStorage.setItem('customers', JSON.stringify(customers));
-      
-      toast({
-        title: "Welcome!",
-        description: `You've successfully joined ${businessName}'s loyalty program!`,
-      });
-      
-      setJoined(true);
-      setCustomer(newCustomer);
-    } catch (e) {
-      console.error("Error saving customer:", e);
-      toast({
-        title: "Error",
-        description: "Could not complete your request. Please try again.",
-        variant: "destructive"
-      });
+    if (businessData) {
+      try {
+        // For development, store in local storage
+        const customerId = `cust_${Date.now()}`;
+        const newCustomer = {
+          id: customerId,
+          name: customerName,
+          businessSlug: businessSlug,
+          joinedAt: new Date().toISOString(),
+          stamps: 0
+        };
+        
+        // Try to insert into Supabase if available
+        if (businessData.id) {
+          const { error } = await supabase
+            .from('business_members')
+            .insert({
+              business_id: businessData.id,
+              stamps: 0
+            });
+            
+          if (error && error.code !== "23505") { // Ignore unique constraint violations
+            console.error("Error joining business:", error);
+          }
+        }
+        
+        // Also store in local storage for development
+        try {
+          const savedCustomers = localStorage.getItem('customers') || '[]';
+          const customers = JSON.parse(savedCustomers);
+          customers.push(newCustomer);
+          localStorage.setItem('customers', JSON.stringify(customers));
+        } catch (e) {
+          console.error("Error saving to localStorage:", e);
+        }
+        
+        toast({
+          title: "Welcome!",
+          description: `You've successfully joined ${businessName}'s loyalty program!`,
+        });
+        
+        setJoined(true);
+        setCustomer(newCustomer);
+      } catch (e) {
+        console.error("Error joining:", e);
+        toast({
+          title: "Error",
+          description: "Could not complete your request. Please try again.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -117,38 +160,6 @@ const JoinPage = () => {
       title: "Not Available",
       description: "In a real app, stamps would be added by the business via QR code scanning.",
     });
-  };
-
-  const handleSuccessfulScan = (businessId: string, timestamp: number, stampCount: number = 1) => {
-    if (customer) {
-      const updatedStamps = Math.min((customer.stamps || 0) + stampCount, businessData?.cardConfig?.maxStamps || 10);
-      
-      const updatedCustomer = { ...customer, stamps: updatedStamps };
-      setCustomer(updatedCustomer);
-      
-      try {
-        const savedCustomers = localStorage.getItem('customers') || '[]';
-        const customers = JSON.parse(savedCustomers);
-        const customerIndex = customers.findIndex((c: any) => c.id === customer.id);
-        
-        if (customerIndex !== -1) {
-          customers[customerIndex] = updatedCustomer;
-          localStorage.setItem('customers', JSON.stringify(customers));
-        }
-        
-        toast({
-          title: "Stamp Collected!",
-          description: `${stampCount} stamp${stampCount > 1 ? 's' : ''} has been added to your loyalty card.`,
-        });
-      } catch (error) {
-        console.error("Error updating customer data:", error);
-        toast({
-          title: "Error",
-          description: "Could not update your stamps. Please try again.",
-          variant: "destructive",
-        });
-      }
-    }
   };
 
   if (loading) {
@@ -212,24 +223,8 @@ const JoinPage = () => {
                 maxStamps={businessData.cardConfig?.maxStamps || 10}
                 currentStamps={customer.stamps}
                 cardStyle={businessData.cardConfig}
-                onStampCollected={() => {}}
-                onReset={() => {
-                  const updatedCustomer = { ...customer, stamps: 0 };
-                  setCustomer(updatedCustomer);
-                  
-                  try {
-                    const savedCustomers = localStorage.getItem('customers') || '[]';
-                    const customers = JSON.parse(savedCustomers);
-                    const customerIndex = customers.findIndex((c: any) => c.id === customer.id);
-                    
-                    if (customerIndex !== -1) {
-                      customers[customerIndex] = updatedCustomer;
-                      localStorage.setItem('customers', JSON.stringify(customers));
-                    }
-                  } catch (error) {
-                    console.error("Error resetting customer data:", error);
-                  }
-                }}
+                onStampCollected={handleCollectStamp}
+                onReset={() => {}}
               />
             </div>
 
@@ -240,23 +235,9 @@ const JoinPage = () => {
               >
                 Show this card when you visit {businessName} to collect stamps
               </p>
-              
-              <Button 
-                onClick={() => setShowScannerDialog(true)}
-                className="w-full bg-orange hover:bg-orange-dark text-white flex items-center justify-center gap-2"
-              >
-                <QrCode size={18} />
-                Scan Me
-              </Button>
             </div>
           </Card>
         </div>
-        
-        <QRScannerDialog 
-          isOpen={showScannerDialog}
-          onClose={() => setShowScannerDialog(false)}
-          onSuccessfulScan={handleSuccessfulScan}
-        />
       </Layout>
     );
   }
