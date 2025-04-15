@@ -109,7 +109,7 @@ const StampGrid: React.FC<StampGridProps> = ({
             >
               {isLastStamp ? (
                 <div className="flex flex-col items-center justify-center w-full h-full">
-                  {cardStyle?.lastStampText && (
+                  {cardStyle?.lastStampText && !isCollected && (
                     <span 
                       className="text-center font-bold text-xs md:text-sm uppercase"
                       style={{ 
@@ -122,7 +122,7 @@ const StampGrid: React.FC<StampGridProps> = ({
                       {cardStyle.lastStampText}
                     </span>
                   )}
-                  {!cardStyle?.lastStampText && <CurrentIcon size={iconSize} className={isCollected ? "animate-bounce-once" : ""} />}
+                  {(!cardStyle?.lastStampText || isCollected) && <CurrentIcon size={iconSize} className={isCollected ? "animate-bounce-once" : ""} />}
                 </div>
               ) : (
                 <CurrentIcon size={iconSize} className={isCollected ? "animate-bounce-once" : ""} />

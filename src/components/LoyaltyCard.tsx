@@ -34,9 +34,8 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   const [stamps, setStamps] = useState<number>(currentStamps);
   const [animatingStamp, setAnimatingStamp] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
-  const [showCompletionDialog, setShowCompletionDialog] = useState<boolean>(false);
-  const [previousStamps, setPreviousStamps] = useState<number>(currentStamps);
   const [showRewardDialog, setShowRewardDialog] = useState<boolean>(false);
+  const [previousStamps, setPreviousStamps] = useState<number>(currentStamps);
   const [currentReward, setCurrentReward] = useState<{stampNumber: number, description: string, icon: string} | null>(null);
   const [stampsCollected, setStampsCollected] = useState<number[]>([]);
 
@@ -71,9 +70,6 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
     if (currentStamps === maxStamps && previousStamps < maxStamps) {
       setShowConfetti(true);
       setTimeout(() => {
-        setShowCompletionDialog(true);
-      }, 1000);
-      setTimeout(() => {
         setShowConfetti(false);
       }, 5000);
     }
@@ -82,23 +78,10 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   }, [currentStamps, maxStamps, previousStamps, toast, cardStyle]);
 
   const handleStampClick = (index: number) => {
-    if (index === stamps && stamps < maxStamps) {
-      setAnimatingStamp(index);
-      
-      setTimeout(() => {
-        setAnimatingStamp(null);
-        setStamps(stamps + 1);
-        setStampsCollected(prev => [...prev, index]);
-        
-        if (onStampCollected) {
-          onStampCollected();
-        }
-      }, 500);
-    }
+    return;
   };
   
   const handleNewCard = () => {
-    setShowCompletionDialog(false);
     if (onReset) {
       onReset();
     }
@@ -222,12 +205,13 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
           stampActiveColor={cardStyle?.stampActiveColor || "#8B4513"}
           descriptionFont={descriptionFont}
           descriptionFontSize={descriptionFontSize}
+          onReset={handleNewCard}
         />
       </Card>
       
       <CardDialogs 
-        showCompletionDialog={showCompletionDialog}
-        setShowCompletionDialog={setShowCompletionDialog}
+        showCompletionDialog={false}
+        setShowCompletionDialog={() => {}}
         showRewardDialog={showRewardDialog}
         setShowRewardDialog={setShowRewardDialog}
         currentReward={currentReward}
