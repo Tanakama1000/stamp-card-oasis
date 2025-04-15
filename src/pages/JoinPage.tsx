@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
@@ -202,6 +203,7 @@ const JoinPage = () => {
     fetchBusinessData();
   }, [businessSlug, businessName, userId, customerName]);
 
+  // This function is now only used for manual joins (deprecated/less used path)
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -293,6 +295,7 @@ const JoinPage = () => {
     }
   };
 
+  // Updated to automatically join the loyalty program after signup
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthLoading(true);
@@ -324,6 +327,41 @@ const JoinPage = () => {
         
         if (data.user) {
           setUserId(data.user.id);
+          
+          // Automatically join the loyalty program after successful signup
+          if (businessData && businessData.id) {
+            try {
+              const memberData = {
+                business_id: businessData.id,
+                stamps: 0,
+                customer_name: customerName,
+                user_id: data.user.id,
+                is_anonymous: false
+              };
+              
+              const { data: membership, error: membershipError } = await supabase
+                .from('business_members')
+                .insert(memberData)
+                .select('id')
+                .single();
+                
+              if (membershipError) {
+                console.error("Error joining business:", membershipError);
+              } else {
+                setMemberId(membership.id);
+                setJoined(true);
+                setCustomer({
+                  id: data.user.id,
+                  name: customerName,
+                  stamps: 0
+                });
+                setStamps(0);
+              }
+            } catch (e) {
+              console.error("Error auto-joining loyalty program:", e);
+            }
+          }
+          
           setIsAuthMode(false);
         }
       } else {
@@ -346,6 +384,63 @@ const JoinPage = () => {
         if (data.user) {
           setUserId(data.user.id);
           setIsAuthMode(false);
+          
+          // Check if the user is already a member
+          if (businessData && businessData.id) {
+            const { data: membership, error: membershipError } = await supabase
+              .from('business_members')
+              .select('*')
+              .eq('business_id', businessData.id)
+              .eq('user_id', data.user.id)
+              .single();
+              
+            if (!membershipError && membership) {
+              setJoined(true);
+              setMemberId(membership.id);
+              setCustomerName(membership.customer_name || "");
+              setCustomer({
+                id: data.user.id,
+                name: membership.customer_name || "Member",
+                stamps: membership.stamps || 0
+              });
+              setStamps(membership.stamps || 0);
+            } else {
+              // Automatically join if not already joined
+              try {
+                const memberData = {
+                  business_id: businessData.id,
+                  stamps: 0,
+                  customer_name: customerName || data.user.email?.split('@')[0] || "Member",
+                  user_id: data.user.id,
+                  is_anonymous: false
+                };
+                
+                const { data: newMembership, error: newMembershipError } = await supabase
+                  .from('business_members')
+                  .insert(memberData)
+                  .select('id')
+                  .single();
+                  
+                if (!newMembershipError) {
+                  setMemberId(newMembership.id);
+                  setJoined(true);
+                  setCustomer({
+                    id: data.user.id,
+                    name: memberData.customer_name,
+                    stamps: 0
+                  });
+                  setStamps(0);
+                  
+                  toast({
+                    title: "Welcome!",
+                    description: `You've been automatically enrolled in ${businessName}'s loyalty program!`,
+                  });
+                }
+              } catch (e) {
+                console.error("Error auto-joining loyalty program:", e);
+              }
+            }
+          }
         }
       }
       
