@@ -83,7 +83,7 @@ const Index = () => {
     <Layout>
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-coffee-dark mb-2">Welcome to Stamp Card Oasis</h1>
+          <h1 className="text-3xl font-bold text-coffee-dark mb-2">Welcome to InStamp</h1>
           <p className="text-coffee-light">Collect stamps and earn rewards from your favorite businesses</p>
         </div>
 

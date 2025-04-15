@@ -24,7 +24,7 @@ interface CardHeaderProps {
 
 const CardHeader: React.FC<CardHeaderProps> = ({
   businessLogo,
-  businessName,
+  businessName = "InStamp",  // Default to InStamp if no business name provided
   businessNameColor,
   businessNameFont,
   businessNameFontSize,
@@ -46,12 +46,21 @@ const CardHeader: React.FC<CardHeaderProps> = ({
   return (
     <div className={`flex items-center justify-between mb-4 md:mb-6 relative z-10 ${isMobile ? 'flex-wrap' : ''}`}>
       <div className={`flex flex-col items-center w-full ${isMobile ? 'gap-2 mb-2' : 'gap-3'}`}>
-        {businessLogo && (
+        {businessLogo ? (
           <div className="flex justify-center w-full mb-2">
             <Avatar className={`${avatarSize} border-2 border-white shadow-md`}>
               <AvatarImage src={businessLogo} alt={businessName || "Business logo"} />
               <AvatarFallback className="bg-orange text-white">
-                {businessName?.charAt(0) || "B"}
+                {businessName?.charAt(0) || "I"}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+        ) : (
+          <div className="flex justify-center w-full mb-2">
+            <Avatar className={`${avatarSize} border-2 border-white shadow-md`}>
+              <AvatarImage src="/lovable-uploads/e8c4240d-e1dd-4f5c-87ce-d22d3b9e8422.png" alt="InStamp logo" />
+              <AvatarFallback className="bg-orange text-white">
+                I
               </AvatarFallback>
             </Avatar>
           </div>
