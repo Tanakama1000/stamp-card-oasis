@@ -67,8 +67,9 @@ const StampGrid: React.FC<StampGridProps> = ({
             animationClass = "animate-scale-in";
           }
           
-          const stampSize = isMobile ? "w-10 h-10" : "w-14 h-14 md:w-16 md:h-16";
-          const iconSize = isMobile ? 18 : 24;
+          // Updated sizes for better mobile visibility
+          const stampSize = isMobile ? "w-14 h-14" : "w-14 h-14 md:w-16 md:h-16";
+          const iconSize = isMobile ? 24 : 24;
           
           stampRow.push(
             <div
@@ -104,7 +105,7 @@ const StampGrid: React.FC<StampGridProps> = ({
             >
               <CurrentIcon size={iconSize} className={isCollected ? "animate-bounce-once" : ""} />
               {isMiniRewardStamp && (
-                <span className="absolute -top-1 -right-1 bg-orange text-white rounded-full w-4 h-4 flex items-center justify-center text-xs shadow-sm">
+                <span className="absolute -top-1 -right-1 bg-orange text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-sm">
                   {stampIndex + 1}
                 </span>
               )}
@@ -113,7 +114,7 @@ const StampGrid: React.FC<StampGridProps> = ({
         }
       }
       rows.push(
-        <div key={i} className="flex justify-center gap-2 my-1">
+        <div key={i} className="flex justify-center gap-3 my-2">
           {stampRow}
         </div>
       );
