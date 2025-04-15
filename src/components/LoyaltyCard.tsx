@@ -40,16 +40,13 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   const [currentReward, setCurrentReward] = useState<{stampNumber: number, description: string, icon: string} | null>(null);
   const [stampsCollected, setStampsCollected] = useState<number[]>([]);
 
-  const cardMaxStamps = cardStyle?.maxStamps || maxStamps;
-  const rewardText = cardStyle?.rewardText || "Your Reward!";
-
   useEffect(() => {
     setStamps(currentStamps);
     
     setStampsCollected(Array.from({ length: currentStamps }, (_, i) => i));
     
-    if (currentStamps > previousStamps && currentStamps < cardMaxStamps) {
-      const remaining = cardMaxStamps - currentStamps;
+    if (currentStamps > previousStamps && currentStamps < maxStamps) {
+      const remaining = maxStamps - currentStamps;
       if (remaining <= 3) {
         toast({
           title: `Almost There!`,
@@ -71,7 +68,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
       }
     }
     
-    if (currentStamps === cardMaxStamps && previousStamps < cardMaxStamps) {
+    if (currentStamps === maxStamps && previousStamps < maxStamps) {
       setShowConfetti(true);
       setTimeout(() => {
         setShowCompletionDialog(true);
@@ -82,10 +79,10 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
     }
     
     setPreviousStamps(currentStamps);
-  }, [currentStamps, cardMaxStamps, previousStamps, toast, cardStyle]);
+  }, [currentStamps, maxStamps, previousStamps, toast, cardStyle]);
 
   const handleStampClick = (index: number) => {
-    if (index === stamps && stamps < cardMaxStamps) {
+    if (index === stamps && stamps < maxStamps) {
       setAnimatingStamp(index);
       
       setTimeout(() => {
@@ -180,16 +177,16 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
           descriptionFont={descriptionFont}
           descriptionFontSize={descriptionFontSize}
           textColor={textColor}
-          maxStamps={cardMaxStamps}
+          maxStamps={maxStamps}
           stamps={stamps}
           progressBarColor={progressBarColor}
           isMobile={isMobile}
-          rewardText={rewardText}
+          rewardText={cardStyle?.rewardText}
         />
 
         <ProgressBar
           stamps={stamps}
-          maxStamps={cardMaxStamps}
+          maxStamps={maxStamps}
           progressBarColor={progressBarColor}
           progressBarBgColor={progressBarBgColor}
           rewards={cardStyle?.rewards}
@@ -206,7 +203,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
         )}
 
         <StampGrid 
-          maxStamps={cardMaxStamps}
+          maxStamps={maxStamps}
           stamps={stamps}
           cardStyle={cardStyle}
           onStampClick={handleStampClick}
@@ -222,7 +219,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
         />
 
         <RewardCard 
-          showReward={stamps >= cardMaxStamps}
+          showReward={stamps >= maxStamps}
           rewardTextColor={rewardTextColor}
           stampActiveColor={cardStyle?.stampActiveColor || "#8B4513"}
           descriptionFont={descriptionFont}
@@ -236,7 +233,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
         showRewardDialog={showRewardDialog}
         setShowRewardDialog={setShowRewardDialog}
         currentReward={currentReward}
-        maxStamps={cardMaxStamps}
+        maxStamps={maxStamps}
         handleNewCard={handleNewCard}
         descriptionFont={descriptionFont}
         descriptionFontSize={descriptionFontSize}

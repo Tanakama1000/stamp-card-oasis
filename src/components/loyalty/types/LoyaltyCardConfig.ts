@@ -1,6 +1,4 @@
 
-import { STAMP_ICONS } from "../types";
-
 export interface LoyaltyCardConfig {
   businessName: string;
   cardTitle?: string;
@@ -34,7 +32,4 @@ export interface LoyaltyCardConfig {
     description: string;
     icon: string;
   }[];
-  lastStampColor?: string;
-  lastStampIcon?: keyof typeof STAMP_ICONS;
-  miniRewardStampColor?: string;
 }
