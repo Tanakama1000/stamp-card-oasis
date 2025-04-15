@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -5,6 +6,7 @@ import Layout from "@/components/Layout";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
 import BusinessStats from "@/components/BusinessStats";
 import CustomerList from "@/components/CustomerList";
+import RecentActivity from "@/components/RecentActivity";
 import CardCustomization from "@/components/loyalty/CardCustomization";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
