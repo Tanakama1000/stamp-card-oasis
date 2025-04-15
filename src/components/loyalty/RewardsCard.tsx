@@ -15,8 +15,8 @@ const RewardsCard: React.FC<RewardsCardProps> = ({
   rewardsCount = 0,
   totalEarned = 0,
   redeemed = 0,
-  textColor = "#0066CC",
-  accentColor = "#E5F0FF"
+  textColor = "#8B1A1A",
+  accentColor = "#FFE4E4"
 }) => {
   return (
     <Card className="overflow-hidden">
