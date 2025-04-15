@@ -1,6 +1,8 @@
+
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
+import RewardsCard from "@/components/loyalty/RewardsCard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +16,8 @@ const Index = () => {
   const [stamps, setStamps] = useState<number>(3);
   const [cardStyle, setCardStyle] = useState<LoyaltyCardConfig | null>(null);
   const maxStamps = cardStyle?.maxStamps || 10;
+  const [totalEarned, setTotalEarned] = useState<number>(0);
+  const [redeemed, setRedeemed] = useState<number>(0);
 
   useEffect(() => {
     const savedCardStyle = localStorage.getItem('loyaltyCardConfig');
@@ -25,7 +29,11 @@ const Index = () => {
         console.error("Error parsing card style from localStorage", error);
       }
     }
-  }, []);
+    
+    // Calculate total earned rewards based on stamps
+    const earnedRewards = Math.floor(stamps / maxStamps);
+    setTotalEarned(earnedRewards);
+  }, [stamps, maxStamps]);
 
   const handleStampCollected = () => {
     toast({
@@ -39,6 +47,11 @@ const Index = () => {
   
   const handleCardReset = () => {
     setStamps(0);
+    // When resetting, add to redeemed count if maxStamps were collected
+    if (stamps >= maxStamps) {
+      setRedeemed(prev => prev + 1);
+    }
+    
     toast({
       title: "New Card Started",
       description: "Your loyalty card has been reset. Start collecting stamps!",
@@ -64,6 +77,7 @@ const Index = () => {
 
   const miniRewards = cardStyle?.rewards || [];
   const sortedRewards = [...(miniRewards || [])].sort((a, b) => a.stampNumber - b.stampNumber);
+  const availableRewards = Math.floor(stamps / maxStamps);
 
   return (
     <Layout>
@@ -138,6 +152,16 @@ const Index = () => {
             cardStyle={cardStyle || undefined}
             onStampCollected={handleStampCollected}
             onReset={handleCardReset}
+          />
+        </div>
+        
+        <div className="mb-8">
+          <RewardsCard 
+            rewardsCount={availableRewards}
+            totalEarned={totalEarned}
+            redeemed={redeemed}
+            textColor={cardStyle?.businessNameColor || "#0066CC"}
+            accentColor={cardStyle?.stampBgColor || "#E5F0FF"}
           />
         </div>
       </div>

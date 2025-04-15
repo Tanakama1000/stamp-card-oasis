@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import QRScannerDialog from "@/components/QRScannerDialog";
+import RewardsCard from "@/components/loyalty/RewardsCard";
 
 const JoinPage = () => {
   const { businessSlug } = useParams();
@@ -39,6 +40,8 @@ const JoinPage = () => {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
         setUserId(data.session.user.id);
+      } else {
+        setIsAuthMode(true);
       }
     };
     
@@ -453,7 +456,7 @@ const JoinPage = () => {
               </h2>
               <p className="text-gray-600">
                 {isSignup 
-                  ? 'Join with an account to track your loyalty cards across devices' 
+                  ? 'Join with an account to access loyalty cards and rewards' 
                   : 'Welcome back! Login to access your loyalty cards'}
               </p>
             </div>
@@ -530,16 +533,6 @@ const JoinPage = () => {
                     : "Don't have an account? Sign Up"}
                 </Button>
               </div>
-              
-              <div className="pt-2 text-center">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsAuthMode(false)}
-                >
-                  Continue as Guest
-                </Button>
-              </div>
             </form>
           </Card>
         </div>
@@ -596,6 +589,16 @@ const JoinPage = () => {
                 onReset={() => {}}
               />
             </div>
+            
+            <div className="mt-6 mb-6">
+              <RewardsCard 
+                rewardsCount={Math.floor(stamps / (loyaltyCardConfig?.maxStamps || 10))}
+                totalEarned={Math.floor(stamps / (loyaltyCardConfig?.maxStamps || 10))}
+                redeemed={0}
+                textColor={loyaltyCardConfig?.businessNameColor || "#2563EB"}
+                accentColor={loyaltyCardConfig?.stampBgColor || "#E5F0FF"}
+              />
+            </div>
 
             <div className="text-center space-y-4">
               <p 
@@ -612,17 +615,6 @@ const JoinPage = () => {
                 <QrCode size={20} />
                 Scan QR Code to Collect Stamp
               </Button>
-              
-              {!userId && (
-                <Button
-                  onClick={toggleAuthMode}
-                  variant="outline"
-                  className="w-full flex items-center justify-center gap-2"
-                >
-                  <UserPlus size={20} />
-                  Create Account to Save Card
-                </Button>
-              )}
             </div>
           </Card>
         </div>
@@ -660,7 +652,7 @@ const JoinPage = () => {
               className="text-coffee-light mt-1"
               style={{ color: loyaltyCardConfig?.textColor || "#6F4E37" }}
             >
-              Enter your name to join the loyalty program
+              Create an account to join the loyalty program
             </p>
           </div>
 
@@ -676,64 +668,28 @@ const JoinPage = () => {
             />
           </div>
 
-          <form onSubmit={handleJoin} className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium mb-1" style={{ color: loyaltyCardConfig?.textColor || "#6F4E37" }}>
-                Your Name
-              </label>
-              <Input
-                id="name"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-                placeholder="Enter your name"
-                className="w-full"
-                required
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Button 
-                type="submit" 
-                className="w-full text-white"
-                style={{ 
-                  backgroundColor: loyaltyCardConfig?.stampActiveColor || "#F97316",
-                  borderColor: loyaltyCardConfig?.stampActiveColor || "#F97316"
-                }}
-              >
-                Join Loyalty Program
-              </Button>
-              
-              <div className="flex items-center justify-center my-2">
-                <div className="flex-1 h-px bg-gray-200"></div>
-                <span className="px-4 text-sm text-gray-500">or</span>
-                <div className="flex-1 h-px bg-gray-200"></div>
-              </div>
-              
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full flex items-center justify-center gap-2"
-                onClick={toggleAuthMode}
-              >
-                <UserPlus size={18} />
-                Join with Account
-              </Button>
-              
-              {!userId && (
-                <Button
-                  type="button"
-                  variant="link"
-                  className="text-sm"
-                  onClick={() => {
-                    setIsSignup(false);
-                    setIsAuthMode(true);
-                  }}
-                >
-                  Already have an account? <span className="underline ml-1">Login</span>
-                </Button>
-              )}
-            </div>
-          </form>
+          <div className="flex flex-col gap-2">
+            <Button
+              onClick={() => { setIsSignup(true); setIsAuthMode(true); }}
+              className="w-full bg-coffee-medium hover:bg-coffee-dark text-white flex items-center justify-center gap-2"
+              style={{ 
+                backgroundColor: loyaltyCardConfig?.stampActiveColor || "#F97316",
+                borderColor: loyaltyCardConfig?.stampActiveColor || "#F97316"
+              }}
+            >
+              <UserPlus size={18} />
+              Create Account
+            </Button>
+            
+            <Button
+              onClick={() => { setIsSignup(false); setIsAuthMode(true); }}
+              variant="outline"
+              className="w-full flex items-center justify-center gap-2"
+            >
+              <LogIn size={18} />
+              Login
+            </Button>
+          </div>
         </Card>
       </div>
     </Layout>
