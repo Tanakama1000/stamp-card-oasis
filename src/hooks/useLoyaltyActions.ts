@@ -168,7 +168,7 @@ export const useLoyaltyActions = ({
     
     try {
       // First get the current stamps state
-      if (!userId.startsWith('anon_') && businessData?.id) {
+      if (userId && !userId.startsWith('anon_') && businessData?.id) {
         const { data: existingMember } = await supabase
           .from('business_members')
           .select('stamps')

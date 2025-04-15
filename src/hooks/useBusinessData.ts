@@ -75,69 +75,20 @@ export const useBusinessData = (businessSlug: string | undefined, userId: string
       }
 
       try {
+        console.log("Fetching business data for slug:", businessSlug);
+        
         // First try to get business from Supabase
         const { data: businesses, error } = await supabase
           .from("businesses")
           .select("*")
           .eq("slug", businessSlug);
         
-        // Changed from .single() to allow more flexible handling
-        if (error || !businesses || businesses.length === 0) {
-          console.log("Error or no businesses found in Supabase:", error);
-          
-          // Check localStorage for businesses
-          const savedBusinesses = localStorage.getItem('businesses');
-          let foundBusiness = null;
-          
-          if (savedBusinesses) {
-            try {
-              const parsedBusinesses = JSON.parse(savedBusinesses);
-              foundBusiness = Array.isArray(parsedBusinesses) ? 
-                parsedBusinesses.find((b: any) => b.slug === businessSlug) : null;
-              
-              console.log("Checking localStorage for business:", businessSlug, foundBusiness);
-            } catch (e) {
-              console.error("Error parsing businesses from localStorage:", e);
-            }
-          }
-          
-          // Use demo business for testing purposes
-          if (!foundBusiness && businessSlug === "coffee-oasis") {
-            console.log("Using demo business: Coffee Oasis");
-            setBusinessName("Coffee Oasis");
-            const defaultBusinessData = {
-              name: "Coffee Oasis",
-              slug: "coffee-oasis",
-              id: "coffee-oasis-id"
-            };
-            setBusinessData(defaultBusinessData);
-            await fetchLoyaltyCardConfig(defaultBusinessData.id);
-            
-            // Check for existing membership for this user
-            await checkExistingMembership(defaultBusinessData, userId);
-            
-            setLoading(false);
-            return;
-          } else if (foundBusiness) {
-            console.log("Found business in localStorage:", foundBusiness);
-            setBusinessName(foundBusiness.name);
-            setBusinessData(foundBusiness);
-            await fetchLoyaltyCardConfig(foundBusiness.id);
-            
-            // Check for existing membership for this user
-            await checkExistingMembership(foundBusiness, userId);
-            
-            setLoading(false);
-            return;
-          }
-          
-          setError("Business not found");
-          toast({
-            title: "Business Not Found",
-            description: "The business you're looking for couldn't be found.",
-            variant: "destructive"
-          });
-        } else if (businesses && businesses.length > 0) {
+        if (error) {
+          console.error("Error fetching from Supabase:", error);
+        }
+        
+        // Check if we found the business in Supabase
+        if (businesses && businesses.length > 0) {
           const business = businesses[0];
           console.log("Found business in Supabase:", business);
           setBusinessName(business.name);
@@ -146,8 +97,65 @@ export const useBusinessData = (businessSlug: string | undefined, userId: string
           
           // Check for existing membership for this user
           await checkExistingMembership(business, userId);
+          setLoading(false);
+          return;
         }
         
+        // If not found in Supabase, check localStorage
+        console.log("Business not found in Supabase, checking localStorage");
+        const savedBusinesses = localStorage.getItem('businesses');
+        let foundBusiness = null;
+        
+        if (savedBusinesses) {
+          try {
+            const parsedBusinesses = JSON.parse(savedBusinesses);
+            foundBusiness = Array.isArray(parsedBusinesses) ? 
+              parsedBusinesses.find((b: any) => b.slug === businessSlug) : null;
+            
+            console.log("Checking localStorage for business:", businessSlug, foundBusiness);
+          } catch (e) {
+            console.error("Error parsing businesses from localStorage:", e);
+          }
+        }
+        
+        // Use demo business for testing purposes
+        if (!foundBusiness && businessSlug === "coffee-oasis") {
+          console.log("Using demo business: Coffee Oasis");
+          setBusinessName("Coffee Oasis");
+          const defaultBusinessData = {
+            name: "Coffee Oasis",
+            slug: "coffee-oasis",
+            id: "coffee-oasis-id"
+          };
+          setBusinessData(defaultBusinessData);
+          await fetchLoyaltyCardConfig(defaultBusinessData.id);
+          
+          // Check for existing membership for this user
+          await checkExistingMembership(defaultBusinessData, userId);
+          
+          setLoading(false);
+          return;
+        } else if (foundBusiness) {
+          console.log("Found business in localStorage:", foundBusiness);
+          setBusinessName(foundBusiness.name);
+          setBusinessData(foundBusiness);
+          await fetchLoyaltyCardConfig(foundBusiness.id);
+          
+          // Check for existing membership for this user
+          await checkExistingMembership(foundBusiness, userId);
+          
+          setLoading(false);
+          return;
+        }
+        
+        // If we reach here, the business wasn't found anywhere
+        console.error("Business not found anywhere:", businessSlug);
+        setError("Business not found");
+        toast({
+          title: "Business Not Found",
+          description: "The business you're looking for couldn't be found.",
+          variant: "destructive"
+        });
         setLoading(false);
       } catch (e) {
         console.error("Error in fetchBusinessData:", e);
