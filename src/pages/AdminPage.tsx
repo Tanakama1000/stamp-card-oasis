@@ -435,10 +435,7 @@ const AdminPage = () => {
         </Card>
 
         <BusinessStats 
-          customerCount={26}
-          rewardsRedeemed={8}
-          totalStamps={142}
-          conversionRate="31%"
+          businessId={businessData.id}
         />
 
         <div className="mt-8">
