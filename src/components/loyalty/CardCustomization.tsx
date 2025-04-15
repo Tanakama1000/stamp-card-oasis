@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -94,7 +93,14 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
         }
 
         if (data?.config) {
-          setConfig(data.config as LoyaltyCardConfig);
+          const loadedConfig = data.config as LoyaltyCardConfig;
+          
+          if (!loadedConfig.rewardText) {
+            loadedConfig.rewardText = `Collect ${loadedConfig.maxStamps} stamps for a free item`;
+          }
+          
+          setConfig(loadedConfig);
+          localStorage.setItem('loyaltyCardConfig', JSON.stringify(loadedConfig));
         }
         setIsLoading(false);
       } catch (err) {
@@ -130,11 +136,13 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
     }
 
     try {
+      const configForStorage: Record<string, any> = { ...config };
+      
       const { data, error } = await supabase
         .from('loyalty_card_configs')
         .upsert({
           business_id: businessData.id,
-          config: config as any
+          config: configForStorage
         }, {
           onConflict: 'business_id'
         });
@@ -159,7 +167,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
   };
 
   const resetToDefaults = () => {
-    setConfig({
+    const defaultConfig: LoyaltyCardConfig = {
       businessName: "Coffee Shop",
       cardTitle: "Loyalty Card",
       maxStamps: 10,
@@ -176,8 +184,10 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
       lastStampBorderColor: "#F97316",
       rewardText: "Collect 10 stamps for a free item",
       rewards: []
-    });
+    };
     
+    setConfig(defaultConfig);
+    localStorage.setItem('loyaltyCardConfig', JSON.stringify(defaultConfig));
     setRewardsVersion(v => v + 1);
     
     toast({
@@ -205,7 +215,8 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
 
   useEffect(() => {
     if (config.rewardText && config.rewardText.includes("stamps for")) {
-      handleChange('rewardText', `Collect ${config.maxStamps} stamps for a free item`);
+      const updatedRewardText = `Collect ${config.maxStamps} stamps for a free item`;
+      handleChange('rewardText', updatedRewardText);
     }
   }, [config.maxStamps]);
 
