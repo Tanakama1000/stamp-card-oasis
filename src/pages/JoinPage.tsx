@@ -91,7 +91,7 @@ const JoinPage = () => {
               setJoined(true);
               setCustomer({
                 id: userId,
-                name: membership.name || "Member",
+                name: customerName || "Member",
                 stamps: membership.stamps || 0
               });
               setStamps(membership.stamps || 0);
@@ -161,7 +161,7 @@ const JoinPage = () => {
     };
     
     fetchBusinessData();
-  }, [businessSlug, businessName, userId]);
+  }, [businessSlug, businessName, userId, customerName]);
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
