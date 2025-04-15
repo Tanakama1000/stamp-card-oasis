@@ -16,6 +16,7 @@ export interface LoyaltyCardConfig {
   stampIcon?: string;
   lastStampText?: string;
   lastStampTextColor?: string;
+  lastStampBorderColor?: string;
   rewardText?: string;
   fontFamily?: string;
   businessNameFont?: string;

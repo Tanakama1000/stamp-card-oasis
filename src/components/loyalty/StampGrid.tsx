@@ -67,6 +67,11 @@ const StampGrid: React.FC<StampGridProps> = ({
           const stampSize = isMobile ? "w-14 h-14" : "w-14 h-14 md:w-16 md:h-16";
           const iconSize = isMobile ? 24 : 24;
           
+          // Determine border color for last stamp
+          const lastStampBorderColor = isLastStamp ? 
+            (cardStyle?.lastStampBorderColor || '#F97316') : 
+            (isMiniRewardStamp ? '#F97316' : cardStyle?.stampActiveColor || '#8B4513');
+          
           stampRow.push(
             <div
               key={stampIndex}
@@ -90,9 +95,11 @@ const StampGrid: React.FC<StampGridProps> = ({
                   : (isMiniRewardStamp && cardStyle?.miniRewardStampColor ? 
                       cardStyle.miniRewardStampColor : 
                       cardStyle?.stampBgColor || '#F5F5DC'),
-                borderColor: (isLastStamp || isMiniRewardStamp)
-                  ? (isCollected ? '#F97316' : '#F97316')
-                  : cardStyle?.stampActiveColor || '#8B4513',
+                borderColor: isLastStamp
+                  ? (cardStyle?.lastStampBorderColor || '#F97316')
+                  : isMiniRewardStamp
+                    ? '#F97316'
+                    : cardStyle?.stampActiveColor || '#8B4513',
                 color: isCollected 
                   ? '#FFFFFF' 
                   : cardStyle?.textColor || '#6F4E37',

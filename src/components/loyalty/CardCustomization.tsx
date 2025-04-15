@@ -21,6 +21,7 @@ import {
   Coffee, 
   Battery, 
   Zap, 
+  Gift, 
   Trophy, 
   Sparkles,
   RefreshCw,
@@ -53,6 +54,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
     stampIcon: "Coffee",
     lastStampText: "FREE",
     lastStampTextColor: "#FFFFFF",
+    lastStampBorderColor: "#F97316",
     rewardText: "Collect 10 stamps for a free item",
     rewards: []
   });
@@ -106,6 +108,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
       stampIcon: "Coffee",
       lastStampText: "FREE",
       lastStampTextColor: "#FFFFFF",
+      lastStampBorderColor: "#F97316",
       rewardText: "Collect 10 stamps for a free item",
       rewards: []
     });
@@ -408,6 +411,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                       handleChange('stampBgColor', '#F5F5DC');
                       handleChange('stampActiveColor', '#8B4513');
                       handleChange('rewardTextColor', '#6F4E37');
+                      handleChange('lastStampBorderColor', '#F97316');
                     }}
                   >
                     <div className="w-3 h-3 rounded-full bg-white border"></div>
@@ -426,6 +430,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                       handleChange('stampBgColor', '#BFDBFE');
                       handleChange('stampActiveColor', '#3B82F6');
                       handleChange('rewardTextColor', '#1E40AF');
+                      handleChange('lastStampBorderColor', '#2563EB');
                     }}
                   >
                     <div className="w-3 h-3 rounded-full bg-blue-500"></div>
@@ -444,6 +449,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                       handleChange('stampBgColor', '#A7F3D0');
                       handleChange('stampActiveColor', '#10B981');
                       handleChange('rewardTextColor', '#065F46');
+                      handleChange('lastStampBorderColor', '#10B981');
                     }}
                   >
                     <div className="w-3 h-3 rounded-full bg-green-500"></div>
@@ -462,6 +468,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                       handleChange('stampBgColor', '#DDD6FE');
                       handleChange('stampActiveColor', '#8B5CF6');
                       handleChange('rewardTextColor', '#5B21B6');
+                      handleChange('lastStampBorderColor', '#8B5CF6');
                     }}
                   >
                     <div className="w-3 h-3 rounded-full bg-purple-500"></div>
@@ -480,6 +487,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                       handleChange('stampBgColor', '#FFEDD5');
                       handleChange('stampActiveColor', '#F97316');
                       handleChange('rewardTextColor', '#9A3412');
+                      handleChange('lastStampBorderColor', '#F97316');
                     }}
                   >
                     <div className="w-3 h-3 rounded-full bg-orange-500"></div>
@@ -498,6 +506,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                       handleChange('stampBgColor', '#374151');
                       handleChange('stampActiveColor', '#60A5FA');
                       handleChange('rewardTextColor', '#F3F4F6');
+                      handleChange('lastStampBorderColor', '#60A5FA');
                     }}
                   >
                     <div className="w-3 h-3 rounded-full bg-gray-800"></div>
@@ -566,6 +575,24 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                     <Input 
                       value={config.lastStampTextColor || '#FFFFFF'}
                       onChange={(e) => handleChange('lastStampTextColor', e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                
+                <div className="mt-4">
+                  <Label htmlFor="lastStampBorderColor">Last Stamp Border Color</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input 
+                      id="lastStampBorderColor"
+                      type="color"
+                      className="w-12 h-8 p-1"
+                      value={config.lastStampBorderColor || '#F97316'}
+                      onChange={(e) => handleChange('lastStampBorderColor', e.target.value)}
+                    />
+                    <Input 
+                      value={config.lastStampBorderColor || '#F97316'}
+                      onChange={(e) => handleChange('lastStampBorderColor', e.target.value)}
                       className="flex-1"
                     />
                   </div>
