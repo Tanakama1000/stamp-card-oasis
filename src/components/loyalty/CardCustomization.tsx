@@ -29,6 +29,7 @@ import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 import { STAMP_ICONS } from "./types";
 import LoyaltyCard from "../LoyaltyCard";
 import { Reward } from "./types";
+import FileUpload from "./FileUpload";
 
 interface CardCustomizationProps {
   onSave: (config: LoyaltyCardConfig) => void;
@@ -145,6 +146,23 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
     });
   };
   
+  const handleLogoUpload = (dataUrl: string) => {
+    handleChange('businessLogo', dataUrl);
+    toast({
+      title: "Logo uploaded",
+      description: "Business logo has been updated"
+    });
+  };
+  
+  const handleBackgroundUpload = (dataUrl: string) => {
+    handleChange('backgroundImage', dataUrl);
+    handleChange('useBackgroundImage', true);
+    toast({
+      title: "Background uploaded",
+      description: "Card background image has been updated"
+    });
+  };
+  
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div className="space-y-6">
@@ -194,12 +212,20 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                 </div>
                 
                 <div>
-                  <Label htmlFor="businessLogo">Business Logo URL</Label>
-                  <Input 
-                    id="businessLogo"
-                    value={config.businessLogo || ''}
-                    onChange={(e) => handleChange('businessLogo', e.target.value)}
-                    placeholder="https://example.com/logo.png" 
+                  <Label>Business Logo</Label>
+                  {config.businessLogo && (
+                    <div className="mb-2 mt-1 p-2 border rounded-md">
+                      <img 
+                        src={config.businessLogo} 
+                        alt="Business Logo" 
+                        className="h-12 object-contain mx-auto" 
+                      />
+                    </div>
+                  )}
+                  <FileUpload 
+                    onFileUploaded={handleLogoUpload}
+                    label="Upload Logo"
+                    accept="image/*"
                   />
                 </div>
                 
@@ -229,13 +255,21 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                 </div>
                 
                 {config.useBackgroundImage && (
-                  <div>
-                    <Label htmlFor="backgroundImage">Background Image URL</Label>
-                    <Input 
-                      id="backgroundImage"
-                      value={config.backgroundImage || ''}
-                      onChange={(e) => handleChange('backgroundImage', e.target.value)}
-                      placeholder="https://example.com/background.jpg" 
+                  <div className="space-y-2">
+                    <Label>Card Background Image</Label>
+                    {config.backgroundImage && (
+                      <div className="mb-2 mt-1 p-2 border rounded-md">
+                        <img 
+                          src={config.backgroundImage} 
+                          alt="Background" 
+                          className="h-24 w-full object-cover rounded" 
+                        />
+                      </div>
+                    )}
+                    <FileUpload
+                      onFileUploaded={handleBackgroundUpload}
+                      label="Upload Background"
+                      accept="image/*"
                     />
                   </div>
                 )}
