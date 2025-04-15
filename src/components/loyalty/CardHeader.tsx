@@ -42,20 +42,20 @@ const CardHeader: React.FC<CardHeaderProps> = ({
   rewardText
 }) => {
   const avatarSize = isMobile ? "h-10 w-10" : "h-12 w-12";
-  const displayBusinessName = businessName || "InStamp";
-  const defaultLogo = "/lovable-uploads/7520843f-cdff-4e16-9a69-f1da892db604.png";
   
   return (
     <div className={`flex items-center justify-between mb-4 md:mb-6 relative z-10 ${isMobile ? 'flex-wrap' : ''}`}>
       <div className={`flex flex-col items-center w-full ${isMobile ? 'gap-2 mb-2' : 'gap-3'}`}>
-        <div className="flex justify-center w-full mb-2">
-          <Avatar className={`${avatarSize} border-2 border-white shadow-md`}>
-            <AvatarImage src={businessLogo || defaultLogo} alt={displayBusinessName || "Business logo"} />
-            <AvatarFallback className="bg-orange text-white">
-              {displayBusinessName?.charAt(0) || "I"}
-            </AvatarFallback>
-          </Avatar>
-        </div>
+        {businessLogo && (
+          <div className="flex justify-center w-full mb-2">
+            <Avatar className={`${avatarSize} border-2 border-white shadow-md`}>
+              <AvatarImage src={businessLogo} alt={businessName || "Business logo"} />
+              <AvatarFallback className="bg-orange text-white">
+                {businessName?.charAt(0) || "B"}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+        )}
         <div className="text-center w-full">
           {businessName && (
             <h3 
@@ -65,7 +65,7 @@ const CardHeader: React.FC<CardHeaderProps> = ({
                 fontFamily: businessNameFont !== "default" ? businessNameFont : 'inherit'
               }}
             >
-              {displayBusinessName}
+              {businessName}
             </h3>
           )}
           <h2 
