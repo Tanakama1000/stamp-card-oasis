@@ -22,6 +22,12 @@ const RewardCard: React.FC<RewardCardProps> = ({
 }) => {
   if (!showReward) return null;
   
+  const handleStartNewCard = () => {
+    if (onReset) {
+      onReset();
+    }
+  };
+  
   return (
     <div 
       className="mt-6 p-4 text-white text-center rounded-lg shadow-lg transform transition-transform"
@@ -51,8 +57,9 @@ const RewardCard: React.FC<RewardCardProps> = ({
       
       {onReset && (
         <Button
-          onClick={onReset}
+          onClick={handleStartNewCard}
           className="mt-4 w-full bg-white hover:bg-gray-100 text-coffee-dark flex items-center justify-center gap-2"
+          aria-label="Start a new loyalty card"
         >
           <RefreshCw size={16} />
           Start New Card

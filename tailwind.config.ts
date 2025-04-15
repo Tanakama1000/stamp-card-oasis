@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -67,6 +68,33 @@ export default {
         orange: {
           DEFAULT: '#D2691E',
           light: '#FF8C00',
+        },
+        // New color presets
+        brand: {
+          purple: '#9b87f5',
+          lavender: '#7E69AB',
+          magenta: '#D946EF',
+          pink: '#FF719A',
+        },
+        ocean: {
+          DEFAULT: '#0EA5E9',
+          light: '#7DD3FC',
+          dark: '#0369A1',
+        },
+        forest: {
+          DEFAULT: '#22C55E',
+          light: '#86EFAC',
+          dark: '#166534',
+        },
+        sunset: {
+          orange: '#F97316',
+          red: '#EF4444',
+          yellow: '#FBBF24',
+        },
+        neutral: {
+          gray: '#8E9196',
+          slate: '#64748B',
+          stone: '#78716C',
         },
         sidebar: {
           DEFAULT: 'hsl(var(--sidebar-background))',
