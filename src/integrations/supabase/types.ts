@@ -68,6 +68,38 @@ export type Database = {
         }
         Relationships: []
       }
+      loyalty_card_configs: {
+        Row: {
+          business_id: string
+          config: Json
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          config: Json
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          config?: Json
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loyalty_card_configs_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           business_name: string | null

@@ -39,6 +39,7 @@ import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 import { STAMP_ICONS } from "./types";
 import LoyaltyCard from "../LoyaltyCard";
 import FileUpload from "./FileUpload";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CardCustomizationProps {
   onSave: (config: LoyaltyCardConfig) => void;
@@ -48,6 +49,7 @@ interface CardCustomizationProps {
 export default function CardCustomization({ onSave, initialConfig }: CardCustomizationProps) {
   const { toast } = useToast();
   const [previewStamps, setPreviewStamps] = useState(3);
+  const [isLoading, setIsLoading] = useState(true);
   const [config, setConfig] = useState<LoyaltyCardConfig>(initialConfig || {
     businessName: "Coffee Shop",
     cardTitle: "Loyalty Card",
@@ -66,20 +68,42 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
     rewardText: "Collect 10 stamps for a free item",
     rewards: []
   });
-  
   const [rewardsVersion, setRewardsVersion] = useState(0);
 
   useEffect(() => {
-    const savedConfig = localStorage.getItem('loyaltyCardConfig');
-    if (savedConfig && !initialConfig) {
-      try {
-        const parsedConfig = JSON.parse(savedConfig);
-        setConfig(parsedConfig);
-      } catch (e) {
-        console.error("Error parsing saved config:", e);
+    const loadCardConfig = async () => {
+      const businessData = JSON.parse(localStorage.getItem('businessData') || 'null');
+      
+      if (!businessData || !businessData.id) {
+        setIsLoading(false);
+        return;
       }
-    }
-  }, [initialConfig]);
+
+      try {
+        const { data, error } = await supabase
+          .from('loyalty_card_configs')
+          .select('config')
+          .eq('business_id', businessData.id)
+          .single();
+
+        if (error) {
+          console.warn('No existing card configuration found:', error);
+          setIsLoading(false);
+          return;
+        }
+
+        if (data?.config) {
+          setConfig(data.config);
+        }
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Error loading card configuration:', err);
+        setIsLoading(false);
+      }
+    };
+
+    loadCardConfig();
+  }, []);
 
   const handleChange = (field: keyof LoyaltyCardConfig, value: any) => {
     setConfig(prev => {
@@ -92,13 +116,45 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
     });
   };
 
-  const handleSave = () => {
-    onSave(config);
-    localStorage.setItem('loyaltyCardConfig', JSON.stringify(config));
-    toast({
-      title: "Card settings saved",
-      description: "Your loyalty card customization has been saved."
-    });
+  const handleSave = async () => {
+    const businessData = JSON.parse(localStorage.getItem('businessData') || 'null');
+    
+    if (!businessData || !businessData.id) {
+      toast({
+        title: "Error",
+        description: "No business found. Please create a business first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('loyalty_card_configs')
+        .upsert({
+          business_id: businessData.id,
+          config: config
+        }, {
+          onConflict: 'business_id'
+        });
+
+      if (error) throw error;
+
+      if (onSave) onSave(config);
+      localStorage.setItem('loyaltyCardConfig', JSON.stringify(config));
+
+      toast({
+        title: "Card settings saved",
+        description: "Your loyalty card customization has been saved to Supabase."
+      });
+    } catch (err) {
+      console.error('Error saving card configuration:', err);
+      toast({
+        title: "Error",
+        description: "Could not save card configuration to Supabase.",
+        variant: "destructive"
+      });
+    }
   };
 
   const resetToDefaults = () => {
@@ -128,7 +184,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
       description: "Card settings have been reset to defaults"
     });
   };
-  
+
   const handleLogoUpload = (dataUrl: string) => {
     handleChange('businessLogo', dataUrl);
     toast({
@@ -136,7 +192,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
       description: "Business logo has been updated"
     });
   };
-  
+
   const handleBackgroundUpload = (dataUrl: string) => {
     handleChange('backgroundImage', dataUrl);
     handleChange('useBackgroundImage', true);
@@ -145,16 +201,24 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
       description: "Card background image has been updated"
     });
   };
-  
+
   useEffect(() => {
     if (config.rewardText && config.rewardText.includes("stamps for")) {
       handleChange('rewardText', `Collect ${config.maxStamps} stamps for a free item`);
     }
   }, [config.maxStamps]);
-  
+
   const countWords = (text: string): number => {
     return text.trim().split(/\s+/).filter(word => word.length > 0).length;
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <p>Loading card configuration...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
