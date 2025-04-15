@@ -55,6 +55,7 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --cream-light: #FFFFFF; // Changed from #FFFDD0 to pure white
   }
 
   .dark {
@@ -108,7 +109,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-white text-foreground; // Changed background to pure white
   }
 
   /* Custom scrollbar */
