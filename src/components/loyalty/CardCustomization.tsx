@@ -141,6 +141,10 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
     }
   }, [config.maxStamps]);
   
+  const countWords = (text: string): number => {
+    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div className="space-y-6">
@@ -534,12 +538,12 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                   value={config.lastStampText || ''}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value.length >= 4 || value === '') {
+                    if (countWords(value) <= 4 || value === '') {
                       handleChange('lastStampText', value);
                     } else {
                       toast({
-                        title: "Text too short",
-                        description: "Last stamp text must be at least 4 characters",
+                        title: "Too many words",
+                        description: "Last stamp text cannot exceed 4 words",
                         variant: "destructive"
                       });
                     }
@@ -547,7 +551,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                   placeholder="FREE" 
                   className="mb-2"
                 />
-                <p className="text-sm text-gray-500 mb-4">Text for the last stamp (minimum 4 characters)</p>
+                <p className="text-sm text-gray-500 mb-4">Text for the last stamp (maximum 4 words)</p>
                 
                 <div>
                   <Label htmlFor="lastStampTextColor">Last Stamp Text Color</Label>
