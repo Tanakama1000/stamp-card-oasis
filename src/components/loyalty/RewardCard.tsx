@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Trophy, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,18 +33,16 @@ const RewardCard: React.FC<RewardCardProps> = ({
       style={{ backgroundColor: stampActiveColor || "#8B4513" }}
     >
       <p 
-        className="font-bold text-lg" 
+        className="font-bold text-lg text-white" 
         style={{ 
-          color: rewardTextColor,
           fontFamily: descriptionFont !== "default" ? descriptionFont : 'inherit' 
         }}
       >
         Congratulations! You've earned a reward!
       </p>
       <p 
-        className={`${descriptionFontSize} mt-1`} 
+        className={`${descriptionFontSize} mt-1 text-white`} 
         style={{ 
-          color: rewardTextColor,
           fontFamily: descriptionFont !== "default" ? descriptionFont : 'inherit'
         }}
       >

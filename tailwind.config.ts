@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -69,7 +68,6 @@ export default {
           DEFAULT: '#D2691E',
           light: '#FF8C00',
         },
-        // New color presets
         brand: {
           purple: '#9b87f5',
           lavender: '#7E69AB',
@@ -105,6 +103,27 @@ export default {
           'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))'
+        },
+        jewel: {
+          emerald: '#50C878',
+          sapphire: '#0F52BA',
+          ruby: '#E0115F',
+          amethyst: '#9966CC',
+          topaz: '#FFC87C',
+        },
+        earth: {
+          moss: '#8A9A5B',
+          clay: '#B76F56',
+          sand: '#F4A460',
+          stone: '#8B7355',
+          terracotta: '#E2725B',
+        },
+        pastel: {
+          mint: '#98FB98',
+          lavender: '#E6E6FA',
+          peach: '#FFDAB9',
+          sky: '#87CEEB',
+          rose: '#FFB6C1',
         }
       },
       borderRadius: {
