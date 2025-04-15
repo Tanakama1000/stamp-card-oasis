@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Check, 
@@ -22,7 +23,8 @@ import {
   Zap, 
   Trophy, 
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  Gift
 } from "lucide-react";
 import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 import { STAMP_ICONS } from "./types";
@@ -49,6 +51,8 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
     cardTitleColor: "#8B4513",
     rewardTextColor: "#6F4E37",
     stampIcon: "Coffee",
+    rewardIcon: "Gift",
+    rewardText: "Collect 10 stamps for a free item",
     rewards: []
   });
   
@@ -99,6 +103,8 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
       cardTitleColor: "#8B4513",
       rewardTextColor: "#6F4E37",
       stampIcon: "Coffee",
+      rewardIcon: "Gift",
+      rewardText: "Collect 10 stamps for a free item",
       rewards: []
     });
     
@@ -126,6 +132,13 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
       description: "Card background image has been updated"
     });
   };
+  
+  // Update maxStamps in rewardText when maxStamps changes
+  useEffect(() => {
+    if (config.rewardText && config.rewardText.includes("stamps for")) {
+      handleChange('rewardText', `Collect ${config.maxStamps} stamps for a free item`);
+    }
+  }, [config.maxStamps]);
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -168,6 +181,16 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                     value={config.cardTitle}
                     onChange={(e) => handleChange('cardTitle', e.target.value)}
                     placeholder="Loyalty Card" 
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="rewardText">Reward Text</Label>
+                  <Input 
+                    id="rewardText"
+                    value={config.rewardText || `Collect ${config.maxStamps} stamps for a free item`}
+                    onChange={(e) => handleChange('rewardText', e.target.value)}
+                    placeholder={`Collect ${config.maxStamps} stamps for a free item`} 
                   />
                 </div>
                 
@@ -502,6 +525,29 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                   })}
                 </div>
               </div>
+              
+              <div className="mt-4">
+                <Label>Reward Icon (Last Stamp)</Label>
+                <div className="grid grid-cols-4 gap-2 mt-2">
+                  {Object.keys(STAMP_ICONS).map((iconName) => {
+                    const IconComponent = STAMP_ICONS[iconName as keyof typeof STAMP_ICONS];
+                    return (
+                      <Button
+                        key={`reward-${iconName}`}
+                        type="button"
+                        variant={config.rewardIcon === iconName ? "default" : "outline"}
+                        className={`flex flex-col items-center justify-center p-2 h-16 ${
+                          config.rewardIcon === iconName ? 'bg-orange text-white' : ''
+                        }`}
+                        onClick={() => handleChange('rewardIcon', iconName)}
+                      >
+                        <IconComponent size={20} />
+                        <span className="text-xs mt-1">{iconName}</span>
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
           
@@ -542,7 +588,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
             
             <div className="mt-4">
               <LoyaltyCard 
-                key={`preview-${rewardsVersion}`}
+                key={`preview-${rewardsVersion}-${config.maxStamps}-${config.rewardIcon || "Gift"}`}
                 customerName="John Doe"
                 maxStamps={config.maxStamps}
                 currentStamps={previewStamps}

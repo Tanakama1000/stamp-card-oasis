@@ -14,6 +14,8 @@ export interface LoyaltyCardConfig {
   backgroundImage?: string;
   useBackgroundImage?: boolean;
   stampIcon?: string;
+  rewardIcon?: string;
+  rewardText?: string;
   fontFamily?: string;
   businessNameFont?: string;
   cardTitleFont?: string;

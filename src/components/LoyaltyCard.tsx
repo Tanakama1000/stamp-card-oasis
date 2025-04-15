@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -182,6 +181,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
           stamps={stamps}
           progressBarColor={progressBarColor}
           isMobile={isMobile}
+          rewardText={cardStyle?.rewardText}
         />
 
         <ProgressBar

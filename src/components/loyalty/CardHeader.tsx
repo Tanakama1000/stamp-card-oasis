@@ -19,6 +19,7 @@ interface CardHeaderProps {
   stamps: number;
   progressBarColor: string;
   isMobile?: boolean;
+  rewardText?: string;
 }
 
 const CardHeader: React.FC<CardHeaderProps> = ({
@@ -37,7 +38,8 @@ const CardHeader: React.FC<CardHeaderProps> = ({
   maxStamps,
   stamps,
   progressBarColor,
-  isMobile
+  isMobile,
+  rewardText
 }) => {
   const avatarSize = isMobile ? "h-10 w-10" : "h-12 w-12";
   
@@ -82,7 +84,7 @@ const CardHeader: React.FC<CardHeaderProps> = ({
               fontFamily: descriptionFont !== "default" ? descriptionFont : 'inherit'
             }}
           >
-            Collect {maxStamps} stamps for a free item
+            {rewardText || `Collect ${maxStamps} stamps for a free item`}
           </p>
         </div>
       </div>
