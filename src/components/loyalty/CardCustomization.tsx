@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,10 +14,9 @@ import {
   Layout, 
   Image as ImageIcon, 
   Type, 
-  Gift, 
+  Award, 
   Star, 
   Heart, 
-  Award, 
   Coffee, 
   Battery, 
   Zap, 
@@ -27,7 +27,6 @@ import {
 import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 import { STAMP_ICONS } from "./types";
 import LoyaltyCard from "../LoyaltyCard";
-import { Reward } from "./types";
 import FileUpload from "./FileUpload";
 
 interface CardCustomizationProps {
@@ -51,12 +50,6 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
     rewardTextColor: "#6F4E37",
     stampIcon: "Coffee",
     rewards: []
-  });
-
-  const [reward, setReward] = useState<Reward>({
-    stampNumber: 5,
-    description: "Free Coffee",
-    icon: "Coffee"
   });
   
   const [rewardsVersion, setRewardsVersion] = useState(0);
@@ -91,40 +84,6 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
       title: "Card settings saved",
       description: "Your loyalty card customization has been saved."
     });
-  };
-
-  const addReward = () => {
-    if (!config.rewards) {
-      config.rewards = [];
-    }
-    
-    const existingRewardIndex = config.rewards.findIndex(r => r.stampNumber === reward.stampNumber);
-    
-    if (existingRewardIndex >= 0) {
-      const updatedRewards = [...config.rewards];
-      updatedRewards[existingRewardIndex] = { ...reward };
-      
-      handleChange('rewards', updatedRewards);
-    } else {
-      handleChange('rewards', [...config.rewards, { ...reward }]);
-    }
-    
-    toast({
-      title: "Reward added",
-      description: `Reward added for stamp #${reward.stampNumber}`
-    });
-  };
-
-  const removeReward = (stampNumber: number) => {
-    if (config.rewards) {
-      const updatedRewards = config.rewards.filter(r => r.stampNumber !== stampNumber);
-      handleChange('rewards', updatedRewards);
-      
-      toast({
-        title: "Reward removed",
-        description: `Reward for stamp #${stampNumber} has been removed`
-      });
-    }
   };
 
   const resetToDefaults = () => {
@@ -175,7 +134,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
           <h2 className="text-xl font-semibold text-coffee-dark mb-4">Loyalty Card Editor</h2>
           
           <Tabs defaultValue="general">
-            <TabsList className="grid grid-cols-4 mb-4">
+            <TabsList className="grid grid-cols-3 mb-4">
               <TabsTrigger value="general" className="flex items-center gap-2">
                 <Layout size={16} />
                 <span>General</span>
@@ -187,10 +146,6 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
               <TabsTrigger value="stamps" className="flex items-center gap-2">
                 <Award size={16} />
                 <span>Stamps</span>
-              </TabsTrigger>
-              <TabsTrigger value="rewards" className="flex items-center gap-2">
-                <Gift size={16} />
-                <span>Rewards</span>
               </TabsTrigger>
             </TabsList>
             
@@ -546,101 +501,6 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                     );
                   })}
                 </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="rewards" className="space-y-4">
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="rewardStampNumber">Stamp Number</Label>
-                  <div className="flex items-center gap-4">
-                    <Slider
-                      id="rewardStampNumber"
-                      min={1}
-                      max={config.maxStamps}
-                      step={1}
-                      value={[reward.stampNumber]}
-                      onValueChange={(value) => setReward(prev => ({ ...prev, stampNumber: value[0] }))}
-                      className="flex-1"
-                    />
-                    <span className="w-12 text-center font-medium">{reward.stampNumber}</span>
-                  </div>
-                </div>
-                
-                <div>
-                  <Label htmlFor="rewardDescription">Reward Description</Label>
-                  <Input 
-                    id="rewardDescription"
-                    value={reward.description}
-                    onChange={(e) => setReward(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Free Coffee" 
-                  />
-                </div>
-                
-                <div>
-                  <Label>Reward Icon</Label>
-                  <div className="grid grid-cols-5 gap-2 mt-2">
-                    {Object.keys(STAMP_ICONS).map((iconName) => {
-                      const IconComponent = STAMP_ICONS[iconName as keyof typeof STAMP_ICONS];
-                      return (
-                        <Button
-                          key={iconName}
-                          type="button"
-                          variant={reward.icon === iconName ? "default" : "outline"}
-                          className={`flex flex-col items-center justify-center p-2 h-16 ${
-                            reward.icon === iconName ? 'bg-orange text-white' : ''
-                          }`}
-                          onClick={() => setReward(prev => ({ ...prev, icon: iconName }))}
-                        >
-                          <IconComponent size={20} />
-                          <span className="text-xs mt-1 truncate w-full">{iconName}</span>
-                        </Button>
-                      );
-                    })}
-                  </div>
-                </div>
-                
-                <Button onClick={addReward} className="w-full">
-                  Add Reward to Stamp #{reward.stampNumber}
-                </Button>
-                
-                {(config.rewards && config.rewards.length > 0) ? (
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Current Rewards</h3>
-                    <div className="space-y-2">
-                      {config.rewards.map((currentReward, index) => {
-                        const RewardIcon = STAMP_ICONS[currentReward.icon as keyof typeof STAMP_ICONS] || Gift;
-                        
-                        return (
-                          <div 
-                            key={index} 
-                            className="flex items-center justify-between p-2 border rounded-md"
-                          >
-                            <div className="flex items-center gap-2">
-                              <div className="bg-orange rounded-full p-1 text-white">
-                                <RewardIcon size={16} />
-                              </div>
-                              <div>
-                                <div className="text-sm font-medium">Stamp #{currentReward.stampNumber}</div>
-                                <div className="text-xs text-coffee-light">{currentReward.description}</div>
-                              </div>
-                            </div>
-                            
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={() => removeReward(currentReward.stampNumber)}
-                              className="h-8 w-8 p-0"
-                            >
-                              <span className="sr-only">Remove</span>
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ) : null}
               </div>
             </TabsContent>
           </Tabs>
