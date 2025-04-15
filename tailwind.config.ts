@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -124,6 +125,34 @@ export default {
           peach: '#FFDAB9',
           sky: '#87CEEB',
           rose: '#FFB6C1',
+        },
+        neon: {
+          pink: '#FF6EC7',
+          blue: '#00FFFF',
+          green: '#39FF14',
+          orange: '#FF9E00',
+          yellow: '#FFFF00',
+        },
+        vibrant: {
+          red: '#FF0000',
+          blue: '#0000FF',
+          green: '#00FF00',
+          purple: '#8000FF',
+          yellow: '#FFFF00',
+        },
+        matte: {
+          black: '#28282B',
+          gray: '#808080',
+          white: '#F5F5F5',
+          beige: '#F5F5DC',
+          brown: '#964B00',
+        },
+        metallic: {
+          gold: '#FFD700',
+          silver: '#C0C0C0',
+          bronze: '#CD7F32',
+          copper: '#B87333',
+          steel: '#71797E',
         }
       },
       borderRadius: {

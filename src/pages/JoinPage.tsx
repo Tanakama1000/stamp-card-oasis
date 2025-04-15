@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
@@ -38,10 +39,11 @@ const JoinPage = () => {
     
     const fetchBusinessData = async () => {
       try {
+        // Use case insensitive comparison for the business slug
         const { data: businesses, error } = await supabase
           .from("businesses")
           .select("*")
-          .eq("slug", businessSlug)
+          .ilike("slug", businessSlug || '')
           .single();
         
         if (error) {
@@ -52,7 +54,9 @@ const JoinPage = () => {
           if (savedBusinesses) {
             try {
               const businesses = JSON.parse(savedBusinesses);
-              foundBusiness = businesses.find((b: any) => b.slug === businessSlug);
+              foundBusiness = businesses.find((b: any) => 
+                b.slug.toLowerCase() === (businessSlug || '').toLowerCase()
+              );
             } catch (e) {
               console.error("Error parsing businesses:", e);
             }
