@@ -1,121 +1,67 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Layout from "@/components/Layout";
 import QRScanner from "@/components/QRScanner";
-import LoyaltyCard from "@/components/LoyaltyCard";
-import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ScanLine, BadgeCheck } from "lucide-react";
-import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ScanPage = () => {
   const { toast } = useToast();
-  const [customerName, setCustomerName] = useState<string>("");  // Default to empty string
-  const [stamps, setStamps] = useState<number>(3);
-  const [maxStamps, setMaxStamps] = useState<number>(10);
-  const [lastScanTime, setLastScanTime] = useState<number | null>(null);
-  const [lastBusinessId, setLastBusinessId] = useState<string | null>(null);
-  const [cardStyle, setCardStyle] = useState<LoyaltyCardConfig | null>(null);
+  const navigate = useNavigate();
+  const [scanning, setScanning] = useState<boolean>(true);
 
-  // Fetch card style from localStorage on component mount
-  useEffect(() => {
-    const savedCardStyle = localStorage.getItem('loyaltyCardConfig');
-    if (savedCardStyle) {
-      try {
-        const parsedStyle = JSON.parse(savedCardStyle);
-        setCardStyle(parsedStyle);
-        setMaxStamps(parsedStyle.maxStamps || 10);
-      } catch (error) {
-        console.error("Error parsing card style from localStorage", error);
-      }
-    }
-  }, []);
-
-  const handleSuccessfulScan = (businessId: string, timestamp: number, stampCount: number = 1) => {
-    console.log("Successful scan:", { businessId, timestamp, stampCount });
-    
-    // Check if user has already scanned this business today
-    if (lastScanTime && lastBusinessId === businessId) {
-      const lastScanDate = new Date(lastScanTime).setHours(0, 0, 0, 0);
-      const today = new Date().setHours(0, 0, 0, 0);
-      
-      if (lastScanDate === today) {
-        toast({
-          title: "Already Scanned Today",
-          description: "You've already collected stamps from this business today.",
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-    
-    // Update stamp count
-    if (stamps < maxStamps) {
-      // Add stamps but don't exceed the maximum
-      const newStampCount = Math.min(stamps + stampCount, maxStamps);
-      setStamps(newStampCount);
-      setLastScanTime(Date.now());
-      setLastBusinessId(businessId);
-      
-      toast({
-        title: "Stamps Added!",
-        description: `${stampCount} stamp${stampCount > 1 ? 's' : ''} has been added to your loyalty card.`,
-      });
-    } else {
-      toast({
-        title: "Card Full!",
-        description: "Your card is already full! Redeem your reward.",
-      });
-    }
-  };
-  
-  const handleCardReset = () => {
-    setStamps(0);
+  const handleSuccessfulScan = (businessId: string, timestamp: number, stamps: number = 1) => {
+    // Success toast notification
     toast({
-      title: "New Card Started",
-      description: "Your loyalty card has been reset. Start collecting stamps!",
-      duration: 3000,
+      title: "QR Code Scanned Successfully!",
+      description: `You collected ${stamps} stamp${stamps !== 1 ? 's' : ''}!`,
+      variant: "default",
     });
+
+    // Navigate back or to the appropriate page
+    setTimeout(() => {
+      navigate(-1);
+    }, 2000);
   };
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-coffee-dark mb-2">Scan & Collect</h1>
-          <p className="text-coffee-light">Scan a business QR code to collect your stamp</p>
+      <div className="max-w-md mx-auto mt-4">
+        <div className="flex items-center mb-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="mr-2"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-xl font-semibold text-coffee-dark">Scan Business QR Code</h1>
         </div>
-
-        <Card className="bg-gradient-to-r from-coffee-light to-orange p-6 mb-8 text-white">
-          <div className="flex items-center gap-3 mb-4">
-            <ScanLine size={24} className="text-cream" />
-            <h2 className="text-xl font-semibold">How It Works</h2>
+        
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="p-4">
+            <p className="text-coffee-medium text-center mb-4">
+              Scan a business QR code to collect stamps
+            </p>
+            
+            {scanning ? (
+              <div className="w-full max-w-sm mx-auto">
+                <QRScanner onSuccessfulScan={handleSuccessfulScan} />
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Button
+                  onClick={() => setScanning(true)}
+                  className="bg-orange hover:bg-orange-dark text-white"
+                >
+                  Start Scanning
+                </Button>
+              </div>
+            )}
           </div>
-          <ol className="list-decimal list-inside space-y-2 ml-4">
-            <li>Ask the business to show their QR code</li>
-            <li>Scan it with your camera</li>
-            <li>Get your stamp automatically added</li>
-            <li>Collect {maxStamps} stamps for a free reward!</li>
-          </ol>
-          <div className="flex items-center gap-2 mt-4">
-            <BadgeCheck size={20} className="text-cream" />
-            <p className="text-sm">You can scan once per business per day</p>
-          </div>
-        </Card>
-
-        <div className="grid grid-cols-1 gap-6 mb-8">
-          <QRScanner onSuccessfulScan={handleSuccessfulScan} />
-        </div>
-
-        <div className="mb-8">
-          <LoyaltyCard
-            customerName={customerName}
-            maxStamps={maxStamps}
-            currentStamps={stamps}
-            cardStyle={cardStyle || undefined}
-            onStampCollected={() => {}}
-            onReset={handleCardReset}
-          />
         </div>
       </div>
     </Layout>

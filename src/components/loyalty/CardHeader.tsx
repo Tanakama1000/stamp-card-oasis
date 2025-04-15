@@ -49,7 +49,7 @@ const CardHeader: React.FC<CardHeaderProps> = ({
         {businessLogo && (
           <div className="flex justify-center w-full mb-2">
             <Avatar className={`${avatarSize} border-2 border-white shadow-md`}>
-              <AvatarImage src={businessLogo} alt="Business logo" />
+              <AvatarImage src={businessLogo} alt={businessName || "Business logo"} />
               <AvatarFallback className="bg-orange text-white">
                 {businessName?.charAt(0) || "B"}
               </AvatarFallback>

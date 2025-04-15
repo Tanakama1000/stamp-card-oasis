@@ -7,7 +7,7 @@ import AdminPage from "./pages/AdminPage";
 import JoinPage from "./pages/JoinPage";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
-import ScanPage from "./pages/ScanPage"; // Import ScanPage
+import ScanPage from "./pages/ScanPage";
 
 const queryClient = new QueryClient();
 

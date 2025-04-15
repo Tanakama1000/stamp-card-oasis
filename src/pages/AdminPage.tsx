@@ -7,7 +7,7 @@ import CustomerList from "@/components/CustomerList";
 import CardCustomization from "@/components/loyalty/CardCustomization";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { QrCode, BarChart2, Users, UserCircle, Link as LinkIcon, Copy, CreditCard } from "lucide-react";
+import { QrCode, BarChart2, Users, UserCircle, Link as LinkIcon, Copy, CreditCard, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,10 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
 import { supabase } from "@/integrations/supabase/client";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
 interface BusinessData {
   id: string;
@@ -22,6 +26,12 @@ interface BusinessData {
   slug: string;
   createdAt: string;
 }
+
+const businessSchema = z.object({
+  name: z.string().min(2, {
+    message: "Business name must be at least 2 characters.",
+  }),
+});
 
 const AdminPage = () => {
   const { toast } = useToast();
@@ -46,6 +56,14 @@ const AdminPage = () => {
   const [slugEditing, setSlugEditing] = useState(false);
   const [tempSlug, setTempSlug] = useState(businessData.slug);
   const [cardConfig, setCardConfig] = useState<LoyaltyCardConfig | null>(null);
+  const [isNameEditing, setIsNameEditing] = useState(false);
+
+  const businessForm = useForm<z.infer<typeof businessSchema>>({
+    resolver: zodResolver(businessSchema),
+    defaultValues: {
+      name: businessData.name,
+    },
+  });
 
   useEffect(() => {
     const fetchBusinessData = async () => {
@@ -64,6 +82,7 @@ const AdminPage = () => {
             createdAt: businesses[0].created_at
           });
           setTempSlug(businesses[0].slug);
+          businessForm.reset({ name: businesses[0].name });
         } else {
           // Fallback to localStorage
           const savedBusinessData = localStorage.getItem('businessData');
@@ -72,6 +91,7 @@ const AdminPage = () => {
               const parsedData = JSON.parse(savedBusinessData);
               setBusinessData(parsedData);
               setTempSlug(parsedData.slug);
+              businessForm.reset({ name: parsedData.name });
             } catch (e) {
               console.error("Error parsing business data:", e);
             }
@@ -175,6 +195,76 @@ const AdminPage = () => {
     });
   };
 
+  const handleBusinessNameSubmit = async (values: z.infer<typeof businessSchema>) => {
+    const newName = values.name.trim();
+    
+    if (newName === businessData.name) {
+      setIsNameEditing(false);
+      return;
+    }
+    
+    // Generate a slug from the business name if not custom edited
+    let newSlug = tempSlug;
+    if (tempSlug === businessData.slug) {
+      newSlug = newName
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '');
+    }
+    
+    const updatedBusinessData = {
+      ...businessData,
+      name: newName,
+      slug: newSlug
+    };
+    
+    // Try to update in Supabase if we have an ID
+    if (businessData.id && businessData.id.includes("b_") === false) {
+      try {
+        const { error } = await supabase
+          .from("businesses")
+          .update({ 
+            name: newName,
+            slug: newSlug 
+          })
+          .eq("id", businessData.id);
+          
+        if (error) {
+          console.error("Error updating business name:", error);
+          toast({
+            title: "Error",
+            description: "Could not update business information.",
+            variant: "destructive"
+          });
+          return;
+        }
+      } catch (e) {
+        console.error("Error updating business name:", e);
+      }
+    }
+    
+    setBusinessData(updatedBusinessData);
+    setTempSlug(newSlug);
+    setIsNameEditing(false);
+    
+    // Update card config with business name if it exists
+    if (cardConfig) {
+      const updatedCardConfig = {
+        ...cardConfig,
+        businessName: newName
+      };
+      setCardConfig(updatedCardConfig);
+      localStorage.setItem('loyaltyCardConfig', JSON.stringify(updatedCardConfig));
+    }
+    
+    localStorage.setItem('businessData', JSON.stringify(updatedBusinessData));
+    
+    toast({
+      title: "Business Updated",
+      description: "Your business information has been updated."
+    });
+  };
+
   const copyJoinLink = () => {
     const joinLink = `${window.location.origin}/join/${businessData.slug}`;
     navigator.clipboard.writeText(joinLink);
@@ -186,8 +276,13 @@ const AdminPage = () => {
   };
   
   const handleSaveCardConfig = (config: LoyaltyCardConfig) => {
-    setCardConfig(config);
-    localStorage.setItem('loyaltyCardConfig', JSON.stringify(config));
+    // Ensure the business name from the business data is reflected in the card config
+    const updatedConfig = {
+      ...config,
+      businessName: businessData.name
+    };
+    setCardConfig(updatedConfig);
+    localStorage.setItem('loyaltyCardConfig', JSON.stringify(updatedConfig));
   };
 
   return (
@@ -197,6 +292,67 @@ const AdminPage = () => {
           <h1 className="text-3xl font-bold text-coffee-dark mb-2">Business Admin Panel</h1>
           <p className="text-coffee-light">Manage your loyalty program and generate QR codes</p>
         </div>
+        
+        <Card className="p-4 mb-4 bg-white card-shadow">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
+            <div>
+              <h3 className="font-semibold text-coffee-dark">Business Information</h3>
+              <p className="text-coffee-light text-sm">Manage your business details</p>
+            </div>
+            
+            {isNameEditing ? (
+              <Form {...businessForm}>
+                <form onSubmit={businessForm.handleSubmit(handleBusinessNameSubmit)} className="w-full md:w-auto">
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <FormField
+                      control={businessForm.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          <FormControl>
+                            <Input 
+                              placeholder="Business Name" 
+                              {...field} 
+                              className="min-w-0 w-full"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" size="sm">Save</Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => {
+                        businessForm.reset({ name: businessData.name });
+                        setIsNameEditing(false);
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            ) : (
+              <div className="flex gap-2">
+                <div className="py-2 px-3 border rounded-md bg-gray-50 min-w-[200px] text-center">
+                  <span className="font-medium">{businessData.name}</span>
+                </div>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => {
+                    businessForm.reset({ name: businessData.name });
+                    setIsNameEditing(true);
+                  }}
+                >
+                  Edit Name
+                </Button>
+              </div>
+            )}
+          </div>
+        </Card>
         
         <Card className="p-4 mb-6 bg-white card-shadow">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -302,7 +458,10 @@ const AdminPage = () => {
             <TabsContent value="card-editor">
               <CardCustomization 
                 onSave={handleSaveCardConfig}
-                initialConfig={cardConfig || undefined}
+                initialConfig={cardConfig || {
+                  businessName: businessData.name,
+                  maxStamps: 10
+                }}
               />
             </TabsContent>
             <TabsContent value="recent-activity">
