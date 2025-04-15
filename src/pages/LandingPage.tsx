@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
@@ -62,15 +61,9 @@ const LandingPage = () => {
           </div>
           <div className="lg:w-1/2">
             <Card className="overflow-hidden shadow-xl bg-white/10 backdrop-blur-sm border-white/20">
-              <img 
-                src="/dashboard-preview.png" 
-                alt="Loyalty Card Dashboard" 
-                className="w-full object-cover rounded-lg"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = "https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2274&q=80";
-                }}
-              />
+              <div className="h-64 md:h-80 bg-coffee-dark/20 flex items-center justify-center">
+                <Coffee size={64} className="text-white opacity-75" />
+              </div>
             </Card>
           </div>
         </div>
@@ -223,45 +216,27 @@ const LandingPage = () => {
               <div className="bg-coffee-dark text-white p-2 text-center font-semibold">
                 Business Dashboard
               </div>
-              <img 
-                src="/dashboard-screenshot.png" 
-                alt="Dashboard Screenshot"
-                className="w-full h-auto"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = "https://images.unsplash.com/photo-1608222351212-18fe0ec7b13b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80";
-                }}
-              />
+              <div className="h-64 bg-gray-100 flex items-center justify-center">
+                <PieChart size={40} className="text-coffee-medium opacity-50" />
+              </div>
             </Card>
             
             <Card className="overflow-hidden shadow-lg card-shadow">
               <div className="bg-coffee-dark text-white p-2 text-center font-semibold">
                 Customer View
               </div>
-              <img 
-                src="/customer-screenshot.png" 
-                alt="Customer View Screenshot"
-                className="w-full h-auto"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = "https://images.unsplash.com/photo-1579389083078-4e7018379f7e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80";
-                }}
-              />
+              <div className="h-64 bg-gray-100 flex items-center justify-center">
+                <Smartphone size={40} className="text-coffee-medium opacity-50" />
+              </div>
             </Card>
             
             <Card className="overflow-hidden shadow-lg card-shadow">
               <div className="bg-coffee-dark text-white p-2 text-center font-semibold">
                 Mobile Experience
               </div>
-              <img 
-                src="/mobile-screenshot.png" 
-                alt="Mobile Experience Screenshot" 
-                className="w-full h-auto"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = "https://images.unsplash.com/photo-1511746981246-d5cf2172f9b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80";
-                }}
-              />
+              <div className="h-64 bg-gray-100 flex items-center justify-center">
+                <Users size={40} className="text-coffee-medium opacity-50" />
+              </div>
             </Card>
           </div>
         </div>

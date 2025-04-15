@@ -1,6 +1,5 @@
 
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -20,8 +19,13 @@ const App = () => {
   useEffect(() => {
     // Check current auth status
     const checkAuth = async () => {
-      const { data } = await supabase.auth.getSession();
-      setIsAuthenticated(!!data.session);
+      try {
+        const { data } = await supabase.auth.getSession();
+        setIsAuthenticated(!!data.session);
+      } catch (error) {
+        console.error("Auth check error:", error);
+        setIsAuthenticated(false); // Fail safely
+      }
     };
     
     checkAuth();
@@ -36,25 +40,35 @@ const App = () => {
     };
   }, []);
 
-  // Protected route component
+  // Protected route component with better loading state
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+    // If still checking auth, show minimal loader instead of full page loading state
     if (isAuthenticated === null) {
-      // Still checking auth status
-      return <div>Loading...</div>;
+      return (
+        <div className="flex justify-center items-center h-screen bg-cream-light">
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-coffee-medium rounded-full animate-bounce" />
+            <div className="w-3 h-3 bg-coffee-medium rounded-full animate-bounce [animation-delay:0.2s]" />
+            <div className="w-3 h-3 bg-coffee-medium rounded-full animate-bounce [animation-delay:0.4s]" />
+          </div>
+        </div>
+      );
     }
     
+    // Redirect if not authenticated
     if (!isAuthenticated) {
       return <Navigate to="/auth" />;
     }
 
+    // Render children if authenticated
     return <>{children}</>;
   };
 
+  // Non-protected routes don't need to wait for auth check
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Toaster />
-        <Sonner />
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/admin" element={
