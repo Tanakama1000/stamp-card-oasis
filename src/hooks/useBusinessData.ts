@@ -1,25 +1,12 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
 
 interface BusinessData {
   id?: string;
   name: string;
   slug: string;
-}
-
-interface LoyaltyCardConfig {
-  businessName: string;
-  cardTitle: string;
-  maxStamps: number;
-  stampIcon: string;
-  cardBgColor: string;
-  textColor: string;
-  businessNameColor: string;
-  cardTitleColor: string;
-  rewardTextColor: string;
-  [key: string]: any;
 }
 
 export const useBusinessData = (businessSlug: string | undefined, userId: string | null) => {
@@ -41,7 +28,7 @@ export const useBusinessData = (businessSlug: string | undefined, userId: string
         .single();
         
       if (!error && configData) {
-        setLoyaltyCardConfig(configData.config);
+        setLoyaltyCardConfig(configData.config as LoyaltyCardConfig);
         return;
       }
       
