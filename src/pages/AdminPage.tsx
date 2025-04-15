@@ -477,33 +477,10 @@ const AdminPage = () => {
               />
             </TabsContent>
             <TabsContent value="recent-activity">
-              <Card className="p-6 bg-white card-shadow">
-                <h3 className="text-xl font-semibold text-coffee-dark mb-4">Recent Stamp Collections</h3>
-                
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-coffee-light">
-                        <th className="text-left p-3 text-coffee-dark">Customer</th>
-                        <th className="text-left p-3 text-coffee-dark">Stamps</th>
-                        <th className="text-left p-3 text-coffee-dark">Date & Time</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recentScans.map((scan, index) => (
-                        <tr key={index} className="border-b border-cream">
-                          <td className="p-3">{scan.customer}</td>
-                          <td className="p-3">+{scan.stamps}</td>
-                          <td className="p-3 text-coffee-light">{formatTimestamp(scan.timestamp)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
+              <RecentActivity businessId={businessData.id} />
             </TabsContent>
             <TabsContent value="customers">
-              <CustomerList />
+              <CustomerList businessId={businessData.id} />
             </TabsContent>
           </Tabs>
         </div>

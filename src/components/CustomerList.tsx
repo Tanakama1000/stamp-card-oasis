@@ -1,35 +1,74 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, UserPlus } from "lucide-react";
-
-// Sample customer data
-const initialCustomers = [
-  { id: 1, name: "John Doe", email: "john@example.com", stamps: 7, rewards: 1 },
-  { id: 2, name: "Jane Smith", email: "jane@example.com", stamps: 3, rewards: 0 },
-  { id: 3, name: "Bob Johnson", email: "bob@example.com", stamps: 9, rewards: 2 },
-  { id: 4, name: "Alice Brown", email: "alice@example.com", stamps: 5, rewards: 0 },
-  { id: 5, name: "Charlie Davis", email: "charlie@example.com", stamps: 8, rewards: 1 },
-];
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface Customer {
-  id: number;
-  name: string;
-  email: string;
+  id: string;
+  user_id?: string;
+  customer_name?: string;
+  email?: string;
   stamps: number;
   rewards: number;
 }
 
-const CustomerList = () => {
-  const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
-  const [searchTerm, setSearchTerm] = useState<string>("");
+interface CustomerListProps {
+  businessId: string;
+}
 
-  const filteredCustomers = customers.filter((customer) => 
-    customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+const CustomerList = ({ businessId }: CustomerListProps) => {
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!businessId) return;
+    
+    const fetchCustomers = async () => {
+      setIsLoading(true);
+      try {
+        // Get customers from business_members table
+        const { data, error } = await supabase
+          .from('business_members')
+          .select('id, user_id, customer_name, stamps')
+          .eq('business_id', businessId);
+        
+        if (error) throw error;
+        
+        // Calculate rewards (assuming every 10 stamps is 1 reward)
+        const customersWithRewards = data.map(customer => {
+          return {
+            ...customer,
+            rewards: Math.floor((customer.stamps || 0) / 10)
+          };
+        });
+        
+        setCustomers(customersWithRewards);
+      } catch (error) {
+        console.error("Error fetching customers:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load customers. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchCustomers();
+  }, [businessId, toast]);
+
+  const filteredCustomers = customers.filter((customer) => {
+    const searchLower = searchTerm.toLowerCase();
+    const customerName = customer.customer_name?.toLowerCase() || '';
+    return customerName.includes(searchLower);
+  });
 
   return (
     <Card className="p-6 bg-white card-shadow">
@@ -56,21 +95,29 @@ const CustomerList = () => {
           <thead>
             <tr className="border-b border-coffee-light">
               <th className="text-left p-3 text-coffee-dark">Name</th>
-              <th className="text-left p-3 text-coffee-dark">Email</th>
               <th className="text-center p-3 text-coffee-dark">Stamps</th>
               <th className="text-center p-3 text-coffee-dark">Rewards</th>
               <th className="text-right p-3 text-coffee-dark">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredCustomers.length > 0 ? (
+            {isLoading ? (
+              <tr>
+                <td colSpan={4} className="p-4 text-center">
+                  <div className="flex justify-center items-center space-x-2">
+                    <div className="h-4 w-4 bg-coffee-light/20 rounded-full animate-pulse"></div>
+                    <div className="h-4 w-4 bg-coffee-light/30 rounded-full animate-pulse"></div>
+                    <div className="h-4 w-4 bg-coffee-light/40 rounded-full animate-pulse"></div>
+                  </div>
+                </td>
+              </tr>
+            ) : filteredCustomers.length > 0 ? (
               filteredCustomers.map((customer) => (
                 <tr key={customer.id} className="border-b border-cream hover:bg-cream/20 transition-colors">
-                  <td className="p-3 font-medium">{customer.name}</td>
-                  <td className="p-3 text-coffee-light">{customer.email}</td>
+                  <td className="p-3 font-medium">{customer.customer_name || 'Anonymous Customer'}</td>
                   <td className="p-3 text-center">
                     <span className="px-3 py-1 bg-orange/10 text-orange-light rounded-full">
-                      {customer.stamps}
+                      {customer.stamps || 0}
                     </span>
                   </td>
                   <td className="p-3 text-center">
@@ -85,8 +132,8 @@ const CustomerList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="p-4 text-center text-coffee-light">
-                  No customers found matching your search.
+                <td colSpan={4} className="p-4 text-center text-coffee-light">
+                  {searchTerm ? "No customers found matching your search." : "No customers have joined your loyalty program yet."}
                 </td>
               </tr>
             )}
