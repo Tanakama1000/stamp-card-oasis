@@ -12,24 +12,30 @@ export type Database = {
       business_members: {
         Row: {
           business_id: string
+          customer_name: string | null
           id: string
+          is_anonymous: boolean | null
           joined_at: string
           stamps: number | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           business_id: string
+          customer_name?: string | null
           id?: string
+          is_anonymous?: boolean | null
           joined_at?: string
           stamps?: number | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           business_id?: string
+          customer_name?: string | null
           id?: string
+          is_anonymous?: boolean | null
           joined_at?: string
           stamps?: number | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {

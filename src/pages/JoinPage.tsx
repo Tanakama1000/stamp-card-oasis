@@ -26,6 +26,7 @@ const JoinPage = () => {
   const [stamps, setStamps] = useState<number>(0);
   const [loyaltyCardConfig, setLoyaltyCardConfig] = useState<any>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [memberId, setMemberId] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -84,21 +85,49 @@ const JoinPage = () => {
           await fetchLoyaltyCardConfig(businesses.id);
           
           if (userId) {
+            // Check if authenticated user is already a member
             const { data: membership } = await supabase
               .from("business_members")
               .select("*")
               .eq("business_id", businesses.id)
               .eq("user_id", userId)
+              .eq("is_anonymous", false)
               .single();
               
             if (membership) {
               setJoined(true);
+              setMemberId(membership.id);
               setCustomer({
                 id: userId,
-                name: customerName || "Member",
+                name: membership.customer_name || "Member",
                 stamps: membership.stamps || 0
               });
               setStamps(membership.stamps || 0);
+            }
+          } else {
+            // Check for anonymous membership in localStorage
+            const savedMemberships = localStorage.getItem('memberships');
+            if (savedMemberships) {
+              try {
+                const memberships = JSON.parse(savedMemberships);
+                const membership = memberships.find((m: any) => 
+                  m.businessId === businesses.id
+                );
+                
+                if (membership) {
+                  setJoined(true);
+                  setMemberId(membership.id);
+                  setCustomer({
+                    id: membership.id,
+                    name: membership.customerName,
+                    stamps: membership.stamps || 0
+                  });
+                  setCustomerName(membership.customerName || "");
+                  setStamps(membership.stamps || 0);
+                }
+              } catch (e) {
+                console.error("Error parsing memberships:", e);
+              }
             }
           }
         } else {
@@ -181,20 +210,27 @@ const JoinPage = () => {
 
     if (businessData) {
       try {
-        let customerId = userId;
+        let membershipId;
         
-        if (!customerId) {
-          customerId = `anon_${Date.now()}`;
-        }
-        
+        // Create a membership record in the database
         if (businessData.id) {
-          const { error } = await supabase
+          const memberData = {
+            business_id: businessData.id,
+            stamps: 0,
+            customer_name: customerName,
+            is_anonymous: !userId
+          };
+          
+          // Add user_id only if authenticated
+          if (userId) {
+            memberData['user_id'] = userId;
+          }
+          
+          const { data: membership, error } = await supabase
             .from('business_members')
-            .upsert({
-              business_id: businessData.id,
-              user_id: customerId,
-              stamps: 0,
-            });
+            .insert(memberData)
+            .select('id')
+            .single();
             
           if (error) {
             console.error("Error joining business:", error);
@@ -205,26 +241,30 @@ const JoinPage = () => {
             });
             return;
           }
+          
+          membershipId = membership.id;
+          setMemberId(membershipId);
         }
         
-        try {
-          const newCustomer = {
-            id: customerId,
-            name: customerName,
-            businessSlug: businessSlug,
-            businessId: businessData.id,
-            joinedAt: new Date().toISOString(),
-            stamps: 0
-          };
-          
-          const savedCustomers = localStorage.getItem('customers') || '[]';
-          const customers = JSON.parse(savedCustomers);
-          customers.push(newCustomer);
-          localStorage.setItem('customers', JSON.stringify(customers));
-          
-          setCustomer(newCustomer);
-        } catch (e) {
-          console.error("Error saving to localStorage:", e);
+        // Store membership in localStorage for anonymous users
+        if (!userId) {
+          try {
+            const membershipData = {
+              id: membershipId,
+              businessId: businessData.id,
+              businessSlug: businessSlug,
+              customerName: customerName,
+              joinedAt: new Date().toISOString(),
+              stamps: 0
+            };
+            
+            const savedMemberships = localStorage.getItem('memberships') || '[]';
+            const memberships = JSON.parse(savedMemberships);
+            memberships.push(membershipData);
+            localStorage.setItem('memberships', JSON.stringify(memberships));
+          } catch (e) {
+            console.error("Error saving to localStorage:", e);
+          }
         }
         
         toast({
@@ -233,6 +273,12 @@ const JoinPage = () => {
         });
         
         setJoined(true);
+        setCustomer({
+          id: membershipId || 'temp-id',
+          name: customerName,
+          stamps: 0
+        });
+        setStamps(0);
       } catch (e) {
         console.error("Error joining:", e);
         toast({
@@ -273,21 +319,33 @@ const JoinPage = () => {
       description: `You've collected ${stampCount} stamp${stampCount > 1 ? 's' : ''}.`,
     });
     
-    if (businessData?.id && (userId || customer?.id)) {
-      const memberId = userId || customer?.id;
-      
+    // Update stamps in database if we have a business ID
+    if (businessData?.id && memberId) {
       supabase
         .from('business_members')
-        .upsert({
-          business_id: businessData.id,
-          user_id: memberId,
-          stamps: newStamps
-        })
+        .update({ stamps: newStamps })
+        .eq('id', memberId)
         .then(({ error }) => {
           if (error) {
             console.error("Error updating stamps:", error);
           }
         });
+        
+      // Also update localStorage for anonymous users
+      if (!userId) {
+        try {
+          const savedMemberships = localStorage.getItem('memberships') || '[]';
+          const memberships = JSON.parse(savedMemberships);
+          const membershipIndex = memberships.findIndex((m: any) => m.id === memberId);
+          
+          if (membershipIndex !== -1) {
+            memberships[membershipIndex].stamps = newStamps;
+            localStorage.setItem('memberships', JSON.stringify(memberships));
+          }
+        } catch (e) {
+          console.error("Error updating localStorage:", e);
+        }
+      }
     }
   };
 
@@ -348,7 +406,7 @@ const JoinPage = () => {
             
             <div className="mb-6">
               <LoyaltyCard 
-                customerName={customerName}
+                customerName={customerName || customer.name}
                 maxStamps={loyaltyCardConfig?.maxStamps || 10}
                 currentStamps={stamps}
                 cardStyle={loyaltyCardConfig}
