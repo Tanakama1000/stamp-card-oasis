@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,7 +26,15 @@ import {
   Trophy, 
   Sparkles,
   RefreshCw,
-  Circle
+  Circle,
+  Cake,
+  Pizza,
+  IceCream,
+  Flower,
+  Diamond,
+  Bell,
+  Medal,
+  ThumbsUp
 } from "lucide-react";
 import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 import { STAMP_ICONS } from "./types";
@@ -51,7 +60,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
     businessNameColor: "#6F4E37",
     cardTitleColor: "#8B4513",
     rewardTextColor: "#6F4E37",
-    stampIcon: "Coffee",
+    stampIcon: "Gift",
     lastStampText: "FREE",
     lastStampTextColor: "#FFFFFF",
     lastStampBorderColor: "#F97316",
@@ -105,7 +114,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
       businessNameColor: "#6F4E37",
       cardTitleColor: "#8B4513",
       rewardTextColor: "#6F4E37",
-      stampIcon: "Coffee",
+      stampIcon: "Gift",
       lastStampText: "FREE",
       lastStampTextColor: "#FFFFFF",
       lastStampBorderColor: "#F97316",
@@ -511,6 +520,83 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                   >
                     <div className="w-3 h-3 rounded-full bg-gray-800"></div>
                     Dark
+                  </Button>
+                  
+                  {/* Additional color presets */}
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex items-center gap-1 bg-red-50 text-red-800 border-red-200"
+                    onClick={() => {
+                      handleChange('cardBgColor', '#FEF2F2');
+                      handleChange('textColor', '#991B1B');
+                      handleChange('businessNameColor', '#7F1D1D');
+                      handleChange('cardTitleColor', '#EF4444');
+                      handleChange('stampBgColor', '#FEE2E2');
+                      handleChange('stampActiveColor', '#EF4444');
+                      handleChange('rewardTextColor', '#991B1B');
+                      handleChange('lastStampBorderColor', '#EF4444');
+                    }}
+                  >
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    Red
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex items-center gap-1 bg-pink-50 text-pink-800 border-pink-200"
+                    onClick={() => {
+                      handleChange('cardBgColor', '#FDF2F8');
+                      handleChange('textColor', '#9D174D');
+                      handleChange('businessNameColor', '#831843');
+                      handleChange('cardTitleColor', '#EC4899');
+                      handleChange('stampBgColor', '#FCE7F3');
+                      handleChange('stampActiveColor', '#EC4899');
+                      handleChange('rewardTextColor', '#9D174D');
+                      handleChange('lastStampBorderColor', '#EC4899');
+                    }}
+                  >
+                    <div className="w-3 h-3 rounded-full bg-pink-500"></div>
+                    Pink
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex items-center gap-1 bg-amber-50 text-amber-800 border-amber-200"
+                    onClick={() => {
+                      handleChange('cardBgColor', '#FFFBEB');
+                      handleChange('textColor', '#92400E');
+                      handleChange('businessNameColor', '#78350F');
+                      handleChange('cardTitleColor', '#F59E0B');
+                      handleChange('stampBgColor', '#FEF3C7');
+                      handleChange('stampActiveColor', '#F59E0B');
+                      handleChange('rewardTextColor', '#92400E');
+                      handleChange('lastStampBorderColor', '#F59E0B');
+                    }}
+                  >
+                    <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                    Amber
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex items-center gap-1 bg-teal-50 text-teal-800 border-teal-200"
+                    onClick={() => {
+                      handleChange('cardBgColor', '#F0FDFA');
+                      handleChange('textColor', '#115E59');
+                      handleChange('businessNameColor', '#134E4A');
+                      handleChange('cardTitleColor', '#14B8A6');
+                      handleChange('stampBgColor', '#CCFBF1');
+                      handleChange('stampActiveColor', '#14B8A6');
+                      handleChange('rewardTextColor', '#115E59');
+                      handleChange('lastStampBorderColor', '#14B8A6');
+                    }}
+                  >
+                    <div className="w-3 h-3 rounded-full bg-teal-500"></div>
+                    Teal
                   </Button>
                 </div>
               </div>
