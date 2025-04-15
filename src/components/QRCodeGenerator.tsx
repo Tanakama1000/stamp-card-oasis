@@ -13,7 +13,7 @@ interface QRCodeGeneratorProps {
 const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
   const { toast } = useToast();
   const [qrValue, setQrValue] = useState<string>("");
-  const qrCodeRef = useRef<SVGSVGElement | null>(null);
+  const qrCodeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Generate a static QR code with fixed data
@@ -33,7 +33,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
   }, []); // Only run once on initial mount
   
   const downloadQRCode = () => {
-    // Check if the SVG element is available
+    // Check if the div containing the SVG is available
     if (!qrCodeRef.current) {
       toast({
         title: "Download Failed",
@@ -44,9 +44,19 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
     }
     
     try {
+      // Get the SVG element from the div
+      const svg = qrCodeRef.current.querySelector('svg');
+      if (!svg) {
+        toast({
+          title: "Download Failed",
+          description: "Could not find the QR code. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       // Create a canvas element
       const canvas = document.createElement("canvas");
-      const svg = qrCodeRef.current;
       const box = svg.getBoundingClientRect();
       
       // Set canvas dimensions
@@ -57,7 +67,6 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
       const svgData = new XMLSerializer().serializeToString(svg);
       const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
       
-      const URL = window.URL || window.webkitURL || window;
       const blobUrl = URL.createObjectURL(svgBlob);
       
       // Create image from SVG blob
@@ -117,9 +126,8 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
       </h3>
 
       <div className="flex flex-col items-center mt-6 space-y-4">
-        <div className="p-4 bg-white rounded-lg">
+        <div className="p-4 bg-white rounded-lg" ref={qrCodeRef}>
           <QRCode 
-            ref={qrCodeRef}
             id="qr-code" 
             value={qrValue} 
             size={200} 
