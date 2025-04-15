@@ -7,6 +7,7 @@ import AdminPage from "./pages/AdminPage";
 import JoinPage from "./pages/JoinPage";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
+import ScanPage from "./pages/ScanPage"; // Import ScanPage
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ const App = () => (
         <Route path="/" element={<LandingPage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/join/:businessSlug" element={<JoinPage />} />
+        <Route path="/scan" element={<ScanPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

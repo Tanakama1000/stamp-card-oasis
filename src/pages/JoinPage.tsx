@@ -5,10 +5,11 @@ import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Coffee } from "lucide-react";
+import { Loader2, Coffee, QrCode } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import LoyaltyCard from "@/components/LoyaltyCard";
+import QRScannerDialog from "@/components/QRScannerDialog";
 
 const JoinPage = () => {
   const { businessSlug } = useParams();
@@ -21,6 +22,8 @@ const JoinPage = () => {
   const [joined, setJoined] = useState<boolean>(false);
   const [businessData, setBusinessData] = useState<any>(null);
   const [customer, setCustomer] = useState<any>(null);
+  const [scannerOpen, setScannerOpen] = useState<boolean>(false);
+  const [stamps, setStamps] = useState<number>(0);
 
   useEffect(() => {
     const fetchBusinessData = async () => {
@@ -161,10 +164,57 @@ const JoinPage = () => {
   };
 
   const handleCollectStamp = () => {
+    setScannerOpen(true);
+  };
+
+  const handleSuccessfulScan = (businessId: string, timestamp: number, stampCount: number = 1) => {
+    // Close the scanner
+    setScannerOpen(false);
+    
+    // Check if the scanned business matches the joined business
+    if (businessData && businessData.id && businessId !== businessData.id) {
+      toast({
+        title: "Wrong Business QR Code",
+        description: "The QR code you scanned is for a different business.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Update stamp count
+    const newStamps = Math.min(stamps + stampCount, businessData?.cardConfig?.maxStamps || 10);
+    setStamps(newStamps);
+    
+    // Update customer object
+    setCustomer(prev => ({
+      ...prev,
+      stamps: newStamps
+    }));
+    
+    // Show success message
     toast({
-      title: "Not Available",
-      description: "In a real app, stamps would be added by the business via QR code scanning.",
+      title: "Stamp Collected!",
+      description: `You've collected ${stampCount} stamp${stampCount > 1 ? 's' : ''}.`,
     });
+    
+    // In a real app, we would update the database here
+    if (businessData?.id) {
+      // Try to update in Supabase if available
+      const tempUserId = customer?.id || `temp_user_${Date.now()}`;
+      
+      supabase
+        .from('business_members')
+        .upsert({
+          business_id: businessData.id,
+          user_id: tempUserId,
+          stamps: newStamps
+        })
+        .then(({ error }) => {
+          if (error) {
+            console.error("Error updating stamps:", error);
+          }
+        });
+    }
   };
 
   if (loading) {
@@ -197,7 +247,7 @@ const JoinPage = () => {
   if (joined && customer && businessData) {
     return (
       <Layout>
-        <div className="max-w-md mx-auto mt-8">
+        <div className="max-w-md mx-auto mt-8 mb-12">
           <Card className="p-6 bg-white card-shadow">
             <div className="text-center mb-6">
               {businessData.cardConfig?.businessLogo ? (
@@ -226,9 +276,9 @@ const JoinPage = () => {
               <LoyaltyCard 
                 customerName={customerName}
                 maxStamps={businessData.cardConfig?.maxStamps || 10}
-                currentStamps={customer.stamps}
+                currentStamps={stamps}
                 cardStyle={businessData.cardConfig}
-                onStampCollected={handleCollectStamp}
+                onStampCollected={() => {}}
                 onReset={() => {}}
               />
             </div>
@@ -240,9 +290,23 @@ const JoinPage = () => {
               >
                 Show this card when you visit {businessName} to collect stamps
               </p>
+              
+              <Button
+                onClick={handleCollectStamp}
+                className="w-full bg-purple-500 hover:bg-purple-600 text-white flex items-center justify-center gap-2"
+              >
+                <QrCode size={20} />
+                Scan QR Code to Collect Stamp
+              </Button>
             </div>
           </Card>
         </div>
+
+        <QRScannerDialog 
+          isOpen={scannerOpen} 
+          onClose={() => setScannerOpen(false)}
+          onSuccessfulScan={handleSuccessfulScan}
+        />
       </Layout>
     );
   }
