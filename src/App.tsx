@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AdminPage from "./pages/AdminPage";
 import JoinPage from "./pages/JoinPage";
 import NotFound from "./pages/NotFound";
+import LandingPage from "./pages/LandingPage";
 
 const queryClient = new QueryClient();
 
@@ -17,7 +18,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <Routes>
-          <Route path="/" element={<Navigate to="/admin" replace />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/join/:businessSlug" element={<JoinPage />} />
           <Route path="*" element={<NotFound />} />
