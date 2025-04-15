@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +18,8 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
 
 const businessSchema = z.object({
   name: z.string().min(2, {
@@ -30,6 +33,18 @@ const AdminPage = () => {
   const [user, setUser] = useState(null);
   const [businessData, setBusinessData] = useState(null);
   const [isCreatingBusiness, setIsCreatingBusiness] = useState(false);
+  const [isNameEditing, setIsNameEditing] = useState(false);
+  const [slugEditing, setSlugEditing] = useState(false);
+  const [tempSlug, setTempSlug] = useState('');
+  const [cardConfig, setCardConfig] = useState<LoyaltyCardConfig | null>(null);
+  
+  // Mock data for recent scans
+  const recentScans = [
+    { customer: "John Doe", stamps: 1, timestamp: new Date().getTime() - 1000 * 60 * 5 },
+    { customer: "Jane Smith", stamps: 1, timestamp: new Date().getTime() - 1000 * 60 * 30 },
+    { customer: "Bob Johnson", stamps: 2, timestamp: new Date().getTime() - 1000 * 60 * 60 },
+    { customer: "Alice Brown", stamps: 1, timestamp: new Date().getTime() - 1000 * 60 * 60 * 2 },
+  ];
 
   const businessForm = useForm<z.infer<typeof businessSchema>>({
     resolver: zodResolver(businessSchema),
@@ -63,6 +78,7 @@ const AdminPage = () => {
 
       if (businesses) {
         setBusinessData(businesses);
+        setTempSlug(businesses.slug);
       } else if (error && error.code !== 'PGRST116') {
         console.error('Error fetching business:', error);
       }
@@ -97,6 +113,7 @@ const AdminPage = () => {
       if (error) throw error;
 
       setBusinessData(data);
+      setTempSlug(data.slug);
       setIsCreatingBusiness(false);
       
       toast({
@@ -111,6 +128,113 @@ const AdminPage = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleBusinessNameSubmit = async (values: z.infer<typeof businessSchema>) => {
+    if (!businessData || !user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('businesses')
+        .update({ name: values.name })
+        .eq('id', businessData.id)
+        .eq('owner_id', user.id);
+      
+      if (error) throw error;
+      
+      setBusinessData({
+        ...businessData,
+        name: values.name
+      });
+      
+      setIsNameEditing(false);
+      
+      toast({
+        title: "Business Updated",
+        description: "Your business name has been updated successfully."
+      });
+    } catch (error) {
+      console.error('Error updating business name:', error);
+      toast({
+        title: "Error",
+        description: "Could not update business name. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  const handleSlugChange = async () => {
+    if (!businessData || !user || !tempSlug.trim()) return;
+    
+    try {
+      const { error } = await supabase
+        .from('businesses')
+        .update({ slug: tempSlug.trim() })
+        .eq('id', businessData.id)
+        .eq('owner_id', user.id);
+      
+      if (error) throw error;
+      
+      setBusinessData({
+        ...businessData,
+        slug: tempSlug.trim()
+      });
+      
+      setSlugEditing(false);
+      
+      toast({
+        title: "URL Updated",
+        description: "Your business URL has been updated successfully."
+      });
+    } catch (error) {
+      console.error('Error updating business slug:', error);
+      toast({
+        title: "Error",
+        description: "Could not update business URL. It may already be taken.",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  const copyJoinLink = () => {
+    const joinLink = `${window.location.origin}/join/${businessData.slug}`;
+    navigator.clipboard.writeText(joinLink);
+    
+    toast({
+      title: "Link Copied",
+      description: "Join link copied to clipboard!"
+    });
+  };
+  
+  const handleQRGenerated = (codeData: string) => {
+    console.log("QR code generated:", codeData);
+  };
+  
+  const handleSaveCardConfig = async (config: LoyaltyCardConfig) => {
+    if (!businessData || !user) return;
+    
+    try {
+      // Here you would save the card configuration to your database
+      // For now, we'll just update the local state
+      setCardConfig(config);
+      
+      toast({
+        title: "Card Saved",
+        description: "Loyalty card configuration has been saved."
+      });
+    } catch (error) {
+      console.error('Error saving card configuration:', error);
+      toast({
+        title: "Error",
+        description: "Could not save loyalty card configuration.",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  const formatTimestamp = (timestamp: number) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString();
   };
 
   if (!user) {
