@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -93,7 +94,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
         }
 
         if (data?.config) {
-          setConfig(data.config);
+          setConfig(data.config as LoyaltyCardConfig);
         }
         setIsLoading(false);
       } catch (err) {
@@ -133,7 +134,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
         .from('loyalty_card_configs')
         .upsert({
           business_id: businessData.id,
-          config: config
+          config: config as any
         }, {
           onConflict: 'business_id'
         });

@@ -35,4 +35,7 @@ export interface LoyaltyCardConfig {
     description: string;
     icon: string;
   }[];
+
+  // Index signature to make it compatible with Json type
+  [key: string]: any;
 }
