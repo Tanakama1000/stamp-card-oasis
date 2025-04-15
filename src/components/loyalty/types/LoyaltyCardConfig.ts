@@ -1,4 +1,3 @@
-
 export interface LoyaltyCardConfig {
   businessName: string;
   cardTitle?: string;
@@ -32,4 +31,9 @@ export interface LoyaltyCardConfig {
     description: string;
     icon: string;
   }[];
+  maxStamps?: number; // Make maxStamps optional
+  rewardText?: string; // Add optional reward text
+  lastStampColor?: string; // Add optional last stamp color
+  lastStampIcon?: keyof typeof STAMP_ICONS; // Add optional last stamp icon
 }
+

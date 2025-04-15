@@ -23,17 +23,18 @@ const StampGrid: React.FC<StampGridProps> = ({
   const isMobile = useIsMobile();
   
   const renderStamps = () => {
-    const stampsPerRow = isMobile ? 3 : 5; // Reduce stamps per row on mobile
+    const stampsPerRow = isMobile ? 3 : 5;
     const rowCount = Math.ceil(maxStamps / stampsPerRow);
     const miniRewards = cardStyle?.rewards || [];
 
+    // Use custom last stamp icon or default to Gift
+    const RewardIcon = cardStyle?.lastStampIcon ? 
+      STAMP_ICONS[cardStyle.lastStampIcon as keyof typeof STAMP_ICONS] : 
+      STAMP_ICONS.Gift;
+      
     const StampIcon = cardStyle?.stampIcon ? 
       STAMP_ICONS[cardStyle.stampIcon as keyof typeof STAMP_ICONS] : 
       STAMP_ICONS.Coffee;
-      
-    const RewardIcon = cardStyle?.rewardIcon ? 
-      STAMP_ICONS[cardStyle.rewardIcon as keyof typeof STAMP_ICONS] : 
-      STAMP_ICONS.Gift;
 
     const rows = [];
 
@@ -43,7 +44,6 @@ const StampGrid: React.FC<StampGridProps> = ({
         const stampIndex = i * stampsPerRow + j;
         if (stampIndex < maxStamps) {
           const isLastStamp = stampIndex === maxStamps - 1;
-          // Find if this stamp has a mini reward
           const miniReward = miniRewards.find(r => r.stampNumber === stampIndex + 1);
           const isMiniRewardStamp = !!miniReward;
           
@@ -51,7 +51,6 @@ const StampGrid: React.FC<StampGridProps> = ({
           if (isLastStamp) {
             CurrentIcon = RewardIcon;
           } else if (isMiniRewardStamp) {
-            // Use the specific icon for this mini reward
             CurrentIcon = STAMP_ICONS[miniReward.icon as keyof typeof STAMP_ICONS] || StampIcon;
           } else {
             CurrentIcon = StampIcon;
@@ -69,7 +68,6 @@ const StampGrid: React.FC<StampGridProps> = ({
             animationClass = "animate-scale-in";
           }
           
-          // Updated sizes for better mobile visibility
           const stampSize = isMobile ? "w-14 h-14" : "w-14 h-14 md:w-16 md:h-16";
           const iconSize = isMobile ? 24 : 24;
           
@@ -96,7 +94,7 @@ const StampGrid: React.FC<StampGridProps> = ({
                       cardStyle.miniRewardStampColor : 
                       cardStyle?.stampBgColor || '#F5F5DC'),
                 borderColor: (isLastStamp || isMiniRewardStamp)
-                  ? (isCollected ? '#F97316' : '#F97316')
+                  ? (isCollected ? cardStyle?.lastStampColor || '#F97316' : cardStyle?.lastStampColor || '#F97316')
                   : cardStyle?.stampActiveColor || '#8B4513',
                 color: isCollected 
                   ? '#FFFFFF' 
