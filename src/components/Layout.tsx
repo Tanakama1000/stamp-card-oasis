@@ -1,12 +1,9 @@
-
 import { Link } from "react-router-dom";
 import { Coffee } from "lucide-react";
 import { TooltipProvider } from "@/components/ui/tooltip";
-
 interface LayoutProps {
   children: React.ReactNode;
 }
-
 const Layout: React.FC<LayoutProps> = ({
   children
 }) => {
@@ -18,9 +15,7 @@ const Layout: React.FC<LayoutProps> = ({
             <span>Stamp Card Oasis</span>
           </Link>
           <div className="flex items-center gap-2">
-            <Link to="/admin" className="text-white hover:text-white/80">
-              Admin Dashboard
-            </Link>
+            
           </div>
         </div>
       </header>
@@ -36,5 +31,4 @@ const Layout: React.FC<LayoutProps> = ({
       </footer>
     </div>;
 };
-
 export default Layout;
