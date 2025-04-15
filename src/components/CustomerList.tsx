@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -32,7 +31,6 @@ const CustomerList = ({ businessId }: CustomerListProps) => {
     const fetchCustomers = async () => {
       setIsLoading(true);
       try {
-        // Get customers from business_members table
         const { data, error } = await supabase
           .from('business_members')
           .select('id, user_id, customer_name, stamps')
@@ -40,7 +38,6 @@ const CustomerList = ({ businessId }: CustomerListProps) => {
         
         if (error) throw error;
         
-        // Calculate rewards (assuming every 10 stamps is 1 reward)
         const customersWithRewards = data.map(customer => {
           return {
             ...customer,
@@ -97,13 +94,12 @@ const CustomerList = ({ businessId }: CustomerListProps) => {
               <th className="text-left p-3 text-coffee-dark">Name</th>
               <th className="text-center p-3 text-coffee-dark">Stamps</th>
               <th className="text-center p-3 text-coffee-dark">Rewards</th>
-              <th className="text-right p-3 text-coffee-dark">Actions</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan={4} className="p-4 text-center">
+                <td colSpan={3} className="p-4 text-center">
                   <div className="flex justify-center items-center space-x-2">
                     <div className="h-4 w-4 bg-coffee-light/20 rounded-full animate-pulse"></div>
                     <div className="h-4 w-4 bg-coffee-light/30 rounded-full animate-pulse"></div>
@@ -125,14 +121,11 @@ const CustomerList = ({ businessId }: CustomerListProps) => {
                       {customer.rewards}
                     </span>
                   </td>
-                  <td className="p-3 text-right">
-                    <Button variant="outline" size="sm">View</Button>
-                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="p-4 text-center text-coffee-light">
+                <td colSpan={3} className="p-4 text-center text-coffee-light">
                   {searchTerm ? "No customers found matching your search." : "No customers have joined your loyalty program yet."}
                 </td>
               </tr>
