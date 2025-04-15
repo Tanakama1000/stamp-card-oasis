@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import LoyaltyCard from "@/components/LoyaltyCard";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { InfoIcon } from "lucide-react";
 
 interface JoinFormProps {
   businessName: string;
@@ -12,6 +14,8 @@ interface JoinFormProps {
   setCustomerName: (name: string) => void;
   handleJoin: (e: React.FormEvent) => void;
   loyaltyCardConfig: any;
+  isAuthenticated?: boolean;
+  onSignInClick?: () => void;
 }
 
 const JoinForm = ({ 
@@ -19,7 +23,9 @@ const JoinForm = ({
   customerName, 
   setCustomerName, 
   handleJoin, 
-  loyaltyCardConfig 
+  loyaltyCardConfig,
+  isAuthenticated = false,
+  onSignInClick
 }: JoinFormProps) => {
   return (
     <div className="max-w-md mx-auto mt-8">
@@ -47,6 +53,24 @@ const JoinForm = ({
             Enter your name to join the loyalty program
           </p>
         </div>
+
+        {!isAuthenticated && (
+          <Alert className="mb-4 bg-blue-50 border-blue-200">
+            <InfoIcon className="h-4 w-4 text-blue-500" />
+            <AlertDescription className="text-sm">
+              Sign in to permanently save your loyalty cards and stamps across devices.
+            </AlertDescription>
+            <div className="mt-2">
+              <Button 
+                variant="outline" 
+                onClick={onSignInClick}
+                className="w-full border-blue-300 text-blue-700 hover:bg-blue-50"
+              >
+                Sign In or Create Account
+              </Button>
+            </div>
+          </Alert>
+        )}
 
         <div className="mb-6">
           <p className="text-sm text-center mb-2 text-gray-500">Here's what your loyalty card will look like:</p>

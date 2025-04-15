@@ -24,9 +24,14 @@ const ErrorState = ({
         <p className="mb-6 text-gray-700">
           {message}
         </p>
-        <Link to="/">
-          <Button className="bg-gray-900 hover:bg-gray-800">Return Home</Button>
-        </Link>
+        <div className="flex flex-col space-y-2">
+          <Link to="/auth">
+            <Button className="w-full bg-blue-600 hover:bg-blue-700">Sign In / Sign Up</Button>
+          </Link>
+          <Link to="/">
+            <Button variant="outline" className="w-full">Return Home</Button>
+          </Link>
+        </div>
       </Card>
     </div>
   );

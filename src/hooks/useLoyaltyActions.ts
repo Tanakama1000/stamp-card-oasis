@@ -35,29 +35,50 @@ export const useLoyaltyActions = ({
       return;
     }
 
-    if (businessData) {
+    if (businessData && userId) {
       try {
-        let customerId = userId;
+        let isAnonymous = userId.startsWith('anon_');
         
-        // Ensure we have a userId (either real or anonymous)
-        if (!customerId) {
-          customerId = `anon_${Date.now()}`;
-          localStorage.setItem('tempUserId', customerId);
-        }
-        
-        if (businessData.id) {
-          // For authenticated users with Supabase accounts
-          if (userId && !userId.startsWith('anon_')) {
-            const { error } = await supabase
+        // For authenticated users with Supabase accounts, save to database
+        if (!isAnonymous && businessData.id) {
+          const { data: existingMember, error: checkError } = await supabase
+            .from('business_members')
+            .select('*')
+            .eq('business_id', businessData.id)
+            .eq('user_id', userId)
+            .maybeSingle();
+            
+          if (checkError) {
+            console.error("Error checking membership:", checkError);
+          }
+          
+          if (existingMember) {
+            // Update existing membership
+            const { error: updateError } = await supabase
               .from('business_members')
-              .upsert({
+              .update({ stamps: existingMember.stamps || 0 })
+              .eq('id', existingMember.id);
+                
+            if (updateError) {
+              console.error("Error updating membership:", updateError);
+            }
+            
+            // Use the existing member data
+            setStamps(existingMember.stamps || 0);
+          } else {
+            // Create new membership
+            const { data: newMember, error: insertError } = await supabase
+              .from('business_members')
+              .insert({
                 business_id: businessData.id,
-                user_id: customerId,
+                user_id: userId,
                 stamps: 0,
-              });
-              
-            if (error) {
-              console.error("Error joining business:", error);
+              })
+              .select()
+              .single();
+                
+            if (insertError) {
+              console.error("Error joining business:", insertError);
               toast({
                 title: "Error",
                 description: "Could not join the loyalty program. Please try again.",
@@ -65,13 +86,17 @@ export const useLoyaltyActions = ({
               });
               return;
             }
+            
+            if (newMember) {
+              setStamps(newMember.stamps || 0);
+            }
           }
         }
         
+        // Always save to localStorage for both authenticated and anonymous users
         try {
-          // Always save to localStorage for both authenticated and anonymous users
           const newCustomer = {
-            id: customerId,
+            id: userId,
             name: customerName,
             businessSlug: businessData.slug,
             businessId: businessData.id,
@@ -84,7 +109,7 @@ export const useLoyaltyActions = ({
           
           // Check if this user already exists for this business
           const existingCustomerIndex = customers.findIndex((c: any) => 
-            c.id === customerId && c.businessSlug === businessData.slug
+            c.id === userId && c.businessSlug === businessData.slug
           );
           
           if (existingCustomerIndex >= 0) {
@@ -125,7 +150,7 @@ export const useLoyaltyActions = ({
     setScannerOpen(true);
   };
 
-  const handleSuccessfulScan = (businessId: string, timestamp: number, stampCount: number = 1) => {
+  const handleSuccessfulScan = async (businessId: string, timestamp: number, stampCount: number = 1) => {
     setScannerOpen(false);
     
     if (businessData && businessData.id && businessId !== businessData.id) {
@@ -138,7 +163,7 @@ export const useLoyaltyActions = ({
     }
     
     const loyaltyCardConfig = businessData?.loyaltyCardConfig;
-    const currentStamps = Math.min((businessData?.stamps || 0) + stampCount, loyaltyCardConfig?.maxStamps || 10);
+    const currentStamps = Math.min((stamps || 0) + stampCount, loyaltyCardConfig?.maxStamps || 10);
     setStamps(currentStamps);
     
     setCustomer((prev: any) => ({
@@ -152,7 +177,7 @@ export const useLoyaltyActions = ({
     });
     
     // Update both Supabase (for authenticated users) and localStorage
-    if (businessData?.id) {
+    if (businessData?.id && userId) {
       // Update localStorage first (for all users)
       try {
         const savedCustomers = localStorage.getItem('customers') || '[]';
@@ -171,19 +196,34 @@ export const useLoyaltyActions = ({
       }
       
       // Update Supabase only for authenticated non-anon users
-      if (userId && !userId.startsWith('anon_')) {
-        supabase
+      if (!userId.startsWith('anon_')) {
+        const { data: existingMember, error: checkError } = await supabase
           .from('business_members')
-          .upsert({
-            business_id: businessData.id,
-            user_id: userId,
-            stamps: currentStamps
-          })
-          .then(({ error }) => {
-            if (error) {
-              console.error("Error updating stamps:", error);
-            }
-          });
+          .select('*')
+          .eq('business_id', businessData.id)
+          .eq('user_id', userId)
+          .maybeSingle();
+          
+        if (checkError) {
+          console.error("Error checking membership:", checkError);
+        }
+        
+        if (existingMember) {
+          // Update existing membership
+          await supabase
+            .from('business_members')
+            .update({ stamps: currentStamps })
+            .eq('id', existingMember.id);
+        } else {
+          // Create membership if it doesn't exist
+          await supabase
+            .from('business_members')
+            .insert({
+              business_id: businessData.id,
+              user_id: userId,
+              stamps: currentStamps
+            });
+        }
       }
     }
   };

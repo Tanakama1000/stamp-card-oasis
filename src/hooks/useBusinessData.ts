@@ -27,7 +27,7 @@ export const useBusinessData = (businessSlug: string | undefined, userId: string
         .from("loyalty_card_configs")
         .select("config")
         .eq("business_id", businessId)
-        .single();
+        .maybeSingle();
         
       if (!error && configData) {
         setLoyaltyCardConfig(configData.config as LoyaltyCardConfig);
@@ -112,6 +112,10 @@ export const useBusinessData = (businessSlug: string | undefined, userId: string
             };
             setBusinessData(defaultBusinessData);
             await fetchLoyaltyCardConfig(defaultBusinessData.id);
+            
+            // Check for existing membership for this user
+            await checkExistingMembership(defaultBusinessData, userId);
+            
             setLoading(false);
             return;
           } else if (foundBusiness) {
@@ -119,33 +123,11 @@ export const useBusinessData = (businessSlug: string | undefined, userId: string
             setBusinessName(foundBusiness.name);
             setBusinessData(foundBusiness);
             await fetchLoyaltyCardConfig(foundBusiness.id);
+            
+            // Check for existing membership for this user
+            await checkExistingMembership(foundBusiness, userId);
+            
             setLoading(false);
-            
-            // Also check for customer data in localStorage
-            if (userId) {
-              const savedCustomers = localStorage.getItem('customers');
-              if (savedCustomers) {
-                try {
-                  const customers = JSON.parse(savedCustomers);
-                  const customerData = customers.find((c: any) => 
-                    c.id === userId && c.businessSlug === businessSlug
-                  );
-                  
-                  if (customerData) {
-                    setJoined(true);
-                    setCustomer({
-                      id: userId,
-                      name: customerData.name,
-                      stamps: customerData.stamps || 0
-                    });
-                    setStamps(customerData.stamps || 0);
-                  }
-                } catch (e) {
-                  console.error("Error parsing customers from localStorage:", e);
-                }
-              }
-            }
-            
             return;
           }
           
@@ -157,27 +139,13 @@ export const useBusinessData = (businessSlug: string | undefined, userId: string
           });
         } else if (businesses && businesses.length > 0) {
           const business = businesses[0];
+          console.log("Found business in Supabase:", business);
           setBusinessName(business.name);
           setBusinessData(business);
           await fetchLoyaltyCardConfig(business.id);
           
-          if (userId) {
-            const { data: membership, error: membershipError } = await supabase
-              .from("business_members")
-              .select("*")
-              .eq("business_id", business.id)
-              .eq("user_id", userId);
-              
-            if (!membershipError && membership && membership.length > 0) {
-              setJoined(true);
-              setCustomer({
-                id: userId,
-                name: "Member",
-                stamps: membership[0].stamps || 0
-              });
-              setStamps(membership[0].stamps || 0);
-            }
-          }
+          // Check for existing membership for this user
+          await checkExistingMembership(business, userId);
         }
         
         setLoading(false);
@@ -193,7 +161,68 @@ export const useBusinessData = (businessSlug: string | undefined, userId: string
       }
     };
     
-    fetchBusinessData();
+    const checkExistingMembership = async (business: BusinessData, userId: string | null) => {
+      if (!userId) return;
+      
+      // First check localStorage
+      const savedCustomers = localStorage.getItem('customers');
+      if (savedCustomers) {
+        try {
+          const customers = JSON.parse(savedCustomers);
+          const customerData = customers.find((c: any) => 
+            c.id === userId && c.businessSlug === business.slug
+          );
+          
+          if (customerData) {
+            setJoined(true);
+            setCustomer({
+              id: userId,
+              name: customerData.name,
+              stamps: customerData.stamps || 0
+            });
+            setStamps(customerData.stamps || 0);
+            return;
+          }
+        } catch (e) {
+          console.error("Error parsing customers from localStorage:", e);
+        }
+      }
+      
+      // Then check Supabase for authenticated users
+      if (!userId.startsWith('anon_') && business.id) {
+        try {
+          const { data: membership, error: membershipError } = await supabase
+            .from("business_members")
+            .select("*")
+            .eq("business_id", business.id)
+            .eq("user_id", userId)
+            .maybeSingle();
+              
+          if (!membershipError && membership) {
+            // Get user profile info if available
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("full_name")
+              .eq("id", userId)
+              .maybeSingle();
+              
+            setJoined(true);
+            setCustomer({
+              id: userId,
+              name: profile?.full_name || "Member",
+              stamps: membership.stamps || 0
+            });
+            setStamps(membership.stamps || 0);
+          }
+        } catch (e) {
+          console.error("Error checking Supabase membership:", e);
+        }
+      }
+    };
+    
+    if (businessSlug && userId) {
+      fetchBusinessData();
+    }
   }, [businessSlug, userId, toast]);
 
   return {
