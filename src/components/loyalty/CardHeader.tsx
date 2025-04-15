@@ -42,6 +42,7 @@ const CardHeader: React.FC<CardHeaderProps> = ({
   rewardText
 }) => {
   const avatarSize = isMobile ? "h-10 w-10" : "h-12 w-12";
+  const displayBusinessName = businessName || "InStamp";
   
   return (
     <div className={`flex items-center justify-between mb-4 md:mb-6 relative z-10 ${isMobile ? 'flex-wrap' : ''}`}>
@@ -49,9 +50,9 @@ const CardHeader: React.FC<CardHeaderProps> = ({
         {businessLogo && (
           <div className="flex justify-center w-full mb-2">
             <Avatar className={`${avatarSize} border-2 border-white shadow-md`}>
-              <AvatarImage src={businessLogo} alt={businessName || "Business logo"} />
+              <AvatarImage src={businessLogo} alt={displayBusinessName || "Business logo"} />
               <AvatarFallback className="bg-orange text-white">
-                {businessName?.charAt(0) || "B"}
+                {displayBusinessName?.charAt(0) || "I"}
               </AvatarFallback>
             </Avatar>
           </div>
@@ -65,7 +66,7 @@ const CardHeader: React.FC<CardHeaderProps> = ({
                 fontFamily: businessNameFont !== "default" ? businessNameFont : 'inherit'
               }}
             >
-              {businessName}
+              {displayBusinessName}
             </h3>
           )}
           <h2 
