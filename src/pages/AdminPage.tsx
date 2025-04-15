@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,7 +37,6 @@ const AdminPage = () => {
   const [tempSlug, setTempSlug] = useState('');
   const [cardConfig, setCardConfig] = useState<LoyaltyCardConfig | null>(null);
   
-  // Mock data for recent scans
   const recentScans = [
     { customer: "John Doe", stamps: 1, timestamp: new Date().getTime() - 1000 * 60 * 5 },
     { customer: "Jane Smith", stamps: 1, timestamp: new Date().getTime() - 1000 * 60 * 30 },
@@ -69,7 +67,6 @@ const AdminPage = () => {
 
       setUser(session.user);
 
-      // Check if the user already has a business
       const { data: businesses, error } = await supabase
         .from('businesses')
         .select('*')
@@ -78,6 +75,7 @@ const AdminPage = () => {
 
       if (businesses) {
         setBusinessData(businesses);
+        localStorage.setItem('businessData', JSON.stringify(businesses));
         setTempSlug(businesses.slug);
       } else if (error && error.code !== 'PGRST116') {
         console.error('Error fetching business:', error);
@@ -91,7 +89,6 @@ const AdminPage = () => {
     if (!user) return;
 
     try {
-      // Generate a unique slug using the Supabase function
       const { data: slugData, error: slugError } = await supabase.rpc('generate_unique_slug', { 
         business_name: values.name 
       });
@@ -113,6 +110,7 @@ const AdminPage = () => {
       if (error) throw error;
 
       setBusinessData(data);
+      localStorage.setItem('businessData', JSON.stringify(data));
       setTempSlug(data.slug);
       setIsCreatingBusiness(false);
       
@@ -142,10 +140,13 @@ const AdminPage = () => {
       
       if (error) throw error;
       
-      setBusinessData({
+      const updatedBusinessData = {
         ...businessData,
         name: values.name
-      });
+      };
+      
+      setBusinessData(updatedBusinessData);
+      localStorage.setItem('businessData', JSON.stringify(updatedBusinessData));
       
       setIsNameEditing(false);
       
@@ -175,10 +176,13 @@ const AdminPage = () => {
       
       if (error) throw error;
       
-      setBusinessData({
+      const updatedBusinessData = {
         ...businessData,
         slug: tempSlug.trim()
-      });
+      };
+      
+      setBusinessData(updatedBusinessData);
+      localStorage.setItem('businessData', JSON.stringify(updatedBusinessData));
       
       setSlugEditing(false);
       
@@ -214,8 +218,6 @@ const AdminPage = () => {
     if (!businessData || !user) return;
     
     try {
-      // Here you would save the card configuration to your database
-      // For now, we'll just update the local state
       setCardConfig(config);
       
       toast({
