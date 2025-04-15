@@ -115,10 +115,15 @@ const JoinPage = () => {
         
         // Try to insert into Supabase if available
         if (businessData.id) {
+          // Generate a random UUID for user_id if no authentication is implemented
+          // In a real app, this would be auth.uid() from the authenticated user
+          const tempUserId = `temp_user_${Date.now()}`;
+          
           const { error } = await supabase
             .from('business_members')
             .insert({
               business_id: businessData.id,
+              user_id: tempUserId, // Add the required user_id field
               stamps: 0
             });
             
