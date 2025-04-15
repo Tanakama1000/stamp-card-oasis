@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Coffee } from "lucide-react";
+import { Image } from "lucide-react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Suspense } from "react";
 
@@ -29,8 +29,12 @@ const Layout: React.FC<LayoutProps> = ({
       <header className="bg-coffee-dark text-white p-4 shadow-md">
         <div className="container mx-auto flex justify-between items-center">
           <Link to="/" className="text-xl font-bold flex items-center gap-2">
-            <Coffee size={24} />
-            <span>Stamp Card Oasis</span>
+            <img 
+              src="/lovable-uploads/04523b06-63b5-485f-ac7d-8624e600ad0d.png" 
+              alt="InStamp Logo" 
+              className="h-8 w-8"
+            />
+            <span>InStamp</span>
           </Link>
           <div className="flex items-center gap-2">InStamp</div>
         </div>

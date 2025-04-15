@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
-import { Coffee, Star, Gift, PieChart, ShieldCheck, Smartphone, Users, ChevronRight, Clock, Award, Mail, Phone } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { Image, Star, Gift, PieChart, ShieldCheck, Smartphone, Users, ChevronRight, Clock, Award, Mail, Phone } from "lucide-react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -13,8 +12,12 @@ const LandingPage = () => {
       <header className="bg-coffee-dark text-white p-4 shadow-md">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Coffee size={24} />
-            <span className="text-xl font-bold">Stamp Card Oasis</span>
+            <img 
+              src="/lovable-uploads/04523b06-63b5-485f-ac7d-8624e600ad0d.png" 
+              alt="InStamp Logo" 
+              className="h-8 w-8"
+            />
+            <span className="text-xl font-bold">InStamp</span>
           </div>
           <div className="flex items-center gap-4">
             <Button 
@@ -62,7 +65,11 @@ const LandingPage = () => {
           <div className="lg:w-1/2">
             <Card className="overflow-hidden shadow-xl bg-white/10 backdrop-blur-sm border-white/20">
               <div className="h-64 md:h-80 bg-coffee-dark/20 flex items-center justify-center">
-                <Coffee size={64} className="text-white opacity-75" />
+                <img 
+                  src="/lovable-uploads/04523b06-63b5-485f-ac7d-8624e600ad0d.png" 
+                  alt="InStamp Logo" 
+                  className="h-24 w-24 opacity-75"
+                />
               </div>
             </Card>
           </div>
@@ -453,8 +460,12 @@ const LandingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Coffee size={24} />
-                <span className="text-xl font-bold">Stamp Card Oasis</span>
+                <img 
+                  src="/lovable-uploads/04523b06-63b5-485f-ac7d-8624e600ad0d.png" 
+                  alt="InStamp Logo" 
+                  className="h-8 w-8"
+                />
+                <span className="text-xl font-bold">InStamp</span>
               </div>
               <p className="text-sm opacity-70 mb-4">
                 Helping businesses build customer loyalty with simple digital solutions.
@@ -531,7 +542,7 @@ const LandingPage = () => {
           
           <div className="pt-8 border-t border-white/10 text-center">
             <p className="text-sm opacity-70">
-              &copy; {new Date().getFullYear()} Stamp Card Oasis. All rights reserved.
+              &copy; {new Date().getFullYear()} InStamp. All rights reserved.
             </p>
           </div>
         </div>
