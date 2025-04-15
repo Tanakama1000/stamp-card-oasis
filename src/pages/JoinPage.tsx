@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
@@ -25,11 +24,20 @@ const JoinPage = () => {
   const [scannerOpen, setScannerOpen] = useState<boolean>(false);
   const [stamps, setStamps] = useState<number>(0);
   const [loyaltyCardConfig, setLoyaltyCardConfig] = useState<any>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        setUserId(data.session.user.id);
+      }
+    };
+    
+    checkAuth();
+    
     const fetchBusinessData = async () => {
       try {
-        // For development, we'll check if we have Supabase data
         const { data: businesses, error } = await supabase
           .from("businesses")
           .select("*")
@@ -38,7 +46,6 @@ const JoinPage = () => {
         
         if (error) {
           console.error("Error fetching business:", error);
-          // Fallback to local storage for development
           const savedBusinesses = localStorage.getItem('businesses');
           let foundBusiness = null;
           
@@ -56,7 +63,6 @@ const JoinPage = () => {
             setBusinessData(foundBusiness);
             await fetchLoyaltyCardConfig(foundBusiness.id);
           } else if (businessSlug === "coffee-oasis") {
-            // Fallback for demo
             setBusinessName("Coffee Oasis");
             const defaultBusinessData = {
               name: "Coffee Oasis",
@@ -72,6 +78,25 @@ const JoinPage = () => {
           setBusinessName(businesses.name);
           setBusinessData(businesses);
           await fetchLoyaltyCardConfig(businesses.id);
+          
+          if (userId) {
+            const { data: membership } = await supabase
+              .from("business_members")
+              .select("*")
+              .eq("business_id", businesses.id)
+              .eq("user_id", userId)
+              .single();
+              
+            if (membership) {
+              setJoined(true);
+              setCustomer({
+                id: userId,
+                name: membership.name || "Member",
+                stamps: membership.stamps || 0
+              });
+              setStamps(membership.stamps || 0);
+            }
+          }
         } else {
           setError("Business not found");
         }
@@ -84,10 +109,19 @@ const JoinPage = () => {
       }
     };
     
-    // Fetch business card configuration
     const fetchLoyaltyCardConfig = async (businessId: string) => {
       try {
-        // Try to fetch from Supabase or localStorage
+        const { data: configData, error } = await supabase
+          .from("loyalty_card_configs")
+          .select("config")
+          .eq("business_id", businessId)
+          .single();
+          
+        if (!error && configData) {
+          setLoyaltyCardConfig(configData.config);
+          return;
+        }
+        
         const savedCardConfig = localStorage.getItem(`loyaltyCardConfig_${businessId}`);
         if (savedCardConfig) {
           try {
@@ -96,7 +130,6 @@ const JoinPage = () => {
           } catch (e) {
             console.error("Error parsing card config:", e);
             
-            // Set default configuration
             setLoyaltyCardConfig({
               businessName: businessName || "Business",
               cardTitle: "Loyalty Card",
@@ -110,7 +143,6 @@ const JoinPage = () => {
             });
           }
         } else {
-          // If no saved config, set up default values
           setLoyaltyCardConfig({
             businessName: businessName || "Business",
             cardTitle: "Loyalty Card",
@@ -129,7 +161,7 @@ const JoinPage = () => {
     };
     
     fetchBusinessData();
-  }, [businessSlug, businessName]);
+  }, [businessSlug, businessName, userId]);
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,41 +177,48 @@ const JoinPage = () => {
 
     if (businessData) {
       try {
-        // For development, store in local storage
-        const customerId = `cust_${Date.now()}`;
-        const newCustomer = {
-          id: customerId,
-          name: customerName,
-          businessSlug: businessSlug,
-          joinedAt: new Date().toISOString(),
-          stamps: 0
-        };
+        let customerId = userId;
         
-        // Try to insert into Supabase if available
+        if (!customerId) {
+          customerId = `anon_${Date.now()}`;
+        }
+        
         if (businessData.id) {
-          // Generate a random UUID for user_id if no authentication is implemented
-          // In a real app, this would be auth.uid() from the authenticated user
-          const tempUserId = `temp_user_${Date.now()}`;
-          
           const { error } = await supabase
             .from('business_members')
-            .insert({
+            .upsert({
               business_id: businessData.id,
-              user_id: tempUserId, // Add the required user_id field
-              stamps: 0
+              user_id: customerId,
+              stamps: 0,
             });
             
-          if (error && error.code !== "23505") { // Ignore unique constraint violations
+          if (error) {
             console.error("Error joining business:", error);
+            toast({
+              title: "Error",
+              description: "Could not join the loyalty program. Please try again.",
+              variant: "destructive"
+            });
+            return;
           }
         }
         
-        // Also store in local storage for development
         try {
+          const newCustomer = {
+            id: customerId,
+            name: customerName,
+            businessSlug: businessSlug,
+            businessId: businessData.id,
+            joinedAt: new Date().toISOString(),
+            stamps: 0
+          };
+          
           const savedCustomers = localStorage.getItem('customers') || '[]';
           const customers = JSON.parse(savedCustomers);
           customers.push(newCustomer);
           localStorage.setItem('customers', JSON.stringify(customers));
+          
+          setCustomer(newCustomer);
         } catch (e) {
           console.error("Error saving to localStorage:", e);
         }
@@ -190,7 +229,6 @@ const JoinPage = () => {
         });
         
         setJoined(true);
-        setCustomer(newCustomer);
       } catch (e) {
         console.error("Error joining:", e);
         toast({
@@ -207,10 +245,8 @@ const JoinPage = () => {
   };
 
   const handleSuccessfulScan = (businessId: string, timestamp: number, stampCount: number = 1) => {
-    // Close the scanner
     setScannerOpen(false);
     
-    // Check if the scanned business matches the joined business
     if (businessData && businessData.id && businessId !== businessData.id) {
       toast({
         title: "Wrong Business QR Code",
@@ -220,32 +256,27 @@ const JoinPage = () => {
       return;
     }
     
-    // Update stamp count
     const newStamps = Math.min(stamps + stampCount, loyaltyCardConfig?.maxStamps || 10);
     setStamps(newStamps);
     
-    // Update customer object
     setCustomer(prev => ({
       ...prev,
       stamps: newStamps
     }));
     
-    // Show success message
     toast({
       title: "Stamp Collected!",
       description: `You've collected ${stampCount} stamp${stampCount > 1 ? 's' : ''}.`,
     });
     
-    // In a real app, we would update the database here
-    if (businessData?.id) {
-      // Try to update in Supabase if available
-      const tempUserId = customer?.id || `temp_user_${Date.now()}`;
+    if (businessData?.id && (userId || customer?.id)) {
+      const memberId = userId || customer?.id;
       
       supabase
         .from('business_members')
         .upsert({
           business_id: businessData.id,
-          user_id: tempUserId,
+          user_id: memberId,
           stamps: newStamps
         })
         .then(({ error }) => {
@@ -378,7 +409,6 @@ const JoinPage = () => {
             </p>
           </div>
 
-          {/* Preview card */}
           <div className="mb-6">
             <p className="text-sm text-center mb-2 text-gray-500">Here's what your loyalty card will look like:</p>
             <LoyaltyCard 
