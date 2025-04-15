@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
 import BusinessStats from "@/components/BusinessStats";
@@ -6,25 +8,15 @@ import CustomerList from "@/components/CustomerList";
 import CardCustomization from "@/components/loyalty/CardCustomization";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { QrCode, BarChart2, Users, UserCircle, Link as LinkIcon, Copy, CreditCard, Save } from "lucide-react";
+import { QrCode, BarChart2, Users, UserCircle, Link as LinkIcon, Copy, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
-import { supabase } from "@/integrations/supabase/client";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-
-interface BusinessData {
-  id: string;
-  name: string;
-  slug: string;
-  createdAt: string;
-}
 
 const businessSchema = z.object({
   name: z.string().min(2, {
@@ -33,287 +25,154 @@ const businessSchema = z.object({
 });
 
 const AdminPage = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
-  const [qrCodeGenerated, setQrCodeGenerated] = useState<number>(0);
-  const isMobile = useIsMobile();
-  
-  const [recentScans, setRecentScans] = useState<
-    Array<{ customer: string; stamps: number; timestamp: number }>
-  >([
-    { customer: "John Doe", stamps: 1, timestamp: Date.now() - 20000 },
-    { customer: "Jane Smith", stamps: 2, timestamp: Date.now() - 120000 },
-    { customer: "Bob Johnson", stamps: 1, timestamp: Date.now() - 300000 },
-  ]);
-  
-  const [businessData, setBusinessData] = useState<BusinessData>({
-    id: "b_" + Date.now(),
-    name: "Coffee Oasis",
-    slug: "coffee-oasis",
-    createdAt: new Date().toISOString()
-  });
-  
-  const [slugEditing, setSlugEditing] = useState(false);
-  const [tempSlug, setTempSlug] = useState(businessData.slug);
-  const [cardConfig, setCardConfig] = useState<LoyaltyCardConfig | null>(null);
-  const [isNameEditing, setIsNameEditing] = useState(false);
+  const [user, setUser] = useState(null);
+  const [businessData, setBusinessData] = useState(null);
+  const [isCreatingBusiness, setIsCreatingBusiness] = useState(false);
 
   const businessForm = useForm<z.infer<typeof businessSchema>>({
     resolver: zodResolver(businessSchema),
     defaultValues: {
-      name: businessData.name,
+      name: "",
     },
   });
 
   useEffect(() => {
-    const fetchBusinessData = async () => {
-      try {
-        const { data: businesses, error } = await supabase
-          .from("businesses")
-          .select("*")
-          .limit(1);
-          
-        if (!error && businesses && businesses.length > 0) {
-          setBusinessData({
-            id: businesses[0].id,
-            name: businesses[0].name,
-            slug: businesses[0].slug,
-            createdAt: businesses[0].created_at
-          });
-          setTempSlug(businesses[0].slug);
-          businessForm.reset({ name: businesses[0].name });
-        } else {
-          const savedBusinessData = localStorage.getItem('businessData');
-          if (savedBusinessData) {
-            try {
-              const parsedData = JSON.parse(savedBusinessData);
-              setBusinessData(parsedData);
-              setTempSlug(parsedData.slug);
-              businessForm.reset({ name: parsedData.name });
-            } catch (e) {
-              console.error("Error parsing business data:", e);
-            }
-          } else {
-            localStorage.setItem('businessData', JSON.stringify(businessData));
-          }
-        }
-      } catch (e) {
-        console.error("Error fetching business data:", e);
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: "Please Login",
+          description: "You need to be logged in to access the admin page.",
+          variant: "destructive"
+        });
+        navigate('/auth');
+        return;
+      }
+
+      setUser(session.user);
+
+      // Check if the user already has a business
+      const { data: businesses, error } = await supabase
+        .from('businesses')
+        .select('*')
+        .eq('owner_id', session.user.id)
+        .single();
+
+      if (businesses) {
+        setBusinessData(businesses);
+      } else if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching business:', error);
       }
     };
-    
-    const savedCardConfig = localStorage.getItem('loyaltyCardConfig');
-    if (savedCardConfig) {
-      try {
-        const parsedConfig = JSON.parse(savedCardConfig);
-        setCardConfig(parsedConfig);
-      } catch (e) {
-        console.error("Error parsing card config:", e);
-      }
-    }
-    
-    fetchBusinessData();
-  }, []);
 
-  useEffect(() => {
-    if (businessData?.id) {
-      const savedCardConfig = localStorage.getItem(`loyaltyCardConfig_${businessData.id}`);
-      if (savedCardConfig) {
-        try {
-          const parsedConfig = JSON.parse(savedCardConfig);
-          setCardConfig(parsedConfig);
-        } catch (e) {
-          console.error("Error parsing card config:", e);
-        }
-      } else {
-        const defaultConfig = {
-          businessName: businessData.name,
-          cardTitle: "Loyalty Card",
-          maxStamps: 10,
-          stampIcon: "Coffee",
-          cardBgColor: "#FFFFFF",
-          textColor: "#6F4E37",
-          businessNameColor: "#2563EB",
-          cardTitleColor: "#2563EB",
-          rewardTextColor: "#2563EB"
-        };
-        setCardConfig(defaultConfig);
-        localStorage.setItem(`loyaltyCardConfig_${businessData.id}`, JSON.stringify(defaultConfig));
-      }
-    }
-  }, [businessData?.id, businessData?.name]);
+    checkUser();
+  }, [navigate, toast]);
 
-  const handleQRGenerated = (codeData: string) => {
+  const handleCreateBusiness = async (values: z.infer<typeof businessSchema>) => {
+    if (!user) return;
+
     try {
-      const data = JSON.parse(codeData);
-      setQrCodeGenerated(prev => prev + 1);
-      
-      const newScan = {
-        customer: data.customer || "Unknown Customer",
-        stamps: data.stamps,
-        timestamp: data.timestamp,
-      };
-      
-      setRecentScans(prev => [newScan, ...prev].slice(0, 10));
-    } catch (err) {
-      console.error("Error parsing QR data:", err);
-    }
-  };
+      // Generate a unique slug using the Supabase function
+      const { data: slugData, error: slugError } = await supabase.rpc('generate_unique_slug', { 
+        business_name: values.name 
+      });
 
-  const formatTimestamp = (timestamp: number) => {
-    const date = new Date(timestamp);
-    return date.toLocaleString();
-  };
+      if (slugError) {
+        throw slugError;
+      }
 
-  const handleSlugChange = async () => {
-    if (!tempSlug.trim()) {
+      const { data, error } = await supabase
+        .from('businesses')
+        .insert({
+          name: values.name,
+          slug: slugData,
+          owner_id: user.id
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setBusinessData(data);
+      setIsCreatingBusiness(false);
+      
       toast({
-        title: "Invalid Slug",
-        description: "Business URL cannot be empty",
+        title: "Business Created",
+        description: `${values.name} has been successfully registered.`
+      });
+    } catch (error) {
+      console.error('Error creating business:', error);
+      toast({
+        title: "Error",
+        description: "Could not create business. Please try again.",
         variant: "destructive"
       });
-      return;
     }
-    
-    const validSlug = tempSlug.trim()
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '');
-    
-    const updatedBusinessData = {
-      ...businessData,
-      slug: validSlug
-    };
-    
-    if (businessData.id && businessData.id.includes("b_") === false) {
-      try {
-        const { error } = await supabase
-          .from("businesses")
-          .update({ slug: validSlug })
-          .eq("id", businessData.id);
-          
-        if (error) {
-          console.error("Error updating business slug:", error);
-          toast({
-            title: "Error",
-            description: "Could not update business URL. It may already be taken.",
-            variant: "destructive"
-          });
-          return;
-        }
-      } catch (e) {
-        console.error("Error updating business slug:", e);
-      }
-    }
-    
-    setBusinessData(updatedBusinessData);
-    setTempSlug(validSlug);
-    setSlugEditing(false);
-    
-    localStorage.setItem('businessData', JSON.stringify(updatedBusinessData));
-    
-    toast({
-      title: "URL Updated",
-      description: "Your business join link has been updated."
-    });
   };
 
-  const handleBusinessNameSubmit = async (values: z.infer<typeof businessSchema>) => {
-    const newName = values.name.trim();
-    
-    if (newName === businessData.name) {
-      setIsNameEditing(false);
-      return;
-    }
-    
-    let newSlug = tempSlug;
-    if (tempSlug === businessData.slug) {
-      newSlug = newName
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '');
-    }
-    
-    const updatedBusinessData = {
-      ...businessData,
-      name: newName,
-      slug: newSlug
-    };
-    
-    if (businessData.id && businessData.id.includes("b_") === false) {
-      try {
-        const { error } = await supabase
-          .from("businesses")
-          .update({ 
-            name: newName,
-            slug: newSlug 
-          })
-          .eq("id", businessData.id);
-          
-        if (error) {
-          console.error("Error updating business name:", error);
-          toast({
-            title: "Error",
-            description: "Could not update business information.",
-            variant: "destructive"
-          });
-          return;
-        }
-      } catch (e) {
-        console.error("Error updating business name:", e);
-      }
-    }
-    
-    setBusinessData(updatedBusinessData);
-    setTempSlug(newSlug);
-    setIsNameEditing(false);
-    
-    if (cardConfig) {
-      const updatedCardConfig = {
-        ...cardConfig,
-        businessName: newName
-      };
-      setCardConfig(updatedCardConfig);
-      localStorage.setItem('loyaltyCardConfig', JSON.stringify(updatedCardConfig));
-    }
-    
-    localStorage.setItem('businessData', JSON.stringify(updatedBusinessData));
-    
-    toast({
-      title: "Business Updated",
-      description: "Your business information has been updated."
-    });
-  };
+  if (!user) {
+    return <Layout><div>Loading...</div></Layout>;
+  }
 
-  const copyJoinLink = () => {
-    const joinLink = `${window.location.origin}/join/${businessData.slug}`;
-    navigator.clipboard.writeText(joinLink);
-    
-    toast({
-      title: "Link Copied",
-      description: "Join link copied to clipboard"
-    });
-  };
-  
-  const handleSaveCardConfig = (config: LoyaltyCardConfig) => {
-    const updatedConfig = {
-      ...config,
-      businessName: businessData.name
-    };
-    setCardConfig(updatedConfig);
-    localStorage.setItem(`loyaltyCardConfig_${businessData.id}`, JSON.stringify(updatedConfig));
-    
-    if (businessData.id && !businessData.id.includes("b_")) {
-      toast({
-        title: "Card Customization Saved",
-        description: "Your loyalty card design has been updated."
-      });
-    } else {
-      toast({
-        title: "Card Customization Saved",
-        description: "Your loyalty card design has been saved locally."
-      });
-    }
-  };
+  if (!businessData && !isCreatingBusiness) {
+    return (
+      <Layout>
+        <div className="max-w-md mx-auto mt-12 text-center">
+          <Card className="p-6 bg-white card-shadow">
+            <h2 className="text-2xl font-bold mb-4">Create Your Business</h2>
+            <p className="mb-6">Let's set up your loyalty program. What's your business name?</p>
+            <Button onClick={() => setIsCreatingBusiness(true)}>
+              Create Business
+            </Button>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (isCreatingBusiness) {
+    return (
+      <Layout>
+        <div className="max-w-md mx-auto mt-12">
+          <Card className="p-6 bg-white card-shadow">
+            <h2 className="text-2xl font-bold mb-4">Create Your Business</h2>
+            <Form {...businessForm}>
+              <form onSubmit={businessForm.handleSubmit(handleCreateBusiness)} className="space-y-4">
+                <FormField
+                  control={businessForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input 
+                          placeholder="Business Name" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex space-x-2">
+                  <Button type="submit">Create Business</Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setIsCreatingBusiness(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
