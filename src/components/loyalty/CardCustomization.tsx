@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -24,7 +24,7 @@ import {
   Trophy, 
   Sparkles,
   RefreshCw,
-  Gift
+  Circle
 } from "lucide-react";
 import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 import { STAMP_ICONS } from "./types";
@@ -51,7 +51,8 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
     cardTitleColor: "#8B4513",
     rewardTextColor: "#6F4E37",
     stampIcon: "Coffee",
-    rewardIcon: "Gift",
+    lastStampText: "FREE",
+    lastStampTextColor: "#FFFFFF",
     rewardText: "Collect 10 stamps for a free item",
     rewards: []
   });
@@ -103,7 +104,8 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
       cardTitleColor: "#8B4513",
       rewardTextColor: "#6F4E37",
       stampIcon: "Coffee",
-      rewardIcon: "Gift",
+      lastStampText: "FREE",
+      lastStampTextColor: "#FFFFFF",
       rewardText: "Collect 10 stamps for a free item",
       rewards: []
     });
@@ -133,7 +135,6 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
     });
   };
   
-  // Update maxStamps in rewardText when maxStamps changes
   useEffect(() => {
     if (config.rewardText && config.rewardText.includes("stamps for")) {
       handleChange('rewardText', `Collect ${config.maxStamps} stamps for a free item`);
@@ -526,26 +527,44 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                 </div>
               </div>
               
-              <div className="mt-4">
-                <Label>Reward Icon (Last Stamp)</Label>
-                <div className="grid grid-cols-4 gap-2 mt-2">
-                  {Object.keys(STAMP_ICONS).map((iconName) => {
-                    const IconComponent = STAMP_ICONS[iconName as keyof typeof STAMP_ICONS];
-                    return (
-                      <Button
-                        key={`reward-${iconName}`}
-                        type="button"
-                        variant={config.rewardIcon === iconName ? "default" : "outline"}
-                        className={`flex flex-col items-center justify-center p-2 h-16 ${
-                          config.rewardIcon === iconName ? 'bg-orange text-white' : ''
-                        }`}
-                        onClick={() => handleChange('rewardIcon', iconName)}
-                      >
-                        <IconComponent size={20} />
-                        <span className="text-xs mt-1">{iconName}</span>
-                      </Button>
-                    );
-                  })}
+              <div className="mt-6">
+                <Label htmlFor="lastStampText">Last Stamp Text</Label>
+                <Input 
+                  id="lastStampText"
+                  value={config.lastStampText || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.length >= 4 || value === '') {
+                      handleChange('lastStampText', value);
+                    } else {
+                      toast({
+                        title: "Text too short",
+                        description: "Last stamp text must be at least 4 characters",
+                        variant: "destructive"
+                      });
+                    }
+                  }}
+                  placeholder="FREE" 
+                  className="mb-2"
+                />
+                <p className="text-sm text-gray-500 mb-4">Text for the last stamp (minimum 4 characters)</p>
+                
+                <div>
+                  <Label htmlFor="lastStampTextColor">Last Stamp Text Color</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input 
+                      id="lastStampTextColor"
+                      type="color"
+                      className="w-12 h-8 p-1"
+                      value={config.lastStampTextColor || '#FFFFFF'}
+                      onChange={(e) => handleChange('lastStampTextColor', e.target.value)}
+                    />
+                    <Input 
+                      value={config.lastStampTextColor || '#FFFFFF'}
+                      onChange={(e) => handleChange('lastStampTextColor', e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
                 </div>
               </div>
             </TabsContent>
@@ -588,7 +607,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
             
             <div className="mt-4">
               <LoyaltyCard 
-                key={`preview-${rewardsVersion}-${config.maxStamps}-${config.rewardIcon || "Gift"}`}
+                key={`preview-${rewardsVersion}-${config.maxStamps}-${config.lastStampText || "FREE"}`}
                 customerName="John Doe"
                 maxStamps={config.maxStamps}
                 currentStamps={previewStamps}

@@ -104,7 +104,6 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
     }
   };
   
-  // Style variables
   const cardBgColor = cardStyle?.cardBgColor || "#FFFFFF";
   const textColor = cardStyle?.textColor || "#6F4E37";
   const businessNameColor = cardStyle?.businessNameColor || textColor;
@@ -113,7 +112,6 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   const progressBarColor = cardStyle?.stampActiveColor || "#8B4513";
   const progressBarBgColor = cardStyle?.stampBgColor || "#F5F5DC";
   
-  // Individual font families for each text element
   const fontFamily = cardStyle?.fontFamily || "";
   const businessNameFont = cardStyle?.businessNameFont || fontFamily;
   const cardTitleFont = cardStyle?.cardTitleFont || fontFamily;

@@ -14,7 +14,8 @@ export interface LoyaltyCardConfig {
   backgroundImage?: string;
   useBackgroundImage?: boolean;
   stampIcon?: string;
-  rewardIcon?: string;
+  lastStampText?: string;
+  lastStampTextColor?: string;
   rewardText?: string;
   fontFamily?: string;
   businessNameFont?: string;
@@ -27,6 +28,7 @@ export interface LoyaltyCardConfig {
   customerNameFontSize?: string;
   descriptionFontSize?: string;
   progressRewardsFontSize?: string;
+  miniRewardStampColor?: string;
   rewards?: {
     stampNumber: number;
     description: string;

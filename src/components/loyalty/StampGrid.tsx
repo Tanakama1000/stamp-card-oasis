@@ -31,10 +31,6 @@ const StampGrid: React.FC<StampGridProps> = ({
       STAMP_ICONS[cardStyle.stampIcon as keyof typeof STAMP_ICONS] : 
       STAMP_ICONS.Coffee;
       
-    const RewardIcon = cardStyle?.rewardIcon ? 
-      STAMP_ICONS[cardStyle.rewardIcon as keyof typeof STAMP_ICONS] : 
-      STAMP_ICONS.Gift;
-
     const rows = [];
 
     for (let i = 0; i < rowCount; i++) {
@@ -48,9 +44,7 @@ const StampGrid: React.FC<StampGridProps> = ({
           const isMiniRewardStamp = !!miniReward;
           
           let CurrentIcon;
-          if (isLastStamp) {
-            CurrentIcon = RewardIcon;
-          } else if (isMiniRewardStamp) {
+          if (isMiniRewardStamp) {
             // Use the specific icon for this mini reward
             CurrentIcon = STAMP_ICONS[miniReward.icon as keyof typeof STAMP_ICONS] || StampIcon;
           } else {
@@ -81,6 +75,7 @@ const StampGrid: React.FC<StampGridProps> = ({
                 ${animationClass}
                 ${isNext && stamps < maxStamps ? "hover:text-white hover:scale-110 hover:shadow-md" : ""}
                 ${(isLastStamp || isMiniRewardStamp) && !isCollected ? "border-dashed" : ""}
+                ${isLastStamp ? "relative" : ""}
               `}
               onClick={() => onStampClick(stampIndex)}
               title={
@@ -105,7 +100,27 @@ const StampGrid: React.FC<StampGridProps> = ({
                 transition: 'transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease',
               }}
             >
-              <CurrentIcon size={iconSize} className={isCollected ? "animate-bounce-once" : ""} />
+              {isLastStamp ? (
+                <div className="flex flex-col items-center justify-center w-full h-full">
+                  {cardStyle?.lastStampText && (
+                    <span 
+                      className="text-center font-bold text-xs md:text-sm uppercase"
+                      style={{ 
+                        color: cardStyle?.lastStampTextColor || '#FFFFFF',
+                        lineHeight: "1",
+                        maxWidth: "100%",
+                        wordBreak: "break-word"
+                      }}
+                    >
+                      {cardStyle.lastStampText}
+                    </span>
+                  )}
+                  {!cardStyle?.lastStampText && <CurrentIcon size={iconSize} className={isCollected ? "animate-bounce-once" : ""} />}
+                </div>
+              ) : (
+                <CurrentIcon size={iconSize} className={isCollected ? "animate-bounce-once" : ""} />
+              )}
+              
               {isMiniRewardStamp && (
                 <span className="absolute -top-1 -right-1 bg-orange text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-sm">
                   {stampIndex + 1}
