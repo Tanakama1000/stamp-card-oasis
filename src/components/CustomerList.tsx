@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, UserPlus } from "lucide-react";
+import { Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -71,10 +70,6 @@ const CustomerList = ({ businessId }: CustomerListProps) => {
     <Card className="p-6 bg-white card-shadow">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold text-coffee-dark">Customer Database</h3>
-        <Button className="bg-orange hover:bg-orange-light flex items-center gap-1">
-          <UserPlus size={16} />
-          <span>Add New</span>
-        </Button>
       </div>
 
       <div className="relative mb-6">
