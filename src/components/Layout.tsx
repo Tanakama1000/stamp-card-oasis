@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Coffee, QrCode } from "lucide-react";
+import { Coffee } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import SignOutButton from "./SignOutButton";
 
@@ -23,15 +23,9 @@ const Layout = ({ children }: LayoutProps) => {
             
             <nav className="hidden md:flex items-center space-x-6">
               {user && (
-                <>
-                  <Link to="/admin" className="text-white hover:text-cream transition-colors">
-                    Admin
-                  </Link>
-                  <Link to="/scan" className="flex items-center gap-1 text-white hover:text-cream transition-colors">
-                    <QrCode size={18} />
-                    <span>Scan</span>
-                  </Link>
-                </>
+                <Link to="/admin" className="text-white hover:text-cream transition-colors">
+                  Admin
+                </Link>
               )}
             </nav>
             

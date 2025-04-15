@@ -8,7 +8,6 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminPage from "./pages/AdminPage";
 import JoinPage from "./pages/JoinPage";
-import ScanPage from "./pages/ScanPage";
 import AuthPage from "./pages/AuthPage";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -31,14 +30,6 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AdminPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/scan"
-              element={
-                <ProtectedRoute>
-                  <ScanPage />
                 </ProtectedRoute>
               }
             />
