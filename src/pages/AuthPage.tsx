@@ -8,11 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 const AuthPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [userType, setUserType] = useState('business_owner');
   const [isSignup, setIsSignup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -33,13 +36,14 @@ const AuthPage = () => {
           options: {
             data: {
               full_name: fullName,
-              user_type: 'business_owner'
+              user_type: userType
             }
           }
         });
 
         if (error) {
           setAuthError(error.message);
+          setIsLoading(false);
           return;
         }
 
@@ -59,6 +63,7 @@ const AuthPage = () => {
 
         if (error) {
           setAuthError(error.message);
+          setIsLoading(false);
           return;
         }
 
@@ -72,7 +77,6 @@ const AuthPage = () => {
     } catch (error) {
       console.error('Authentication error:', error);
       setAuthError('An unexpected error occurred. Please try again.');
-    } finally {
       setIsLoading(false);
     }
   };
@@ -94,13 +98,30 @@ const AuthPage = () => {
           
           <form onSubmit={handleAuth} className="space-y-4">
             {isSignup && (
-              <Input 
-                type="text" 
-                placeholder="Full Name" 
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
+              <>
+                <Input 
+                  type="text" 
+                  placeholder="Full Name" 
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+                <div className="space-y-2">
+                  <Label htmlFor="user-type">Account Type</Label>
+                  <Select 
+                    value={userType} 
+                    onValueChange={setUserType}
+                  >
+                    <SelectTrigger id="user-type">
+                      <SelectValue placeholder="Select account type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="business_owner">Business Owner</SelectItem>
+                      <SelectItem value="customer">Customer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
             )}
             <Input 
               type="email" 
