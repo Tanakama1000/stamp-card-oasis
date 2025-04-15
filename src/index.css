@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
@@ -55,7 +56,8 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
-    --cream-light: #FFFFFF; // Changed from #FFFDD0 to pure white
+    /* Changed from #FFFDD0 to pure white */
+    --cream-light: #FFFFFF;
   }
 
   .dark {
@@ -109,7 +111,8 @@
   }
 
   body {
-    @apply bg-white text-foreground; // Changed background to pure white
+    /* Changed background to pure white */
+    @apply bg-white text-foreground;
   }
 
   /* Custom scrollbar */
