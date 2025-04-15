@@ -79,11 +79,11 @@ export const useBusinessData = (businessSlug: string | undefined, userId: string
         const { data: businesses, error } = await supabase
           .from("businesses")
           .select("*")
-          .eq("slug", businessSlug)
-          .single();
+          .eq("slug", businessSlug);
         
-        if (error) {
-          console.log("Error fetching business from Supabase:", error);
+        // Changed from .single() to allow more flexible handling
+        if (error || !businesses || businesses.length === 0) {
+          console.log("Error or no businesses found in Supabase:", error);
           
           // Check localStorage for businesses
           const savedBusinesses = localStorage.getItem('businesses');
@@ -155,36 +155,29 @@ export const useBusinessData = (businessSlug: string | undefined, userId: string
             description: "The business you're looking for couldn't be found.",
             variant: "destructive"
           });
-        } else if (businesses) {
-          setBusinessName(businesses.name);
-          setBusinessData(businesses);
-          await fetchLoyaltyCardConfig(businesses.id);
+        } else if (businesses && businesses.length > 0) {
+          const business = businesses[0];
+          setBusinessName(business.name);
+          setBusinessData(business);
+          await fetchLoyaltyCardConfig(business.id);
           
           if (userId) {
-            const { data: membership } = await supabase
+            const { data: membership, error: membershipError } = await supabase
               .from("business_members")
               .select("*")
-              .eq("business_id", businesses.id)
-              .eq("user_id", userId)
-              .single();
+              .eq("business_id", business.id)
+              .eq("user_id", userId);
               
-            if (membership) {
+            if (!membershipError && membership && membership.length > 0) {
               setJoined(true);
               setCustomer({
                 id: userId,
                 name: "Member",
-                stamps: membership.stamps || 0
+                stamps: membership[0].stamps || 0
               });
-              setStamps(membership.stamps || 0);
+              setStamps(membership[0].stamps || 0);
             }
           }
-        } else {
-          setError("Business not found");
-          toast({
-            title: "Business Not Found",
-            description: "The business you're looking for couldn't be found.",
-            variant: "destructive"
-          });
         }
         
         setLoading(false);

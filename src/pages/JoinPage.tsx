@@ -26,6 +26,11 @@ const JoinPage = () => {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
         setUserId(data.session.user.id);
+      } else {
+        // Set a temporary anonymous user ID if not logged in
+        const tempId = localStorage.getItem('tempUserId') || `anon_${Date.now()}`;
+        localStorage.setItem('tempUserId', tempId);
+        setUserId(tempId);
       }
     };
     
@@ -74,7 +79,10 @@ const JoinPage = () => {
   if (error) {
     return (
       <Layout>
-        <ErrorState />
+        <ErrorState 
+          title="Business Not Found"
+          message="The business you're looking for doesn't exist or the link is invalid."
+        />
       </Layout>
     );
   }
