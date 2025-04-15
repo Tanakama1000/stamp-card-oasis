@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
@@ -68,7 +67,6 @@ const AdminPage = () => {
   useEffect(() => {
     const fetchBusinessData = async () => {
       try {
-        // Try to get data from Supabase first
         const { data: businesses, error } = await supabase
           .from("businesses")
           .select("*")
@@ -84,7 +82,6 @@ const AdminPage = () => {
           setTempSlug(businesses[0].slug);
           businessForm.reset({ name: businesses[0].name });
         } else {
-          // Fallback to localStorage
           const savedBusinessData = localStorage.getItem('businessData');
           if (savedBusinessData) {
             try {
@@ -96,7 +93,6 @@ const AdminPage = () => {
               console.error("Error parsing business data:", e);
             }
           } else {
-            // Create default business data in localStorage
             localStorage.setItem('businessData', JSON.stringify(businessData));
           }
         }
@@ -105,7 +101,6 @@ const AdminPage = () => {
       }
     };
     
-    // Load card configuration
     const savedCardConfig = localStorage.getItem('loyaltyCardConfig');
     if (savedCardConfig) {
       try {
@@ -118,6 +113,34 @@ const AdminPage = () => {
     
     fetchBusinessData();
   }, []);
+
+  useEffect(() => {
+    if (businessData?.id) {
+      const savedCardConfig = localStorage.getItem(`loyaltyCardConfig_${businessData.id}`);
+      if (savedCardConfig) {
+        try {
+          const parsedConfig = JSON.parse(savedCardConfig);
+          setCardConfig(parsedConfig);
+        } catch (e) {
+          console.error("Error parsing card config:", e);
+        }
+      } else {
+        const defaultConfig = {
+          businessName: businessData.name,
+          cardTitle: "Loyalty Card",
+          maxStamps: 10,
+          stampIcon: "Coffee",
+          cardBgColor: "#FFFFFF",
+          textColor: "#6F4E37",
+          businessNameColor: "#2563EB",
+          cardTitleColor: "#2563EB",
+          rewardTextColor: "#2563EB"
+        };
+        setCardConfig(defaultConfig);
+        localStorage.setItem(`loyaltyCardConfig_${businessData.id}`, JSON.stringify(defaultConfig));
+      }
+    }
+  }, [businessData?.id, businessData?.name]);
 
   const handleQRGenerated = (codeData: string) => {
     try {
@@ -161,7 +184,6 @@ const AdminPage = () => {
       slug: validSlug
     };
     
-    // Try to update in Supabase if we have an ID
     if (businessData.id && businessData.id.includes("b_") === false) {
       try {
         const { error } = await supabase
@@ -203,7 +225,6 @@ const AdminPage = () => {
       return;
     }
     
-    // Generate a slug from the business name if not custom edited
     let newSlug = tempSlug;
     if (tempSlug === businessData.slug) {
       newSlug = newName
@@ -218,7 +239,6 @@ const AdminPage = () => {
       slug: newSlug
     };
     
-    // Try to update in Supabase if we have an ID
     if (businessData.id && businessData.id.includes("b_") === false) {
       try {
         const { error } = await supabase
@@ -247,7 +267,6 @@ const AdminPage = () => {
     setTempSlug(newSlug);
     setIsNameEditing(false);
     
-    // Update card config with business name if it exists
     if (cardConfig) {
       const updatedCardConfig = {
         ...cardConfig,
@@ -276,13 +295,24 @@ const AdminPage = () => {
   };
   
   const handleSaveCardConfig = (config: LoyaltyCardConfig) => {
-    // Ensure the business name from the business data is reflected in the card config
     const updatedConfig = {
       ...config,
       businessName: businessData.name
     };
     setCardConfig(updatedConfig);
-    localStorage.setItem('loyaltyCardConfig', JSON.stringify(updatedConfig));
+    localStorage.setItem(`loyaltyCardConfig_${businessData.id}`, JSON.stringify(updatedConfig));
+    
+    if (businessData.id && !businessData.id.includes("b_")) {
+      toast({
+        title: "Card Customization Saved",
+        description: "Your loyalty card design has been updated."
+      });
+    } else {
+      toast({
+        title: "Card Customization Saved",
+        description: "Your loyalty card design has been saved locally."
+      });
+    }
   };
 
   return (

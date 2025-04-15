@@ -24,6 +24,7 @@ const JoinPage = () => {
   const [customer, setCustomer] = useState<any>(null);
   const [scannerOpen, setScannerOpen] = useState<boolean>(false);
   const [stamps, setStamps] = useState<number>(0);
+  const [loyaltyCardConfig, setLoyaltyCardConfig] = useState<any>(null);
 
   useEffect(() => {
     const fetchBusinessData = async () => {
@@ -53,30 +54,24 @@ const JoinPage = () => {
           if (foundBusiness) {
             setBusinessName(foundBusiness.name);
             setBusinessData(foundBusiness);
+            await fetchLoyaltyCardConfig(foundBusiness.id);
           } else if (businessSlug === "coffee-oasis") {
             // Fallback for demo
             setBusinessName("Coffee Oasis");
-            setBusinessData({
+            const defaultBusinessData = {
               name: "Coffee Oasis",
               slug: "coffee-oasis",
-              cardConfig: {
-                businessName: "Coffee Oasis",
-                cardTitle: "Loyalty Card",
-                maxStamps: 10,
-                stampIcon: "Coffee",
-                cardBgColor: "#FFFFFF",
-                textColor: "#6F4E37",
-                businessNameColor: "#2563EB",
-                cardTitleColor: "#2563EB",
-                rewardTextColor: "#2563EB",
-              }
-            });
+              id: "coffee-oasis-id"
+            };
+            setBusinessData(defaultBusinessData);
+            await fetchLoyaltyCardConfig(defaultBusinessData.id);
           } else {
             setError("Business not found");
           }
         } else if (businesses) {
           setBusinessName(businesses.name);
           setBusinessData(businesses);
+          await fetchLoyaltyCardConfig(businesses.id);
         } else {
           setError("Business not found");
         }
@@ -89,8 +84,52 @@ const JoinPage = () => {
       }
     };
     
+    // Fetch business card configuration
+    const fetchLoyaltyCardConfig = async (businessId: string) => {
+      try {
+        // Try to fetch from Supabase or localStorage
+        const savedCardConfig = localStorage.getItem(`loyaltyCardConfig_${businessId}`);
+        if (savedCardConfig) {
+          try {
+            const parsedConfig = JSON.parse(savedCardConfig);
+            setLoyaltyCardConfig(parsedConfig);
+          } catch (e) {
+            console.error("Error parsing card config:", e);
+            
+            // Set default configuration
+            setLoyaltyCardConfig({
+              businessName: businessName || "Business",
+              cardTitle: "Loyalty Card",
+              maxStamps: 10,
+              stampIcon: "Coffee",
+              cardBgColor: "#FFFFFF",
+              textColor: "#6F4E37",
+              businessNameColor: "#2563EB",
+              cardTitleColor: "#2563EB",
+              rewardTextColor: "#2563EB"
+            });
+          }
+        } else {
+          // If no saved config, set up default values
+          setLoyaltyCardConfig({
+            businessName: businessName || "Business",
+            cardTitle: "Loyalty Card",
+            maxStamps: 10,
+            stampIcon: "Coffee",
+            cardBgColor: "#FFFFFF",
+            textColor: "#6F4E37",
+            businessNameColor: "#2563EB",
+            cardTitleColor: "#2563EB",
+            rewardTextColor: "#2563EB"
+          });
+        }
+      } catch (e) {
+        console.error("Error fetching loyalty card config:", e);
+      }
+    };
+    
     fetchBusinessData();
-  }, [businessSlug]);
+  }, [businessSlug, businessName]);
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,7 +221,7 @@ const JoinPage = () => {
     }
     
     // Update stamp count
-    const newStamps = Math.min(stamps + stampCount, businessData?.cardConfig?.maxStamps || 10);
+    const newStamps = Math.min(stamps + stampCount, loyaltyCardConfig?.maxStamps || 10);
     setStamps(newStamps);
     
     // Update customer object
@@ -250,9 +289,9 @@ const JoinPage = () => {
         <div className="max-w-md mx-auto mt-8 mb-12">
           <Card className="p-6 bg-white card-shadow">
             <div className="text-center mb-6">
-              {businessData.cardConfig?.businessLogo ? (
+              {loyaltyCardConfig?.businessLogo ? (
                 <img 
-                  src={businessData.cardConfig.businessLogo} 
+                  src={loyaltyCardConfig.businessLogo} 
                   alt={businessName}
                   className="h-12 w-12 object-contain mx-auto mb-2"
                 />
@@ -261,12 +300,12 @@ const JoinPage = () => {
               )}
               <h2 
                 className="text-2xl font-bold mb-1"
-                style={{ color: businessData.cardConfig?.businessNameColor || "#2563EB" }}
+                style={{ color: loyaltyCardConfig?.businessNameColor || "#2563EB" }}
               >
                 Welcome to {businessName}!
               </h2>
               <p 
-                style={{ color: businessData.cardConfig?.cardTitleColor || "#2563EB" }}
+                style={{ color: loyaltyCardConfig?.cardTitleColor || "#2563EB" }}
               >
                 Here's your loyalty card
               </p>
@@ -275,9 +314,9 @@ const JoinPage = () => {
             <div className="mb-6">
               <LoyaltyCard 
                 customerName={customerName}
-                maxStamps={businessData.cardConfig?.maxStamps || 10}
+                maxStamps={loyaltyCardConfig?.maxStamps || 10}
                 currentStamps={stamps}
-                cardStyle={businessData.cardConfig}
+                cardStyle={loyaltyCardConfig}
                 onStampCollected={() => {}}
                 onReset={() => {}}
               />
@@ -286,7 +325,7 @@ const JoinPage = () => {
             <div className="text-center space-y-4">
               <p 
                 className="text-sm"
-                style={{ color: businessData.cardConfig?.rewardTextColor || "#2563EB" }}
+                style={{ color: loyaltyCardConfig?.rewardTextColor || "#2563EB" }}
               >
                 Show this card when you visit {businessName} to collect stamps
               </p>
@@ -316,14 +355,45 @@ const JoinPage = () => {
       <div className="max-w-md mx-auto mt-8">
         <Card className="p-6 bg-white card-shadow">
           <div className="text-center mb-6">
-            <Coffee size={40} className="mx-auto text-coffee-dark mb-2" />
-            <h2 className="text-2xl font-bold text-coffee-dark">Join {businessName}</h2>
-            <p className="text-coffee-light mt-1">Enter your name to join the loyalty program</p>
+            {loyaltyCardConfig?.businessLogo ? (
+              <img 
+                src={loyaltyCardConfig.businessLogo} 
+                alt={businessName}
+                className="h-16 w-16 object-contain mx-auto mb-2"
+              />
+            ) : (
+              <Coffee size={40} className="mx-auto text-coffee-dark mb-2" />
+            )}
+            <h2 
+              className="text-2xl font-bold"
+              style={{ color: loyaltyCardConfig?.businessNameColor || "#2563EB" }}
+            >
+              Join {businessName}
+            </h2>
+            <p 
+              className="text-coffee-light mt-1"
+              style={{ color: loyaltyCardConfig?.textColor || "#6F4E37" }}
+            >
+              Enter your name to join the loyalty program
+            </p>
+          </div>
+
+          {/* Preview card */}
+          <div className="mb-6">
+            <p className="text-sm text-center mb-2 text-gray-500">Here's what your loyalty card will look like:</p>
+            <LoyaltyCard 
+              customerName="Your Name"
+              maxStamps={loyaltyCardConfig?.maxStamps || 10}
+              currentStamps={0}
+              cardStyle={loyaltyCardConfig}
+              onStampCollected={() => {}}
+              onReset={() => {}}
+            />
           </div>
 
           <form onSubmit={handleJoin} className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-coffee-dark mb-1">
+              <label htmlFor="name" className="block text-sm font-medium mb-1" style={{ color: loyaltyCardConfig?.textColor || "#6F4E37" }}>
                 Your Name
               </label>
               <Input
@@ -336,7 +406,14 @@ const JoinPage = () => {
               />
             </div>
 
-            <Button type="submit" className="w-full bg-orange hover:bg-orange-dark text-white">
+            <Button 
+              type="submit" 
+              className="w-full text-white"
+              style={{ 
+                backgroundColor: loyaltyCardConfig?.stampActiveColor || "#F97316",
+                borderColor: loyaltyCardConfig?.stampActiveColor || "#F97316"
+              }}
+            >
               Join Loyalty Program
             </Button>
           </form>
