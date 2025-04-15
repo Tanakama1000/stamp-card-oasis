@@ -78,13 +78,13 @@ const AuthPage = () => {
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: fullName,
-            user_type: "business", // Default to business users for now
+            user_type: "business", // Default all new sign-ups to business users
           },
         },
       });
@@ -96,7 +96,12 @@ const AuthPage = () => {
         description: "Please check your email for the confirmation link.",
       });
       
-      setMode("signin");
+      // If we have user data, redirect immediately to admin
+      if (data.user) {
+        navigate('/admin');
+      } else {
+        setMode("signin");
+      }
     } catch (error: any) {
       toast({
         title: "Registration failed",
