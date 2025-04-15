@@ -610,12 +610,7 @@ const JoinPage = () => {
               
               <Button
                 onClick={handleCollectStamp}
-                className="w-full flex items-center justify-center gap-2"
-                style={{ 
-                  backgroundColor: "#5271ff", 
-                  color: "white",
-                  hover: { backgroundColor: "#3a5dff" }
-                }}
+                className="w-full flex items-center justify-center gap-2 bg-[#5271ff] hover:bg-[#3a5dff] text-white"
               >
                 <QrCode size={20} />
                 Scan QR Code to Collect Stamp
