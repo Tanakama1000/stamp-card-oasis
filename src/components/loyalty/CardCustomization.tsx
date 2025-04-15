@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -95,7 +94,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
 
   const handleSave = () => {
     onSave(config);
-    localStorage.setItem('loyaltyCardStyle', JSON.stringify(config));
+    localStorage.setItem('loyaltyCardConfig', JSON.stringify(config));
     toast({
       title: "Card settings saved",
       description: "Your loyalty card customization has been saved."
@@ -522,7 +521,6 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                     Dark
                   </Button>
                   
-                  {/* Additional color presets */}
                   <Button 
                     variant="outline" 
                     size="sm"

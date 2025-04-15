@@ -16,7 +16,7 @@ const Index = () => {
   const maxStamps = cardStyle?.maxStamps || 10;
 
   useEffect(() => {
-    const savedCardStyle = localStorage.getItem('loyaltyCardStyle');
+    const savedCardStyle = localStorage.getItem('loyaltyCardConfig');
     if (savedCardStyle) {
       try {
         const parsedStyle = JSON.parse(savedCardStyle);

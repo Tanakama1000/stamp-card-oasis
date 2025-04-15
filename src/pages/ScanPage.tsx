@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import QRScanner from "@/components/QRScanner";
@@ -18,7 +19,7 @@ const ScanPage = () => {
 
   // Fetch card style from localStorage on component mount
   useEffect(() => {
-    const savedCardStyle = localStorage.getItem('loyaltyCardStyle');
+    const savedCardStyle = localStorage.getItem('loyaltyCardConfig');
     if (savedCardStyle) {
       try {
         const parsedStyle = JSON.parse(savedCardStyle);
@@ -108,7 +109,7 @@ const ScanPage = () => {
 
         <div className="mb-8">
           <LoyaltyCard
-            customerName={customerName}  // Can now be empty
+            customerName={customerName}
             maxStamps={maxStamps}
             currentStamps={stamps}
             cardStyle={cardStyle || undefined}
