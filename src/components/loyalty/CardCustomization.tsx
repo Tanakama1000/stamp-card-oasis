@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -59,9 +58,10 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
     description: "Free Coffee",
     icon: "Coffee"
   });
+  
+  const [rewardsVersion, setRewardsVersion] = useState(0);
 
   useEffect(() => {
-    // Load saved configuration from localStorage if available
     const savedConfig = localStorage.getItem('loyaltyCardConfig');
     if (savedConfig && !initialConfig) {
       try {
@@ -77,12 +77,16 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
     setConfig(prev => {
       const updated = { ...prev, [field]: value };
       localStorage.setItem('loyaltyCardConfig', JSON.stringify(updated));
+      if (field === 'rewards') {
+        setRewardsVersion(v => v + 1);
+      }
       return updated;
     });
   };
 
   const handleSave = () => {
     onSave(config);
+    localStorage.setItem('loyaltyCardStyle', JSON.stringify(config));
     toast({
       title: "Card settings saved",
       description: "Your loyalty card customization has been saved."
@@ -94,7 +98,6 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
       config.rewards = [];
     }
     
-    // Check if this stamp already has a reward
     const existingRewardIndex = config.rewards.findIndex(r => r.stampNumber === reward.stampNumber);
     
     if (existingRewardIndex >= 0) {
@@ -139,6 +142,8 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
       stampIcon: "Coffee",
       rewards: []
     });
+    
+    setRewardsVersion(v => v + 1);
     
     toast({
       title: "Reset complete",
@@ -677,6 +682,7 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
             
             <div className="mt-4">
               <LoyaltyCard 
+                key={`preview-${rewardsVersion}`}
                 customerName="John Doe"
                 maxStamps={config.maxStamps}
                 currentStamps={previewStamps}

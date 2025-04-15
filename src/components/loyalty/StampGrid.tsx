@@ -43,6 +43,7 @@ const StampGrid: React.FC<StampGridProps> = ({
         const stampIndex = i * stampsPerRow + j;
         if (stampIndex < maxStamps) {
           const isLastStamp = stampIndex === maxStamps - 1;
+          // Find if this stamp has a mini reward
           const miniReward = miniRewards.find(r => r.stampNumber === stampIndex + 1);
           const isMiniRewardStamp = !!miniReward;
           
@@ -50,6 +51,7 @@ const StampGrid: React.FC<StampGridProps> = ({
           if (isLastStamp) {
             CurrentIcon = RewardIcon;
           } else if (isMiniRewardStamp) {
+            // Use the specific icon for this mini reward
             CurrentIcon = STAMP_ICONS[miniReward.icon as keyof typeof STAMP_ICONS] || StampIcon;
           } else {
             CurrentIcon = StampIcon;

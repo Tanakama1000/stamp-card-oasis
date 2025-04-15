@@ -23,7 +23,11 @@ const ProgressRewards: React.FC<ProgressRewardsProps> = ({
   textColor,
   isMobile
 }) => {
-  if (rewards.length === 0) return null;
+  // If no rewards, don't render anything
+  if (!rewards || rewards.length === 0) return null;
+  
+  // Sort rewards by stamp number for consistent display
+  const sortedRewards = [...rewards].sort((a, b) => a.stampNumber - b.stampNumber);
   
   return (
     <div className="mb-4 md:mb-5 p-2 md:p-3 bg-cream bg-opacity-80 rounded-lg relative z-10 shadow-sm">
@@ -37,14 +41,14 @@ const ProgressRewards: React.FC<ProgressRewardsProps> = ({
         Progress Rewards:
       </h4>
       <div className="flex flex-wrap gap-1 md:gap-2">
-        {rewards.map((reward, index) => {
+        {sortedRewards.map((reward, index) => {
           const RewardIcon = STAMP_ICONS[reward.icon as keyof typeof STAMP_ICONS] || Gift;
           const isCollected = stamps >= reward.stampNumber;
           const iconSize = isMobile ? 12 : 14;
           
           return (
             <Badge 
-              key={index}
+              key={`${reward.stampNumber}-${reward.icon}-${index}`}
               className={`px-2 md:px-3 py-1 md:py-1.5 flex items-center gap-1 md:gap-1.5 transition-all duration-300 ${
                 isCollected 
                   ? 'bg-orange hover:bg-orange-dark text-white' 
