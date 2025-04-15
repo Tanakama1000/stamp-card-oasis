@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +19,7 @@ export const useBusinessData = (businessSlug: string | undefined, userId: string
   const [joined, setJoined] = useState<boolean>(false);
   const [customer, setCustomer] = useState<any>(null);
   const [stamps, setStamps] = useState<number>(0);
+  const { toast } = useToast();
 
   const fetchLoyaltyCardConfig = async (businessId: string) => {
     try {
@@ -73,6 +75,7 @@ export const useBusinessData = (businessSlug: string | undefined, userId: string
       }
 
       try {
+        // First try to get business from Supabase
         const { data: businesses, error } = await supabase
           .from("businesses")
           .select("*")
@@ -80,24 +83,27 @@ export const useBusinessData = (businessSlug: string | undefined, userId: string
           .single();
         
         if (error) {
-          console.error("Error fetching business:", error);
+          console.log("Error fetching business from Supabase:", error);
+          
+          // Check localStorage for businesses
           const savedBusinesses = localStorage.getItem('businesses');
           let foundBusiness = null;
           
           if (savedBusinesses) {
             try {
-              const businesses = JSON.parse(savedBusinesses);
-              foundBusiness = businesses.find((b: any) => b.slug === businessSlug);
+              const parsedBusinesses = JSON.parse(savedBusinesses);
+              foundBusiness = Array.isArray(parsedBusinesses) ? 
+                parsedBusinesses.find((b: any) => b.slug === businessSlug) : null;
+              
+              console.log("Checking localStorage for business:", businessSlug, foundBusiness);
             } catch (e) {
-              console.error("Error parsing businesses:", e);
+              console.error("Error parsing businesses from localStorage:", e);
             }
           }
           
-          if (foundBusiness) {
-            setBusinessName(foundBusiness.name);
-            setBusinessData(foundBusiness);
-            await fetchLoyaltyCardConfig(foundBusiness.id);
-          } else if (businessSlug === "coffee-oasis") {
+          // Use demo business for testing purposes
+          if (!foundBusiness && businessSlug === "coffee-oasis") {
+            console.log("Using demo business: Coffee Oasis");
             setBusinessName("Coffee Oasis");
             const defaultBusinessData = {
               name: "Coffee Oasis",
@@ -106,9 +112,49 @@ export const useBusinessData = (businessSlug: string | undefined, userId: string
             };
             setBusinessData(defaultBusinessData);
             await fetchLoyaltyCardConfig(defaultBusinessData.id);
-          } else {
-            setError("Business not found");
+            setLoading(false);
+            return;
+          } else if (foundBusiness) {
+            console.log("Found business in localStorage:", foundBusiness);
+            setBusinessName(foundBusiness.name);
+            setBusinessData(foundBusiness);
+            await fetchLoyaltyCardConfig(foundBusiness.id);
+            setLoading(false);
+            
+            // Also check for customer data in localStorage
+            if (userId) {
+              const savedCustomers = localStorage.getItem('customers');
+              if (savedCustomers) {
+                try {
+                  const customers = JSON.parse(savedCustomers);
+                  const customerData = customers.find((c: any) => 
+                    c.id === userId && c.businessSlug === businessSlug
+                  );
+                  
+                  if (customerData) {
+                    setJoined(true);
+                    setCustomer({
+                      id: userId,
+                      name: customerData.name,
+                      stamps: customerData.stamps || 0
+                    });
+                    setStamps(customerData.stamps || 0);
+                  }
+                } catch (e) {
+                  console.error("Error parsing customers from localStorage:", e);
+                }
+              }
+            }
+            
+            return;
           }
+          
+          setError("Business not found");
+          toast({
+            title: "Business Not Found",
+            description: "The business you're looking for couldn't be found.",
+            variant: "destructive"
+          });
         } else if (businesses) {
           setBusinessName(businesses.name);
           setBusinessData(businesses);
@@ -134,18 +180,28 @@ export const useBusinessData = (businessSlug: string | undefined, userId: string
           }
         } else {
           setError("Business not found");
+          toast({
+            title: "Business Not Found",
+            description: "The business you're looking for couldn't be found.",
+            variant: "destructive"
+          });
         }
         
         setLoading(false);
       } catch (e) {
         console.error("Error in fetchBusinessData:", e);
         setError("Failed to load business data");
+        toast({
+          title: "Error",
+          description: "Failed to load business data. Please try again.",
+          variant: "destructive"
+        });
         setLoading(false);
       }
     };
     
     fetchBusinessData();
-  }, [businessSlug, userId]);
+  }, [businessSlug, userId, toast]);
 
   return {
     businessName,
