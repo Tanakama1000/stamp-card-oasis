@@ -5,10 +5,15 @@ import { useAuth } from "@/contexts/AuthContext";
 interface ProtectedRouteProps {
   children: React.ReactNode;
   redirectTo?: string;
+  requiresAdmin?: boolean;
 }
 
-const ProtectedRoute = ({ children, redirectTo = "/auth" }: ProtectedRouteProps) => {
-  const { user, loading } = useAuth();
+const ProtectedRoute = ({ 
+  children, 
+  redirectTo = "/auth",
+  requiresAdmin = false
+}: ProtectedRouteProps) => {
+  const { user, loading, userType } = useAuth();
 
   if (loading) {
     // You could render a loading spinner here
@@ -21,6 +26,10 @@ const ProtectedRoute = ({ children, redirectTo = "/auth" }: ProtectedRouteProps)
 
   if (!user) {
     return <Navigate to={redirectTo} replace />;
+  }
+  
+  if (requiresAdmin && userType !== 'business') {
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

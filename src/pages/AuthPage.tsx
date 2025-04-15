@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Coffee, User, LockKeyhole } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
+import { useAuth } from "@/contexts/AuthContext";
 
 type AuthMode = "signin" | "signup";
 
@@ -20,6 +21,18 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user, userType } = useAuth();
+  
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user) {
+      if (userType === 'business') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
+    }
+  }, [user, userType, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +51,7 @@ const AuthPage = () => {
         description: "You have successfully signed in.",
       });
       
-      navigate("/admin");
+      // Navigation will happen in the useEffect hook based on userType
     } catch (error: any) {
       toast({
         title: "Sign in failed",
