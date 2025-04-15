@@ -163,68 +163,105 @@ export const useLoyaltyActions = ({
     }
     
     const loyaltyCardConfig = businessData?.loyaltyCardConfig;
-    const currentStamps = Math.min((stamps || 0) + stampCount, loyaltyCardConfig?.maxStamps || 10);
-    setStamps(currentStamps);
+    // Get current stamps from the customer via database or state
+    let currentStamps = 0;
     
-    setCustomer((prev: any) => ({
-      ...prev,
-      stamps: currentStamps
-    }));
-    
-    toast({
-      title: "Stamp Collected!",
-      description: `You've collected ${stampCount} stamp${stampCount > 1 ? 's' : ''}.`,
-    });
-    
-    // Update both Supabase (for authenticated users) and localStorage
-    if (businessData?.id && userId) {
-      // Update localStorage first (for all users)
-      try {
-        const savedCustomers = localStorage.getItem('customers') || '[]';
-        let customers = JSON.parse(savedCustomers);
-        
-        const customerIndex = customers.findIndex((c: any) => 
-          c.id === userId && c.businessSlug === businessData.slug
-        );
-        
-        if (customerIndex >= 0) {
-          customers[customerIndex].stamps = currentStamps;
-          localStorage.setItem('customers', JSON.stringify(customers));
-        }
-      } catch (e) {
-        console.error("Error updating localStorage:", e);
-      }
-      
-      // Update Supabase only for authenticated non-anon users
-      if (!userId.startsWith('anon_')) {
-        const { data: existingMember, error: checkError } = await supabase
+    try {
+      // First get the current stamps state
+      if (!userId.startsWith('anon_') && businessData?.id) {
+        const { data: existingMember } = await supabase
           .from('business_members')
-          .select('*')
+          .select('stamps')
           .eq('business_id', businessData.id)
           .eq('user_id', userId)
           .maybeSingle();
           
-        if (checkError) {
-          console.error("Error checking membership:", checkError);
-        }
-        
         if (existingMember) {
-          // Update existing membership
-          await supabase
-            .from('business_members')
-            .update({ stamps: currentStamps })
-            .eq('id', existingMember.id);
-        } else {
-          // Create membership if it doesn't exist
-          await supabase
-            .from('business_members')
-            .insert({
-              business_id: businessData.id,
-              user_id: userId,
-              stamps: currentStamps
-            });
+          currentStamps = existingMember.stamps || 0;
+        }
+      } else {
+        // For anonymous users, try to get stamps from localStorage
+        const savedCustomers = localStorage.getItem('customers') || '[]';
+        let customers = JSON.parse(savedCustomers);
+        const customerRecord = customers.find((c: any) => 
+          c.id === userId && c.businessSlug === businessData.slug
+        );
+        if (customerRecord) {
+          currentStamps = customerRecord.stamps || 0;
         }
       }
+      
+      // Now calculate new stamp count and update state
+      const newStampCount = Math.min((currentStamps + stampCount), loyaltyCardConfig?.maxStamps || 10);
+      setStamps(newStampCount);
+      
+      setCustomer((prev: any) => ({
+        ...prev,
+        stamps: newStampCount
+      }));
+      
+      toast({
+        title: "Stamp Collected!",
+        description: `You've collected ${stampCount} stamp${stampCount > 1 ? 's' : ''}.`,
+      });
+      
+      // Update both Supabase (for authenticated users) and localStorage
+      if (businessData?.id && userId) {
+        // Update localStorage first (for all users)
+        try {
+          const savedCustomers = localStorage.getItem('customers') || '[]';
+          let customers = JSON.parse(savedCustomers);
+          
+          const customerIndex = customers.findIndex((c: any) => 
+            c.id === userId && c.businessSlug === businessData.slug
+          );
+          
+          if (customerIndex >= 0) {
+            customers[customerIndex].stamps = newStampCount;
+            localStorage.setItem('customers', JSON.stringify(customers));
+          }
+        } catch (e) {
+          console.error("Error updating localStorage:", e);
+        }
+        
+        // Update Supabase only for authenticated non-anon users
+        if (!userId.startsWith('anon_')) {
+          const { data: existingMember, error: checkError } = await supabase
+            .from('business_members')
+            .select('*')
+            .eq('business_id', businessData.id)
+            .eq('user_id', userId)
+            .maybeSingle();
+            
+          if (checkError) {
+            console.error("Error checking membership:", checkError);
+          }
+          
+          if (existingMember) {
+            // Update existing membership
+            await supabase
+              .from('business_members')
+              .update({ stamps: newStampCount })
+              .eq('id', existingMember.id);
+          } else {
+            // Create membership if it doesn't exist
+            await supabase
+              .from('business_members')
+              .insert({
+                business_id: businessData.id,
+                user_id: userId,
+                stamps: newStampCount
+              });
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error in handleSuccessfulScan:", error);
+      toast({
+        title: "Error",
+        description: "Failed to collect stamp. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
