@@ -1,6 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Coffee } from "lucide-react";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -24,7 +25,9 @@ const Layout: React.FC<LayoutProps> = ({
         </div>
       </header>
       <main className="container mx-auto py-8 px-4 bg-slate-50">
-        {children}
+        <TooltipProvider>
+          {children}
+        </TooltipProvider>
       </main>
       <footer className="bg-coffee-dark text-white p-4 mt-auto">
         <div className="container mx-auto text-center text-sm">
@@ -33,4 +36,5 @@ const Layout: React.FC<LayoutProps> = ({
       </footer>
     </div>;
 };
+
 export default Layout;
