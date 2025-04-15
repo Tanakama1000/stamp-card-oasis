@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Camera, QrCode } from "lucide-react";
+import { Camera } from "lucide-react";
 import QRScanner from "@/components/QRScanner";
 
 interface QRScannerDialogProps {
@@ -41,7 +41,11 @@ const QRScannerDialog = ({ isOpen, onClose, onSuccessfulScan }: QRScannerDialogP
           {!showScanner ? (
             <div className="text-center">
               <div className="w-48 h-48 mx-auto bg-cream-light rounded-lg flex items-center justify-center mb-6">
-                <QrCode className="h-24 w-24 text-coffee-dark opacity-60" />
+                <img 
+                  src="/lovable-uploads/7520843f-cdff-4e16-9a69-f1da892db604.png" 
+                  alt="InStamp Logo" 
+                  className="h-24 w-24"
+                />
               </div>
               <p className="text-coffee-medium mb-6">
                 Scan a business QR code to collect a stamp
