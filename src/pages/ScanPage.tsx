@@ -17,6 +17,18 @@ const ScanPage = () => {
   const handleSuccessfulScan = async (businessId: string, timestamp: number, stamps: number = 1) => {
     try {
       setError(null);
+      
+      // Validate business ID
+      if (!businessId || businessId.trim() === '') {
+        setError("Invalid business QR code. Missing business identifier.");
+        toast({
+          title: "Scan Error",
+          description: "Invalid QR code format. Please try again with a valid business QR code.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Success toast notification
       toast({
         title: "QR Code Scanned Successfully!",

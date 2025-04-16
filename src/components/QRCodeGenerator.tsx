@@ -2,21 +2,29 @@
 import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { QrCode, Download } from "lucide-react";
+import { QrCode, Download, AlertTriangle } from "lucide-react";
 import QRCode from "react-qr-code";
 import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface QRCodeGeneratorProps {
   onGenerate?: (codeData: string) => void;
-  businessId?: string;
+  businessId: string;  // Changed from optional to required
 }
 
-const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessId = "cafe-loyalty-app-123" }) => {
+const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessId }) => {
   const { toast } = useToast();
   const [qrValue, setQrValue] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
   const qrCodeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Validate businessId
+    if (!businessId || businessId.trim() === "") {
+      setError("Business ID is required to generate a QR code");
+      return;
+    }
+
     // Generate a unique, persistent QR code for the business
     const generateQRCode = () => {
       const qrData = {
@@ -29,6 +37,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
       try {
         const qrValue = JSON.stringify(qrData);
         setQrValue(qrValue);
+        setError(null);
         
         console.log("Business QR code generated:", qrData);
 
@@ -37,6 +46,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
         }
       } catch (error) {
         console.error("Error generating QR code:", error);
+        setError("Could not generate QR code. Please try again.");
         toast({
           title: "QR Code Error",
           description: "Could not generate QR code. Please try again.",
@@ -50,6 +60,16 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
   }, [businessId, onGenerate, toast]); // Added toast to dependencies
   
   const downloadQRCode = () => {
+    // Check if there's an error
+    if (error) {
+      toast({
+        title: "Cannot Download QR Code",
+        description: "Please fix the errors before downloading.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Check if the div containing the SVG is available
     if (!qrCodeRef.current) {
       toast({
@@ -111,7 +131,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
         // Create download link
         const downloadLink = document.createElement("a");
         downloadLink.href = pngUrl;
-        downloadLink.download = `business-qrcode-static.png`;
+        downloadLink.download = `business-qrcode-${businessId}.png`;
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
@@ -142,19 +162,29 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
         Business QR Code
       </h3>
 
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       <div className="flex flex-col items-center mt-6 space-y-4">
-        <div className="p-4 bg-white rounded-lg" ref={qrCodeRef}>
-          <QRCode 
-            id="qr-code" 
-            value={qrValue} 
-            size={200} 
-          />
-        </div>
+        {!error && (
+          <div className="p-4 bg-white rounded-lg" ref={qrCodeRef}>
+            <QRCode 
+              id="qr-code" 
+              value={qrValue} 
+              size={200} 
+            />
+          </div>
+        )}
         
         <Button
           onClick={downloadQRCode}
           variant="outline"
           className="w-full flex items-center justify-center gap-2"
+          disabled={!!error}
         >
           <Download size={18} />
           Download QR Code

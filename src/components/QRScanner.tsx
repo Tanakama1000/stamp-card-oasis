@@ -71,6 +71,27 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
     }
   };
 
+  const validateBusinessExists = async (businessId: string): Promise<boolean> => {
+    try {
+      // Check if the business exists in the database
+      const { data, error } = await supabase
+        .from('businesses')
+        .select('id')
+        .eq('id', businessId)
+        .single();
+      
+      if (error) {
+        console.error("Error validating business:", error);
+        return false;
+      }
+      
+      return !!data;
+    } catch (error) {
+      console.error("Error in business validation:", error);
+      return false;
+    }
+  };
+
   const onQRCodeSuccess = async (decodedText: string) => {
     if (processingQr) return; // Prevent multiple simultaneous processing
     
@@ -90,13 +111,21 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
         return;
       }
 
-      // Validate the QR content
+      // Validate the QR content structure
       if (!qrData.businessId || !qrData.type || qrData.type !== "business_stamp") {
         handleInvalidQR("Invalid QR code: This is not a valid business stamp QR code.");
         return;
       }
 
       const businessId = qrData.businessId;
+      
+      // Validate that the business exists
+      const businessExists = await validateBusinessExists(businessId);
+      if (!businessExists) {
+        handleInvalidQR("Business not found. This QR code refers to a business that doesn't exist.");
+        return;
+      }
+      
       const defaultStamps = 1;
 
       // Get the current user session to identify the customer
