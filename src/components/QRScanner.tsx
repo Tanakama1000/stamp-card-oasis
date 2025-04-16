@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { Card } from "@/components/ui/card";
@@ -5,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Camera, CameraOff, CheckCircle2, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface QRScannerProps {
   onSuccessfulScan: (businessId: string, timestamp: number, stamps?: number) => void;
@@ -15,6 +17,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
   const [scanning, setScanning] = useState<boolean>(false);
   const [scanResult, setScanResult] = useState<{ success: boolean; message: string } | null>(null);
   const [html5QrCode, setHtml5QrCode] = useState<Html5Qrcode | null>(null);
+  const [processingQr, setProcessingQr] = useState<boolean>(false);
 
   useEffect(() => {
     // Initialize scanner
@@ -68,7 +71,10 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
     }
   };
 
-  const onQRCodeSuccess = (decodedText: string) => {
+  const onQRCodeSuccess = async (decodedText: string) => {
+    if (processingQr) return; // Prevent multiple simultaneous processing
+    
+    setProcessingQr(true);
     try {
       // Stop scanning after successful scan
       stopScanner();
@@ -83,41 +89,104 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
         return;
       }
 
-      if (!qrData.timestamp) {
-        handleInvalidQR("Invalid QR code: missing timestamp");
-        return;
+      // No need to validate timestamp as we're using a persistent QR code now
+      const businessId = qrData.businessId;
+      const defaultStamps = 1;
+
+      // Get the current user session to identify the customer
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData?.session?.user?.id;
+      
+      // If user is authenticated, update their stamps in the database
+      if (userId) {
+        try {
+          // First check if the user is already a member of this business
+          const { data: existingMembership, error: fetchError } = await supabase
+            .from('business_members')
+            .select('id, stamps')
+            .eq('business_id', businessId)
+            .eq('user_id', userId)
+            .single();
+          
+          if (fetchError && fetchError.code !== 'PGRST116') {
+            console.error("Error fetching membership:", fetchError);
+            throw new Error("Could not check membership status");
+          }
+
+          let newStampCount = defaultStamps;
+          let memberId;
+          
+          if (existingMembership) {
+            // Update existing membership with a new stamp
+            const updatedStamps = (existingMembership.stamps || 0) + defaultStamps;
+            const { error: updateError } = await supabase
+              .from('business_members')
+              .update({ stamps: updatedStamps })
+              .eq('id', existingMembership.id);
+            
+            if (updateError) {
+              console.error("Error updating stamps:", updateError);
+              throw new Error("Could not update stamps");
+            }
+
+            newStampCount = updatedStamps;
+            memberId = existingMembership.id;
+          } else {
+            // Create new membership for this business with initial stamp
+            const { data: newMembership, error: insertError } = await supabase
+              .from('business_members')
+              .insert({
+                business_id: businessId,
+                user_id: userId,
+                stamps: defaultStamps,
+                is_anonymous: false,
+              })
+              .select('id')
+              .single();
+            
+            if (insertError) {
+              console.error("Error creating membership:", insertError);
+              throw new Error("Could not create membership");
+            }
+
+            memberId = newMembership.id;
+          }
+          
+          // Success! Call the callback with data
+          onSuccessfulScan(
+            businessId, 
+            new Date().getTime(),  // Current timestamp for the scan event
+            defaultStamps
+          );
+          
+          setScanResult({
+            success: true,
+            message: `Successfully scanned! ${defaultStamps} stamp(s) added to your loyalty card.`,
+          });
+
+          toast({
+            title: "Stamp Collected!",
+            description: `${defaultStamps} stamp(s) have been added to your loyalty card.`,
+          });
+        } catch (error) {
+          console.error("Database error:", error);
+          handleInvalidQR("Server error. Please try again.");
+        }
+      } else {
+        // For anonymous users without authentication
+        // Just call the callback for local UI updates
+        onSuccessfulScan(businessId, new Date().getTime(), defaultStamps);
+        
+        setScanResult({
+          success: true,
+          message: `Successfully scanned! ${defaultStamps} stamp(s) added to your loyalty card.`,
+        });
       }
-
-      // Validate timestamp (within 15 minutes instead of 5)
-      const currentTime = new Date().getTime();
-      const qrTimestamp = qrData.timestamp;
-      const timeDifference = Math.abs(currentTime - qrTimestamp);
-      const fifteenMinutesInMs = 15 * 60 * 1000;
-
-      if (timeDifference > fifteenMinutesInMs) {
-        handleInvalidQR("QR code has expired. Please ask for a new one.");
-        return;
-      }
-
-      // Success! Call the callback with data
-      onSuccessfulScan(
-        qrData.businessId, 
-        qrData.timestamp, 
-        qrData.stamps || 1
-      );
-
-      setScanResult({
-        success: true,
-        message: `Successfully scanned! ${qrData.stamps || 1} stamp(s) added to your card.`,
-      });
-
-      toast({
-        title: "Stamp Collected!",
-        description: `${qrData.stamps || 1} stamp(s) have been added to your loyalty card.`,
-      });
     } catch (err) {
       console.error("Error processing QR data:", err);
       handleInvalidQR("Could not process QR code data. Please try again.");
+    } finally {
+      setProcessingQr(false);
     }
   };
 
@@ -131,6 +200,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
       description: message,
       variant: "destructive",
     });
+    setProcessingQr(false);
   };
 
   const onQRCodeError = (err: any) => {

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,28 +7,28 @@ import { useToast } from "@/hooks/use-toast";
 
 interface QRCodeGeneratorProps {
   onGenerate?: (codeData: string) => void;
+  businessId?: string;
 }
 
-const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
+const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessId = "cafe-loyalty-app-123" }) => {
   const { toast } = useToast();
   const [qrValue, setQrValue] = useState<string>("");
   const qrCodeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Generate QR code with current timestamp
+    // Generate a unique, persistent QR code for the business
     const generateQRCode = () => {
-      const currentTimestamp = new Date().getTime();
       const qrData = {
-        customer: "Business QR",
-        stamps: 1,
-        businessId: "cafe-loyalty-app-123",
-        timestamp: currentTimestamp,
+        type: "business_stamp",
+        businessId: businessId,
+        // Add a unique identifier for the business, but not a changing timestamp
+        uniqueId: `business-${businessId}`
       };
 
       const qrValue = JSON.stringify(qrData);
       setQrValue(qrValue);
       
-      console.log("QR code generated:", qrData);
+      console.log("Business QR code generated:", qrData);
 
       if (onGenerate) {
         onGenerate(qrValue);
@@ -37,12 +36,8 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
     };
 
     generateQRCode();
-
-    // Set up a timer to refresh the QR code every minute to avoid expiration
-    const refreshInterval = setInterval(generateQRCode, 60000);
-    
-    return () => clearInterval(refreshInterval);
-  }, []); // Only run once on initial mount
+    // No interval needed since the QR code doesn't change over time
+  }, [businessId, onGenerate]); // Only regenerate if the businessId changes
   
   const downloadQRCode = () => {
     // Check if the div containing the SVG is available

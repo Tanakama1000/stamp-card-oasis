@@ -6,13 +6,14 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const ScanPage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [scanning, setScanning] = useState<boolean>(true);
 
-  const handleSuccessfulScan = (businessId: string, timestamp: number, stamps: number = 1) => {
+  const handleSuccessfulScan = async (businessId: string, timestamp: number, stamps: number = 1) => {
     // Success toast notification
     toast({
       title: "QR Code Scanned Successfully!",
@@ -20,7 +21,42 @@ const ScanPage = () => {
       variant: "default",
     });
 
-    // Navigate back or to the appropriate page
+    // Get the current session to check if user is authenticated
+    const { data: sessionData } = await supabase.auth.getSession();
+    
+    if (sessionData?.session?.user?.id) {
+      // User is authenticated, database update was handled in QRScanner component
+      console.log("Authenticated user scanned business QR:", businessId);
+    } else {
+      // For anonymous users, store in localStorage
+      try {
+        const savedMemberships = localStorage.getItem('memberships') || '[]';
+        const memberships = JSON.parse(savedMemberships);
+        
+        // Find if user already has membership with this business
+        const existingIndex = memberships.findIndex((m: any) => m.businessId === businessId);
+        
+        if (existingIndex >= 0) {
+          // Update existing membership
+          memberships[existingIndex].stamps = (memberships[existingIndex].stamps || 0) + stamps;
+        } else {
+          // Create new membership
+          memberships.push({
+            id: `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            businessId: businessId,
+            customerName: "Anonymous Customer",
+            joinedAt: new Date().toISOString(),
+            stamps: stamps
+          });
+        }
+        
+        localStorage.setItem('memberships', JSON.stringify(memberships));
+      } catch (e) {
+        console.error("Error updating localStorage:", e);
+      }
+    }
+
+    // Navigate back or to the appropriate page after a short delay
     setTimeout(() => {
       navigate(-1);
     }, 2000);
