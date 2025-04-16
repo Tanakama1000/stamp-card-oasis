@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,19 +26,28 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
         uniqueId: `business-${businessId}`
       };
 
-      const qrValue = JSON.stringify(qrData);
-      setQrValue(qrValue);
-      
-      console.log("Business QR code generated:", qrData);
+      try {
+        const qrValue = JSON.stringify(qrData);
+        setQrValue(qrValue);
+        
+        console.log("Business QR code generated:", qrData);
 
-      if (onGenerate) {
-        onGenerate(qrValue);
+        if (onGenerate) {
+          onGenerate(qrValue);
+        }
+      } catch (error) {
+        console.error("Error generating QR code:", error);
+        toast({
+          title: "QR Code Error",
+          description: "Could not generate QR code. Please try again.",
+          variant: "destructive",
+        });
       }
     };
 
     generateQRCode();
     // No interval needed since the QR code doesn't change over time
-  }, [businessId, onGenerate]); // Only regenerate if the businessId changes
+  }, [businessId, onGenerate, toast]); // Added toast to dependencies
   
   const downloadQRCode = () => {
     // Check if the div containing the SVG is available

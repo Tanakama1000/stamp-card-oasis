@@ -80,21 +80,34 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
       stopScanner();
 
       // Parse the QR data
-      const qrData = JSON.parse(decodedText);
-      console.log("QR data decoded:", qrData);
-
-      // Validate the QR content
-      if (!qrData.businessId) {
-        handleInvalidQR("Invalid QR code: missing business ID");
+      let qrData;
+      try {
+        qrData = JSON.parse(decodedText);
+        console.log("QR data decoded:", qrData);
+      } catch (error) {
+        console.error("Invalid QR format:", error);
+        handleInvalidQR("Invalid QR code format. Please scan a valid business QR code.");
         return;
       }
 
-      // No need to validate timestamp as we're using a persistent QR code now
+      // Validate the QR content
+      if (!qrData.businessId || !qrData.type || qrData.type !== "business_stamp") {
+        handleInvalidQR("Invalid QR code: This is not a valid business stamp QR code.");
+        return;
+      }
+
       const businessId = qrData.businessId;
       const defaultStamps = 1;
 
       // Get the current user session to identify the customer
-      const { data: sessionData } = await supabase.auth.getSession();
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error("Session error:", sessionError);
+        handleInvalidQR("Authentication error. Please try logging in again.");
+        return;
+      }
+      
       const userId = sessionData?.session?.user?.id;
       
       // If user is authenticated, update their stamps in the database
@@ -106,9 +119,9 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
             .select('id, stamps')
             .eq('business_id', businessId)
             .eq('user_id', userId)
-            .single();
+            .maybeSingle();
           
-          if (fetchError && fetchError.code !== 'PGRST116') {
+          if (fetchError) {
             console.error("Error fetching membership:", fetchError);
             throw new Error("Could not check membership status");
           }
@@ -149,7 +162,11 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
               throw new Error("Could not create membership");
             }
 
-            memberId = newMembership.id;
+            if (newMembership) {
+              memberId = newMembership.id;
+            } else {
+              throw new Error("Failed to create membership - no data returned");
+            }
           }
           
           // Success! Call the callback with data
