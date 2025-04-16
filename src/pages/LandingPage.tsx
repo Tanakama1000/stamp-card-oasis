@@ -1,5 +1,7 @@
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
 import { Image, Star, Gift, PieChart, ShieldCheck, Smartphone, Users, ChevronRight, Clock, Award, Mail, Phone } from "lucide-react";
 
