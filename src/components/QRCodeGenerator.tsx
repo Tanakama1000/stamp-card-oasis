@@ -16,20 +16,32 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate }) => {
   const qrCodeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Generate a static QR code with fixed data
-    const staticQRData = {
-      customer: "Business QR",
-      stamps: 1,
-      businessId: "cafe-loyalty-app-123",
-      timestamp: 1680000000000, // Fixed timestamp (April 2023)
+    // Generate QR code with current timestamp
+    const generateQRCode = () => {
+      const currentTimestamp = new Date().getTime();
+      const qrData = {
+        customer: "Business QR",
+        stamps: 1,
+        businessId: "cafe-loyalty-app-123",
+        timestamp: currentTimestamp,
+      };
+
+      const qrValue = JSON.stringify(qrData);
+      setQrValue(qrValue);
+      
+      console.log("QR code generated:", qrData);
+
+      if (onGenerate) {
+        onGenerate(qrValue);
+      }
     };
 
-    const qrValue = JSON.stringify(staticQRData);
-    setQrValue(qrValue);
+    generateQRCode();
 
-    if (onGenerate) {
-      onGenerate(qrValue);
-    }
+    // Set up a timer to refresh the QR code every minute to avoid expiration
+    const refreshInterval = setInterval(generateQRCode, 60000);
+    
+    return () => clearInterval(refreshInterval);
   }, []); // Only run once on initial mount
   
   const downloadQRCode = () => {

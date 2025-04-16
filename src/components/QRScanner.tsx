@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { Card } from "@/components/ui/card";
@@ -89,13 +88,13 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
         return;
       }
 
-      // Validate timestamp (within 5 minutes)
+      // Validate timestamp (within 15 minutes instead of 5)
       const currentTime = new Date().getTime();
       const qrTimestamp = qrData.timestamp;
       const timeDifference = Math.abs(currentTime - qrTimestamp);
-      const fiveMinutesInMs = 5 * 60 * 1000;
+      const fifteenMinutesInMs = 15 * 60 * 1000;
 
-      if (timeDifference > fiveMinutesInMs) {
+      if (timeDifference > fifteenMinutesInMs) {
         handleInvalidQR("QR code has expired. Please ask for a new one.");
         return;
       }
