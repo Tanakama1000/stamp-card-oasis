@@ -2,6 +2,7 @@
 import React from "react";
 import { Trophy, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 interface RewardCardProps {
   showReward: boolean;
@@ -10,6 +11,7 @@ interface RewardCardProps {
   descriptionFont?: string;
   descriptionFontSize?: string;
   onReset?: () => void;
+  businessId?: string;
 }
 
 const RewardCard: React.FC<RewardCardProps> = ({
@@ -18,11 +20,35 @@ const RewardCard: React.FC<RewardCardProps> = ({
   stampActiveColor,
   descriptionFont,
   descriptionFontSize,
-  onReset
+  onReset,
+  businessId
 }) => {
   if (!showReward) return null;
   
-  const handleStartNewCard = () => {
+  const handleStartNewCard = async () => {
+    // If there is a business ID, record the reward redemption
+    if (businessId) {
+      try {
+        // Get current user
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user?.id) {
+          // Record the redemption in the database
+          await supabase
+            .from('business_members')
+            .update({ 
+              stamps: 0,  // Reset stamps
+              redeemed_rewards: supabase.rpc('increment_redeemed_rewards', { user_id_param: session.user.id, business_id_param: businessId })
+            })
+            .eq('business_id', businessId)
+            .eq('user_id', session.user.id);
+        }
+      } catch (error) {
+        console.error("Failed to record reward redemption:", error);
+      }
+    }
+    
+    // Call the reset function provided by the parent
     if (onReset) {
       onReset();
     }
@@ -47,7 +73,7 @@ const RewardCard: React.FC<RewardCardProps> = ({
           fontFamily: descriptionFont !== "default" ? descriptionFont : 'inherit'
         }}
       >
-        Show this to a staff member to claim.
+        Show this to a staff member to claim reward, before you start a new card.
       </p>
       <div className="flex justify-center mt-2">
         <Trophy size={32} className="text-yellow-300 animate-pulse" />

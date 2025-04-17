@@ -46,7 +46,7 @@ const CardDialogs: React.FC<CardDialogsProps> = ({
             <DialogTitle className="text-center text-2xl">Card Completed! 🎉</DialogTitle>
             <DialogDescription className="text-center">
               Congratulations! You've collected all {maxStamps} stamps and earned a reward.
-              Let's start your next loyalty card.
+              Show this to a staff member to claim reward, before you start a new card.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-center my-6">

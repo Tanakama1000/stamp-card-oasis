@@ -72,29 +72,26 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
         
         if (customerError) throw customerError;
         
-        // Get total stamps
-        const { data: stampsData, error: stampsError } = await supabase
+        // Get total stamps and redeemed rewards
+        const { data: membersData, error: membersError } = await supabase
           .from('business_members')
-          .select('stamps')
+          .select('stamps, redeemed_rewards')
           .eq('business_id', businessId);
         
-        if (stampsError) throw stampsError;
+        if (membersError) throw membersError;
         
-        // Calculate total stamps
-        const totalStamps = stampsData.reduce((sum, member) => sum + (member.stamps || 0), 0);
-        
-        // Calculate estimated rewards redeemed (assume every 10 stamps is 1 reward)
-        const maxStampsBeforeReward = 10;
-        const estimatedRewardsRedeemed = Math.floor(totalStamps / maxStampsBeforeReward);
+        // Calculate total stamps and redeemed rewards
+        const totalStamps = membersData.reduce((sum, member) => sum + (member.stamps || 0), 0);
+        const totalRedeemedRewards = membersData.reduce((sum, member) => sum + (member.redeemed_rewards || 0), 0);
         
         // Calculate conversion rate (customers with at least 1 stamp / total customers)
-        const activeCustomers = stampsData.filter(member => (member.stamps || 0) > 0).length;
+        const activeCustomers = membersData.filter(member => (member.stamps || 0) > 0 || (member.redeemed_rewards || 0) > 0).length;
         const totalCustomers = customerCount || 0;
         const conversionRate = totalCustomers ? Math.round((activeCustomers / totalCustomers) * 100) + "%" : "0%";
         
         setStats({
           customerCount: customerCount || 0,
-          rewardsRedeemed: estimatedRewardsRedeemed,
+          rewardsRedeemed: totalRedeemedRewards,
           totalStamps,
           conversionRate,
         });
@@ -122,7 +119,7 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
         title="Rewards Redeemed"
         value={stats.rewardsRedeemed}
         icon={<Award size={20} />}
-        change={isLoading ? "" : "Estimated from stamps"}
+        change={isLoading ? "" : "Actual redemption count"}
         trend="neutral"
         isLoading={isLoading}
       />
@@ -138,7 +135,7 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
         title="Conversion Rate"
         value={stats.conversionRate}
         icon={<TrendingUp size={20} />}
-        change={isLoading ? "" : "Customers with stamps"}
+        change={isLoading ? "" : "Active customers"}
         trend="neutral"
         isLoading={isLoading}
       />

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Gift, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const { toast } = useToast();
@@ -18,6 +19,7 @@ const Index = () => {
   const maxStamps = cardStyle?.maxStamps || 10;
   const [totalEarned, setTotalEarned] = useState<number>(0);
   const [redeemed, setRedeemed] = useState<number>(0);
+  const [businessId, setBusinessId] = useState<string>("");
 
   useEffect(() => {
     const savedCardStyle = localStorage.getItem('loyaltyCardConfig');
@@ -25,6 +27,9 @@ const Index = () => {
       try {
         const parsedStyle = JSON.parse(savedCardStyle);
         setCardStyle(parsedStyle);
+        if (parsedStyle.businessId) {
+          setBusinessId(parsedStyle.businessId);
+        }
       } catch (error) {
         console.error("Error parsing card style from localStorage", error);
       }
@@ -46,15 +51,16 @@ const Index = () => {
   };
   
   const handleCardReset = () => {
-    setStamps(0);
     // When resetting, add to redeemed count if maxStamps were collected
     if (stamps >= maxStamps) {
       setRedeemed(prev => prev + 1);
     }
     
+    setStamps(0);
+    
     toast({
       title: "New Card Started",
-      description: "Your loyalty card has been reset. Start collecting stamps!",
+      description: "Your loyalty card has been reset. Your reward has been recorded!",
       duration: 3000,
     });
   };
@@ -152,6 +158,7 @@ const Index = () => {
             cardStyle={cardStyle || undefined}
             onStampCollected={handleStampCollected}
             onReset={handleCardReset}
+            businessId={businessId}
           />
         </div>
         

@@ -25,6 +25,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   cardStyle,
   onReset,
   isMobile: propIsMobile,
+  businessId,
 }) => {
   const { toast } = useToast();
   const { width, height } = useWindowSize();
@@ -206,6 +207,7 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
           descriptionFont={descriptionFont}
           descriptionFontSize={descriptionFontSize}
           onReset={handleNewCard}
+          businessId={businessId}
         />
       </Card>
       
