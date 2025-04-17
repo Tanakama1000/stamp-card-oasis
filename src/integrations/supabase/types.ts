@@ -16,6 +16,7 @@ export type Database = {
           id: string
           is_anonymous: boolean | null
           joined_at: string
+          redeemed_rewards: number | null
           stamps: number | null
           user_id: string | null
         }
@@ -25,6 +26,7 @@ export type Database = {
           id?: string
           is_anonymous?: boolean | null
           joined_at?: string
+          redeemed_rewards?: number | null
           stamps?: number | null
           user_id?: string | null
         }
@@ -34,6 +36,7 @@ export type Database = {
           id?: string
           is_anonymous?: boolean | null
           joined_at?: string
+          redeemed_rewards?: number | null
           stamps?: number | null
           user_id?: string | null
         }
@@ -141,6 +144,10 @@ export type Database = {
       generate_unique_slug: {
         Args: { business_name: string }
         Returns: string
+      }
+      increment_redeemed_rewards: {
+        Args: { user_id_param: string; business_id_param: string }
+        Returns: number
       }
     }
     Enums: {

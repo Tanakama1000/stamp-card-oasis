@@ -33,15 +33,21 @@ const RewardCard: React.FC<RewardCardProps> = ({
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session?.user?.id) {
-          // Record the redemption in the database
-          await supabase
-            .from('business_members')
-            .update({ 
-              stamps: 0,  // Reset stamps
-              redeemed_rewards: supabase.rpc('increment_redeemed_rewards', { user_id_param: session.user.id, business_id_param: businessId })
-            })
-            .eq('business_id', businessId)
-            .eq('user_id', session.user.id);
+          // Record the redemption in the database using RPC
+          await supabase.rpc('increment_redeemed_rewards', {
+            user_id_param: session.user.id,
+            business_id_param: businessId
+          }).then(({ data }) => {
+            // Update stamps to 0 and set redeemed_rewards to the value returned by the function
+            return supabase
+              .from('business_members')
+              .update({ 
+                stamps: 0,
+                redeemed_rewards: data
+              })
+              .eq('business_id', businessId)
+              .eq('user_id', session.user.id);
+          });
         }
       } catch (error) {
         console.error("Failed to record reward redemption:", error);

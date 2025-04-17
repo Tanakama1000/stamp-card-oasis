@@ -80,21 +80,23 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
         
         if (membersError) throw membersError;
         
-        // Calculate total stamps and redeemed rewards
-        const totalStamps = membersData.reduce((sum, member) => sum + (member.stamps || 0), 0);
-        const totalRedeemedRewards = membersData.reduce((sum, member) => sum + (member.redeemed_rewards || 0), 0);
-        
-        // Calculate conversion rate (customers with at least 1 stamp / total customers)
-        const activeCustomers = membersData.filter(member => (member.stamps || 0) > 0 || (member.redeemed_rewards || 0) > 0).length;
-        const totalCustomers = customerCount || 0;
-        const conversionRate = totalCustomers ? Math.round((activeCustomers / totalCustomers) * 100) + "%" : "0%";
-        
-        setStats({
-          customerCount: customerCount || 0,
-          rewardsRedeemed: totalRedeemedRewards,
-          totalStamps,
-          conversionRate,
-        });
+        if (membersData) {
+          // Calculate total stamps and redeemed rewards
+          const totalStamps = membersData.reduce((sum, member) => sum + (member.stamps || 0), 0);
+          const totalRedeemedRewards = membersData.reduce((sum, member) => sum + (member.redeemed_rewards || 0), 0);
+          
+          // Calculate conversion rate (customers with at least 1 stamp / total customers)
+          const activeCustomers = membersData.filter(member => (member.stamps || 0) > 0 || (member.redeemed_rewards || 0) > 0).length;
+          const totalCustomers = customerCount || 0;
+          const conversionRate = totalCustomers ? Math.round((activeCustomers / totalCustomers) * 100) + "%" : "0%";
+          
+          setStats({
+            customerCount: customerCount || 0,
+            rewardsRedeemed: totalRedeemedRewards,
+            totalStamps,
+            conversionRate,
+          });
+        }
       } catch (error) {
         console.error("Error fetching business stats:", error);
       } finally {

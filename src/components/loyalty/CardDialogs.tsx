@@ -91,7 +91,7 @@ const CardDialogs: React.FC<CardDialogsProps> = ({
                     fontFamily: descriptionFont !== "default" ? descriptionFont : 'inherit'
                   }}
                 >
-                  Show this to a staff member to claim your reward.
+                  Show this to a staff member to claim reward, before you start a new card.
                   Keep collecting stamps to earn more rewards!
                 </p>
               </>
