@@ -82,7 +82,7 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
         
         if (membersData) {
           // Calculate total stamps and redeemed rewards
-          const totalStamps = membersData.reduce((sum, member) => {
+          const currentStamps = membersData.reduce((sum, member) => {
             // Check if stamps is defined before adding
             const memberStamps = member.stamps !== null && member.stamps !== undefined ? member.stamps : 0;
             return sum + memberStamps;
@@ -107,7 +107,7 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
           setStats({
             customerCount: customerCount || 0,
             rewardsRedeemed: totalRedeemedRewards,
-            totalStamps,
+            totalStamps: currentStamps,
             conversionRate,
           });
         }
@@ -143,7 +143,7 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
         title="Total Stamps"
         value={stats.totalStamps}
         icon={<Coffee size={20} />}
-        change={isLoading ? "" : "Total collected"}
+        change={isLoading ? "" : "Current stamps collected"}
         trend="neutral"
         isLoading={isLoading}
       />

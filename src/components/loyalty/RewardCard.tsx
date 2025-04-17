@@ -53,6 +53,8 @@ const RewardCard: React.FC<RewardCardProps> = ({
               .eq('business_id', businessId)
               .eq('user_id', session.user.id);
           });
+          
+          console.log("Card reset successfully");
         }
       } catch (error) {
         console.error("Failed to record reward redemption:", error);
