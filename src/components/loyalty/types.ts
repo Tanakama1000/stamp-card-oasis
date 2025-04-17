@@ -16,7 +16,7 @@ export interface LoyaltyCardProps {
   cardStyle?: LoyaltyCardConfig;
   onReset?: () => void;
   isMobile?: boolean;
-  businessId?: string;
+  businessId?: string; // Adding the businessId property
 }
 
 export const STAMP_ICONS = {

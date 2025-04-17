@@ -82,11 +82,25 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
         
         if (membersData) {
           // Calculate total stamps and redeemed rewards
-          const totalStamps = membersData.reduce((sum, member) => sum + (member.stamps || 0), 0);
-          const totalRedeemedRewards = membersData.reduce((sum, member) => sum + (member.redeemed_rewards || 0), 0);
+          const totalStamps = membersData.reduce((sum, member) => {
+            // Check if stamps is defined before adding
+            const memberStamps = member.stamps !== null && member.stamps !== undefined ? member.stamps : 0;
+            return sum + memberStamps;
+          }, 0);
+          
+          const totalRedeemedRewards = membersData.reduce((sum, member) => {
+            // Check if redeemed_rewards is defined before adding
+            const memberRewards = member.redeemed_rewards !== null && member.redeemed_rewards !== undefined ? member.redeemed_rewards : 0;
+            return sum + memberRewards;
+          }, 0);
           
           // Calculate conversion rate (customers with at least 1 stamp / total customers)
-          const activeCustomers = membersData.filter(member => (member.stamps || 0) > 0 || (member.redeemed_rewards || 0) > 0).length;
+          const activeCustomers = membersData.filter(member => {
+            const hasStamps = member.stamps !== null && member.stamps !== undefined && member.stamps > 0;
+            const hasRewards = member.redeemed_rewards !== null && member.redeemed_rewards !== undefined && member.redeemed_rewards > 0;
+            return hasStamps || hasRewards;
+          }).length;
+          
           const totalCustomers = customerCount || 0;
           const conversionRate = totalCustomers ? Math.round((activeCustomers / totalCustomers) * 100) + "%" : "0%";
           

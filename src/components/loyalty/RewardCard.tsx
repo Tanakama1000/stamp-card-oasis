@@ -37,7 +37,12 @@ const RewardCard: React.FC<RewardCardProps> = ({
           await supabase.rpc('increment_redeemed_rewards', {
             user_id_param: session.user.id,
             business_id_param: businessId
-          }).then(({ data }) => {
+          }).then(({ data, error }) => {
+            if (error) {
+              console.error("Error incrementing rewards:", error);
+              return;
+            }
+            
             // Update stamps to 0 and set redeemed_rewards to the value returned by the function
             return supabase
               .from('business_members')
