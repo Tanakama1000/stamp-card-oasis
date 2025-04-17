@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -56,6 +55,7 @@ const Index = () => {
       setRedeemed(prev => prev + 1);
     }
     
+    // Reset stamps to 0
     setStamps(0);
     
     toast({

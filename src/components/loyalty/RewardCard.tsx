@@ -3,6 +3,7 @@ import React from "react";
 import { Trophy, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface RewardCardProps {
   showReward: boolean;
@@ -23,6 +24,8 @@ const RewardCard: React.FC<RewardCardProps> = ({
   onReset,
   businessId
 }) => {
+  const { toast } = useToast();
+  
   if (!showReward) return null;
   
   const handleStartNewCard = async () => {
@@ -54,10 +57,22 @@ const RewardCard: React.FC<RewardCardProps> = ({
               .eq('user_id', session.user.id);
           });
           
+          toast({
+            title: "New Card Started!",
+            description: "Your loyalty card has been reset and your reward recorded.",
+            duration: 3000,
+          });
+          
           console.log("Card reset successfully");
         }
       } catch (error) {
         console.error("Failed to record reward redemption:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to reset your card. Please try again.",
+          duration: 3000,
+        });
       }
     }
     

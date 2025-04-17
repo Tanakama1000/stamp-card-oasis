@@ -1,4 +1,3 @@
-
 import { Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy, Sparkles, Cake, Pizza, IceCream, Flower, Diamond, Bell, Medal, ThumbsUp } from "lucide-react";
 import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 
@@ -16,7 +15,7 @@ export interface LoyaltyCardProps {
   cardStyle?: LoyaltyCardConfig;
   onReset?: () => void;
   isMobile?: boolean;
-  businessId?: string; // Adding the businessId property
+  businessId?: string;
 }
 
 export const STAMP_ICONS = {
