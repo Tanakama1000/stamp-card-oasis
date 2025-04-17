@@ -49,7 +49,7 @@ const RewardsCard: React.FC<RewardsCardProps> = ({
             Total rewards earned: <span className="font-medium">{totalEarned}</span>
           </p>
           <p className="text-sm text-gray-500">
-            Rewards redeemed: <span className="font-medium">{redeemed}</span>
+            Total Stamps: <span className="font-medium">{redeemed}</span>
           </p>
         </div>
       </div>
