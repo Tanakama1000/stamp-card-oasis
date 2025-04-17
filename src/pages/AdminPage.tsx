@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -466,7 +465,10 @@ const AdminPage = () => {
             </TabsList>
             <TabsContent value="qr-generator">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <QRCodeGenerator onGenerate={handleQRGenerated} />
+                <QRCodeGenerator 
+                  onGenerate={handleQRGenerated} 
+                  businessId={businessData.id} 
+                />
               </div>
             </TabsContent>
             <TabsContent value="card-editor">
