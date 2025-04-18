@@ -38,7 +38,7 @@ const RewardCard: React.FC<RewardCardProps> = ({
   const handleStartNewCard = async () => {
     console.log("Start New Card button clicked, businessId:", businessId);
     
-    // Validate businessId exists
+    // Validate businessId exists and isn't empty
     if (!businessId || businessId.trim() === "") {
       console.error("No business ID provided or empty string");
       toast({
@@ -67,6 +67,24 @@ const RewardCard: React.FC<RewardCardProps> = ({
 
       console.log("Processing card reset for user:", session.user.id, "and business:", businessId);
 
+      // First, update stamps to 0 (we'll update redeemed_rewards after the RPC call)
+      const { error: updateStampsError } = await supabase
+        .from('business_members')
+        .update({ stamps: 0 })
+        .eq('business_id', businessId)
+        .eq('user_id', session.user.id);
+
+      if (updateStampsError) {
+        console.error("Error resetting stamps:", updateStampsError);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to reset your card. Please try again.",
+          duration: 3000,
+        });
+        return;
+      }
+
       // Record the redemption in the database using RPC
       const { data, error: rpcError } = await supabase.rpc('increment_redeemed_rewards', {
         user_id_param: session.user.id,
@@ -86,22 +104,19 @@ const RewardCard: React.FC<RewardCardProps> = ({
 
       console.log("Increment rewards RPC successful, new count:", data);
 
-      // Update stamps to 0 and set redeemed_rewards to the value returned by the function
-      const { error: updateError } = await supabase
+      // Update redeemed_rewards to the value returned by the function
+      const { error: updateRewardsError } = await supabase
         .from('business_members')
-        .update({ 
-          stamps: 0,
-          redeemed_rewards: data
-        })
+        .update({ redeemed_rewards: data })
         .eq('business_id', businessId)
         .eq('user_id', session.user.id);
 
-      if (updateError) {
-        console.error("Error updating business member:", updateError);
+      if (updateRewardsError) {
+        console.error("Error updating redeemed rewards:", updateRewardsError);
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Failed to reset your card. Please try again.",
+          title: "Error", 
+          description: "Failed to update rewards count. Please try again.",
           duration: 3000,
         });
         return;

@@ -35,12 +35,18 @@ const Index = () => {
           console.log("Business ID set from localStorage:", parsedStyle.businessId);
         } else {
           console.warn("No businessId found in card configuration");
+          // Fallback business ID for testing - remove in production
+          setBusinessId("3967978c-7313-4039-9d80-8b24af9c89fa");
+          console.log("Using fallback businessId for testing");
         }
       } catch (error) {
         console.error("Error parsing card style from localStorage", error);
       }
     } else {
       console.warn("No card configuration found in localStorage");
+      // Fallback business ID for testing - remove in production
+      setBusinessId("3967978c-7313-4039-9d80-8b24af9c89fa");
+      console.log("Using fallback businessId for testing since no localStorage data");
     }
     
     // Calculate total earned rewards based on stamps
