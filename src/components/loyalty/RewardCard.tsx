@@ -29,8 +29,16 @@ const RewardCard: React.FC<RewardCardProps> = ({
   if (!showReward) return null;
   
   const handleStartNewCard = async () => {
+    console.log("Start New Card button clicked, businessId:", businessId);
+    
     if (!businessId) {
       console.error("No business ID provided");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not identify business for this card.",
+        duration: 3000,
+      });
       return;
     }
 
@@ -40,8 +48,16 @@ const RewardCard: React.FC<RewardCardProps> = ({
       
       if (!session?.user?.id) {
         console.error("No user session found");
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "You need to be logged in to reset your card.",
+          duration: 3000,
+        });
         return;
       }
+
+      console.log("Processing card reset for user:", session.user.id, "and business:", businessId);
 
       // Record the redemption in the database using RPC
       const { data, error: rpcError } = await supabase.rpc('increment_redeemed_rewards', {
@@ -51,8 +67,16 @@ const RewardCard: React.FC<RewardCardProps> = ({
 
       if (rpcError) {
         console.error("Error incrementing rewards:", rpcError);
-        throw rpcError;
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to record your reward. Please try again.",
+          duration: 3000,
+        });
+        return;
       }
+
+      console.log("Increment rewards RPC successful, new count:", data);
 
       // Update stamps to 0 and set redeemed_rewards to the value returned by the function
       const { error: updateError } = await supabase
@@ -66,9 +90,17 @@ const RewardCard: React.FC<RewardCardProps> = ({
 
       if (updateError) {
         console.error("Error updating business member:", updateError);
-        throw updateError;
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to reset your card. Please try again.",
+          duration: 3000,
+        });
+        return;
       }
 
+      console.log("Card reset successful in database");
+      
       // Show success toast
       toast({
         title: "New Card Started!",
@@ -76,11 +108,12 @@ const RewardCard: React.FC<RewardCardProps> = ({
         duration: 3000,
       });
       
-      console.log("Card reset successful");
-      
       // Call the reset function provided by the parent AFTER successful database update
       if (onReset) {
+        console.log("Calling onReset callback");
         onReset();
+      } else {
+        console.warn("No onReset callback provided");
       }
     } catch (error) {
       console.error("Failed to record reward redemption:", error);

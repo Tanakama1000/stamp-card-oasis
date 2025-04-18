@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -28,6 +29,7 @@ const Index = () => {
         setCardStyle(parsedStyle);
         if (parsedStyle.businessId) {
           setBusinessId(parsedStyle.businessId);
+          console.log("Business ID set from localStorage:", parsedStyle.businessId);
         }
       } catch (error) {
         console.error("Error parsing card style from localStorage", error);
@@ -57,6 +59,8 @@ const Index = () => {
     
     // Reset stamps to 0
     setStamps(0);
+    
+    console.log("Card reset in Index.tsx");
   };
   
   const handleSaveName = () => {
