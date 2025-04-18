@@ -29,56 +29,67 @@ const RewardCard: React.FC<RewardCardProps> = ({
   if (!showReward) return null;
   
   const handleStartNewCard = async () => {
-    // If there is a business ID, record the reward redemption
-    if (businessId) {
-      try {
-        // Get current user
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session?.user?.id) {
-          // Record the redemption in the database using RPC
-          await supabase.rpc('increment_redeemed_rewards', {
-            user_id_param: session.user.id,
-            business_id_param: businessId
-          }).then(({ data, error }) => {
-            if (error) {
-              console.error("Error incrementing rewards:", error);
-              return;
-            }
-            
-            // Update stamps to 0 and set redeemed_rewards to the value returned by the function
-            return supabase
-              .from('business_members')
-              .update({ 
-                stamps: 0,
-                redeemed_rewards: data
-              })
-              .eq('business_id', businessId)
-              .eq('user_id', session.user.id);
-          });
-          
-          toast({
-            title: "New Card Started!",
-            description: "Your loyalty card has been reset and your reward recorded.",
-            duration: 3000,
-          });
-          
-          console.log("Card reset successfully");
-        }
-      } catch (error) {
-        console.error("Failed to record reward redemption:", error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to reset your card. Please try again.",
-          duration: 3000,
-        });
-      }
+    if (!businessId) {
+      console.error("No business ID provided");
+      return;
     }
-    
-    // Call the reset function provided by the parent
-    if (onReset) {
-      onReset();
+
+    try {
+      // Get current user session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.user?.id) {
+        console.error("No user session found");
+        return;
+      }
+
+      // Record the redemption in the database using RPC
+      const { data, error: rpcError } = await supabase.rpc('increment_redeemed_rewards', {
+        user_id_param: session.user.id,
+        business_id_param: businessId
+      });
+
+      if (rpcError) {
+        console.error("Error incrementing rewards:", rpcError);
+        throw rpcError;
+      }
+
+      // Update stamps to 0 and set redeemed_rewards to the value returned by the function
+      const { error: updateError } = await supabase
+        .from('business_members')
+        .update({ 
+          stamps: 0,
+          redeemed_rewards: data
+        })
+        .eq('business_id', businessId)
+        .eq('user_id', session.user.id);
+
+      if (updateError) {
+        console.error("Error updating business member:", updateError);
+        throw updateError;
+      }
+
+      // Show success toast
+      toast({
+        title: "New Card Started!",
+        description: "Your loyalty card has been reset and your reward recorded.",
+        duration: 3000,
+      });
+      
+      console.log("Card reset successful");
+      
+      // Call the reset function provided by the parent AFTER successful database update
+      if (onReset) {
+        onReset();
+      }
+    } catch (error) {
+      console.error("Failed to record reward redemption:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to reset your card. Please try again.",
+        duration: 3000,
+      });
     }
   };
   

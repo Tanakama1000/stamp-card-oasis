@@ -57,12 +57,6 @@ const Index = () => {
     
     // Reset stamps to 0
     setStamps(0);
-    
-    toast({
-      title: "New Card Started",
-      description: "Your loyalty card has been reset. Your reward has been recorded!",
-      duration: 3000,
-    });
   };
   
   const handleSaveName = () => {
