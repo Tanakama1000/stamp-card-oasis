@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -22,31 +21,17 @@ const Index = () => {
   const [businessId, setBusinessId] = useState<string>("");
 
   useEffect(() => {
-    // Get card configuration from localStorage
     const savedCardStyle = localStorage.getItem('loyaltyCardConfig');
     if (savedCardStyle) {
       try {
         const parsedStyle = JSON.parse(savedCardStyle);
         setCardStyle(parsedStyle);
-        
-        // Store businessId from card configuration
         if (parsedStyle.businessId) {
           setBusinessId(parsedStyle.businessId);
-          console.log("Business ID set from localStorage:", parsedStyle.businessId);
-        } else {
-          console.warn("No businessId found in card configuration");
-          // Fallback business ID for testing - remove in production
-          setBusinessId("3967978c-7313-4039-9d80-8b24af9c89fa");
-          console.log("Using fallback businessId for testing");
         }
       } catch (error) {
         console.error("Error parsing card style from localStorage", error);
       }
-    } else {
-      console.warn("No card configuration found in localStorage");
-      // Fallback business ID for testing - remove in production
-      setBusinessId("3967978c-7313-4039-9d80-8b24af9c89fa");
-      console.log("Using fallback businessId for testing since no localStorage data");
     }
     
     // Calculate total earned rewards based on stamps
@@ -72,14 +57,7 @@ const Index = () => {
     
     // Reset stamps to 0
     setStamps(0);
-    
-    console.log("Card reset in Index.tsx");
   };
-  
-  // For debugging
-  useEffect(() => {
-    console.log("Current business ID:", businessId);
-  }, [businessId]);
   
   const handleSaveName = () => {
     if (customerName.trim()) {

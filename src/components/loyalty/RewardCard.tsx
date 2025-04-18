@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Trophy, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,27 +26,11 @@ const RewardCard: React.FC<RewardCardProps> = ({
 }) => {
   const { toast } = useToast();
   
-  // Debug log to check business ID on mount and when it changes
-  useEffect(() => {
-    if (showReward) {
-      console.log("RewardCard mounted/updated with businessId:", businessId);
-    }
-  }, [businessId, showReward]);
-  
   if (!showReward) return null;
   
   const handleStartNewCard = async () => {
-    console.log("Start New Card button clicked, businessId:", businessId);
-    
-    // Validate businessId exists and isn't empty
-    if (!businessId || businessId.trim() === "") {
-      console.error("No business ID provided or empty string");
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not identify business for this card.",
-        duration: 3000,
-      });
+    if (!businessId) {
+      console.error("No business ID provided");
       return;
     }
 
@@ -56,32 +40,6 @@ const RewardCard: React.FC<RewardCardProps> = ({
       
       if (!session?.user?.id) {
         console.error("No user session found");
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "You need to be logged in to reset your card.",
-          duration: 3000,
-        });
-        return;
-      }
-
-      console.log("Processing card reset for user:", session.user.id, "and business:", businessId);
-
-      // First, update stamps to 0 (we'll update redeemed_rewards after the RPC call)
-      const { error: updateStampsError } = await supabase
-        .from('business_members')
-        .update({ stamps: 0 })
-        .eq('business_id', businessId)
-        .eq('user_id', session.user.id);
-
-      if (updateStampsError) {
-        console.error("Error resetting stamps:", updateStampsError);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to reset your card. Please try again.",
-          duration: 3000,
-        });
         return;
       }
 
@@ -93,37 +51,24 @@ const RewardCard: React.FC<RewardCardProps> = ({
 
       if (rpcError) {
         console.error("Error incrementing rewards:", rpcError);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to record your reward. Please try again.",
-          duration: 3000,
-        });
-        return;
+        throw rpcError;
       }
 
-      console.log("Increment rewards RPC successful, new count:", data);
-
-      // Update redeemed_rewards to the value returned by the function
-      const { error: updateRewardsError } = await supabase
+      // Update stamps to 0 and set redeemed_rewards to the value returned by the function
+      const { error: updateError } = await supabase
         .from('business_members')
-        .update({ redeemed_rewards: data })
+        .update({ 
+          stamps: 0,
+          redeemed_rewards: data
+        })
         .eq('business_id', businessId)
         .eq('user_id', session.user.id);
 
-      if (updateRewardsError) {
-        console.error("Error updating redeemed rewards:", updateRewardsError);
-        toast({
-          variant: "destructive",
-          title: "Error", 
-          description: "Failed to update rewards count. Please try again.",
-          duration: 3000,
-        });
-        return;
+      if (updateError) {
+        console.error("Error updating business member:", updateError);
+        throw updateError;
       }
 
-      console.log("Card reset successful in database");
-      
       // Show success toast
       toast({
         title: "New Card Started!",
@@ -131,12 +76,11 @@ const RewardCard: React.FC<RewardCardProps> = ({
         duration: 3000,
       });
       
+      console.log("Card reset successful");
+      
       // Call the reset function provided by the parent AFTER successful database update
       if (onReset) {
-        console.log("Calling onReset callback");
         onReset();
-      } else {
-        console.warn("No onReset callback provided");
       }
     } catch (error) {
       console.error("Failed to record reward redemption:", error);
