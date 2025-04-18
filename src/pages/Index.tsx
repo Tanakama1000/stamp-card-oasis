@@ -22,18 +22,25 @@ const Index = () => {
   const [businessId, setBusinessId] = useState<string>("");
 
   useEffect(() => {
+    // Get card configuration from localStorage
     const savedCardStyle = localStorage.getItem('loyaltyCardConfig');
     if (savedCardStyle) {
       try {
         const parsedStyle = JSON.parse(savedCardStyle);
         setCardStyle(parsedStyle);
+        
+        // Store businessId from card configuration
         if (parsedStyle.businessId) {
           setBusinessId(parsedStyle.businessId);
           console.log("Business ID set from localStorage:", parsedStyle.businessId);
+        } else {
+          console.warn("No businessId found in card configuration");
         }
       } catch (error) {
         console.error("Error parsing card style from localStorage", error);
       }
+    } else {
+      console.warn("No card configuration found in localStorage");
     }
     
     // Calculate total earned rewards based on stamps
@@ -62,6 +69,11 @@ const Index = () => {
     
     console.log("Card reset in Index.tsx");
   };
+  
+  // For debugging
+  useEffect(() => {
+    console.log("Current business ID:", businessId);
+  }, [businessId]);
   
   const handleSaveName = () => {
     if (customerName.trim()) {

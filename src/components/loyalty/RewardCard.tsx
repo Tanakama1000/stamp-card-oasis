@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Trophy, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,13 +26,21 @@ const RewardCard: React.FC<RewardCardProps> = ({
 }) => {
   const { toast } = useToast();
   
+  // Debug log to check business ID on mount and when it changes
+  useEffect(() => {
+    if (showReward) {
+      console.log("RewardCard mounted/updated with businessId:", businessId);
+    }
+  }, [businessId, showReward]);
+  
   if (!showReward) return null;
   
   const handleStartNewCard = async () => {
     console.log("Start New Card button clicked, businessId:", businessId);
     
-    if (!businessId) {
-      console.error("No business ID provided");
+    // Validate businessId exists
+    if (!businessId || businessId.trim() === "") {
+      console.error("No business ID provided or empty string");
       toast({
         variant: "destructive",
         title: "Error",
