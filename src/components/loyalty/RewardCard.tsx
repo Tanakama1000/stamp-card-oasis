@@ -67,25 +67,7 @@ const RewardCard: React.FC<RewardCardProps> = ({
 
       console.log("Processing card reset for user:", session.user.id, "and business:", businessId);
 
-      // First, update stamps to 0 (we'll update redeemed_rewards after the RPC call)
-      const { error: updateStampsError } = await supabase
-        .from('business_members')
-        .update({ stamps: 0 })
-        .eq('business_id', businessId)
-        .eq('user_id', session.user.id);
-
-      if (updateStampsError) {
-        console.error("Error resetting stamps:", updateStampsError);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to reset your card. Please try again.",
-          duration: 3000,
-        });
-        return;
-      }
-
-      // Record the redemption in the database using RPC
+      // First, increment the redeemed_rewards counter using the RPC function
       const { data, error: rpcError } = await supabase.rpc('increment_redeemed_rewards', {
         user_id_param: session.user.id,
         business_id_param: businessId
@@ -104,19 +86,22 @@ const RewardCard: React.FC<RewardCardProps> = ({
 
       console.log("Increment rewards RPC successful, new count:", data);
 
-      // Update redeemed_rewards to the value returned by the function
-      const { error: updateRewardsError } = await supabase
+      // Then reset stamps to 0 and update redeemed_rewards
+      const { error: updateError } = await supabase
         .from('business_members')
-        .update({ redeemed_rewards: data })
+        .update({ 
+          stamps: 0,
+          redeemed_rewards: data
+        })
         .eq('business_id', businessId)
         .eq('user_id', session.user.id);
 
-      if (updateRewardsError) {
-        console.error("Error updating redeemed rewards:", updateRewardsError);
+      if (updateError) {
+        console.error("Error updating business member:", updateError);
         toast({
           variant: "destructive",
           title: "Error", 
-          description: "Failed to update rewards count. Please try again.",
+          description: "Failed to reset your card. Please try again.",
           duration: 3000,
         });
         return;
