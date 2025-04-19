@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -17,7 +18,6 @@ const Index = () => {
   const [cardStyle, setCardStyle] = useState<LoyaltyCardConfig | null>(null);
   const maxStamps = cardStyle?.maxStamps || 10;
   const [totalEarned, setTotalEarned] = useState<number>(0);
-  const [redeemed, setRedeemed] = useState<number>(0);
   const [businessId, setBusinessId] = useState<string>("");
 
   useEffect(() => {
@@ -64,14 +64,8 @@ const Index = () => {
   };
   
   const handleCardReset = () => {
-    // When resetting, add to redeemed count if maxStamps were collected
-    if (stamps >= maxStamps) {
-      setRedeemed(prev => prev + 1);
-    }
-    
     // Reset stamps to 0
     setStamps(0);
-    
     console.log("Card reset in Index.tsx");
   };
   

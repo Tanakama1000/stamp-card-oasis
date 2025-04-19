@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { Trophy, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
