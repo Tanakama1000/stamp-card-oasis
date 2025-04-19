@@ -162,7 +162,7 @@ const Index = () => {
         <div className="mb-8">
           <LoyaltyCard
             customerName={customerName}
-            maxStamps={cardStyle?.maxStamps || maxStamps}
+            maxStamps={maxStamps}
             currentStamps={stamps}
             cardStyle={cardStyle || undefined}
             onStampCollected={handleStampCollected}
@@ -173,7 +173,7 @@ const Index = () => {
         
         <div className="mb-8">
           <RewardsCard 
-            rewardsCount={availableRewards}
+            rewardsCount={Math.floor(stamps / maxStamps)}
             totalEarned={totalEarned}
             totalStamps={stamps}
             textColor={cardStyle?.businessNameColor || "#0066CC"}
