@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
@@ -203,7 +202,6 @@ const JoinPage = () => {
     fetchBusinessData();
   }, [businessSlug, businessName, userId, customerName]);
 
-  // This function is now only used for manual joins (deprecated/less used path)
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -295,7 +293,6 @@ const JoinPage = () => {
     }
   };
 
-  // Updated to automatically join the loyalty program after signup
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthLoading(true);
@@ -328,7 +325,6 @@ const JoinPage = () => {
         if (data.user) {
           setUserId(data.user.id);
           
-          // Automatically join the loyalty program after successful signup
           if (businessData && businessData.id) {
             try {
               const memberData = {
@@ -385,7 +381,6 @@ const JoinPage = () => {
           setUserId(data.user.id);
           setIsAuthMode(false);
           
-          // Check if the user is already a member
           if (businessData && businessData.id) {
             const { data: membership, error: membershipError } = await supabase
               .from('business_members')
@@ -405,7 +400,6 @@ const JoinPage = () => {
               });
               setStamps(membership.stamps || 0);
             } else {
-              // Automatically join if not already joined
               try {
                 const memberData = {
                   business_id: businessData.id,
@@ -689,7 +683,7 @@ const JoinPage = () => {
               <RewardsCard 
                 rewardsCount={Math.floor(stamps / (loyaltyCardConfig?.maxStamps || 10))}
                 totalEarned={Math.floor(stamps / (loyaltyCardConfig?.maxStamps || 10))}
-                redeemed={0}
+                totalStamps={stamps}
                 textColor={loyaltyCardConfig?.businessNameColor || "#2563EB"}
                 accentColor={loyaltyCardConfig?.stampBgColor || "#E5F0FF"}
               />

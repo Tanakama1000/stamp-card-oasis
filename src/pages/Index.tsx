@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -182,7 +181,7 @@ const Index = () => {
           <RewardsCard 
             rewardsCount={availableRewards}
             totalEarned={totalEarned}
-            redeemed={redeemed}
+            totalStamps={stamps}
             textColor={cardStyle?.businessNameColor || "#0066CC"}
             accentColor={cardStyle?.stampBgColor || "#E5F0FF"}
           />
