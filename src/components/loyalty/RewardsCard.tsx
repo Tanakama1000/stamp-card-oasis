@@ -6,7 +6,7 @@ import { Trophy } from "lucide-react";
 interface RewardsCardProps {
   rewardsCount?: number;
   totalEarned?: number;
-  redeemed?: number;
+  totalStamps?: number;
   textColor?: string;
   accentColor?: string;
 }
@@ -14,7 +14,7 @@ interface RewardsCardProps {
 const RewardsCard: React.FC<RewardsCardProps> = ({
   rewardsCount = 0,
   totalEarned = 0,
-  redeemed = 0,
+  totalStamps = 0,
   textColor = "#8B1A1A",
   accentColor = "#FFE4E4"
 }) => {
@@ -49,7 +49,7 @@ const RewardsCard: React.FC<RewardsCardProps> = ({
             Total rewards earned: <span className="font-medium">{totalEarned}</span>
           </p>
           <p className="text-sm text-gray-500">
-            Redeemed rewards: <span className="font-medium">{redeemed}</span>
+            Total stamps collected: <span className="font-medium">{totalStamps}</span>
           </p>
         </div>
       </div>

@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { Trophy, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,7 +25,6 @@ const RewardCard: React.FC<RewardCardProps> = ({
 }) => {
   const { toast } = useToast();
   
-  // Debug log to check business ID on mount and when it changes
   useEffect(() => {
     if (showReward) {
       console.log("RewardCard mounted/updated with businessId:", businessId);
@@ -38,7 +36,6 @@ const RewardCard: React.FC<RewardCardProps> = ({
   const handleStartNewCard = async () => {
     console.log("Start New Card button clicked, businessId:", businessId);
     
-    // Validate businessId exists and isn't empty
     if (!businessId || businessId.trim() === "") {
       console.error("No business ID provided or empty string");
       toast({
@@ -51,7 +48,6 @@ const RewardCard: React.FC<RewardCardProps> = ({
     }
 
     try {
-      // Get current user session
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session?.user?.id) {
@@ -67,7 +63,6 @@ const RewardCard: React.FC<RewardCardProps> = ({
 
       console.log("Processing card reset for user:", session.user.id, "and business:", businessId);
 
-      // First, increment the redeemed_rewards counter using the RPC function
       const { data, error: rpcError } = await supabase.rpc('increment_redeemed_rewards', {
         user_id_param: session.user.id,
         business_id_param: businessId
@@ -86,7 +81,6 @@ const RewardCard: React.FC<RewardCardProps> = ({
 
       console.log("Increment rewards RPC successful, new count:", data);
 
-      // Then reset stamps to 0 and update redeemed_rewards
       const { error: updateError } = await supabase
         .from('business_members')
         .update({ 
@@ -109,14 +103,12 @@ const RewardCard: React.FC<RewardCardProps> = ({
 
       console.log("Card reset successful in database");
       
-      // Show success toast
       toast({
         title: "New Card Started!",
         description: "Your loyalty card has been reset and your reward recorded.",
         duration: 3000,
       });
       
-      // Call the reset function provided by the parent AFTER successful database update
       if (onReset) {
         console.log("Calling onReset callback");
         onReset();
@@ -153,22 +145,20 @@ const RewardCard: React.FC<RewardCardProps> = ({
           fontFamily: descriptionFont !== "default" ? descriptionFont : 'inherit'
         }}
       >
-        Show this to a staff member to claim reward, before you start a new card.
+        Show this to a staff member to claim your reward.
       </p>
       <div className="flex justify-center mt-2">
         <Trophy size={32} className="text-yellow-300 animate-pulse" />
       </div>
       
-      {onReset && (
-        <Button
-          onClick={handleStartNewCard}
-          className="mt-4 w-full bg-white hover:bg-gray-100 text-coffee-dark flex items-center justify-center gap-2"
-          aria-label="Start a new loyalty card"
-        >
-          <RefreshCw size={16} />
-          Start New Card
-        </Button>
-      )}
+      <Button
+        onClick={handleStartNewCard}
+        className="mt-4 w-full bg-white hover:bg-gray-100 text-coffee-dark flex items-center justify-center gap-2"
+        aria-label="Start a new loyalty card"
+      >
+        <RefreshCw size={16} />
+        Start New Card
+      </Button>
     </div>
   );
 };
