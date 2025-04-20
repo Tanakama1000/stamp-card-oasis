@@ -1,10 +1,9 @@
 
 import React, { useEffect } from "react";
-import { Trophy, RefreshCw, AlertTriangle } from "lucide-react";
+import { Trophy, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface RewardCardProps {
   showReward: boolean;
@@ -91,12 +90,14 @@ const RewardCard: React.FC<RewardCardProps> = ({
         }
       }
 
+      // Show success message
       toast({
         title: "Card Reset Successfully",
         description: "Your loyalty card has been reset and your reward has been recorded.",
         duration: 3000,
       });
 
+      // Call the onReset callback to update the UI immediately
       if (onReset) {
         onReset();
       }
