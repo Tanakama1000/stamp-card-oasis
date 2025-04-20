@@ -26,7 +26,6 @@ const RewardCard: React.FC<RewardCardProps> = ({
   businessId
 }) => {
   const { toast } = useToast();
-  const [error, setError] = React.useState<string | null>(null);
   const [processing, setProcessing] = React.useState(false);
   
   useEffect(() => {
@@ -39,19 +38,13 @@ const RewardCard: React.FC<RewardCardProps> = ({
 
   const handleManualReset = async () => {
     try {
-      setError(null);
       setProcessing(true);
-
-      if (!businessId || businessId.trim() === "") {
-        setError("Could not identify business for this card. Please try scanning again.");
-        return;
-      }
 
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
 
-      if (userId) {
-        // For authenticated users
+      if (userId && businessId) {
+        // For authenticated users with business ID
         const { data: membership, error: membershipError } = await supabase
           .from('business_members')
           .select('id, stamps, redeemed_rewards')
@@ -64,7 +57,6 @@ const RewardCard: React.FC<RewardCardProps> = ({
           throw new Error("Could not find your membership");
         }
 
-        // Increment redeemed rewards and reset stamps
         const { error: updateError } = await supabase
           .from('business_members')
           .update({ 
@@ -78,19 +70,20 @@ const RewardCard: React.FC<RewardCardProps> = ({
           throw new Error("Could not update your card");
         }
       } else {
-        // For anonymous users
+        // For anonymous users or no business ID
         try {
           const savedMemberships = localStorage.getItem('memberships') || '[]';
           const memberships = JSON.parse(savedMemberships);
-          const membershipIndex = memberships.findIndex((m: any) => m.businessId === businessId);
-
-          if (membershipIndex === -1) {
-            throw new Error("Could not find your membership");
+          
+          // If business ID exists, update specific membership
+          if (businessId) {
+            const membershipIndex = memberships.findIndex((m: any) => m.businessId === businessId);
+            if (membershipIndex !== -1) {
+              memberships[membershipIndex].stamps = 0;
+              memberships[membershipIndex].redeemedRewards = (memberships[membershipIndex].redeemedRewards || 0) + 1;
+            }
           }
-
-          // Update local storage
-          memberships[membershipIndex].stamps = 0;
-          memberships[membershipIndex].redeemedRewards = (memberships[membershipIndex].redeemedRewards || 0) + 1;
+          
           localStorage.setItem('memberships', JSON.stringify(memberships));
         } catch (e) {
           console.error("Error updating localStorage:", e);
@@ -109,7 +102,6 @@ const RewardCard: React.FC<RewardCardProps> = ({
       }
     } catch (error) {
       console.error("Reset error:", error);
-      setError(error instanceof Error ? error.message : "Failed to reset your card. Please try again.");
       toast({
         variant: "destructive",
         title: "Reset Failed",
@@ -145,13 +137,6 @@ const RewardCard: React.FC<RewardCardProps> = ({
       <div className="flex justify-center mt-2">
         <Trophy size={32} className="text-yellow-300 animate-pulse" />
       </div>
-
-      {error && (
-        <Alert variant="destructive" className="mt-4 mb-2 bg-red-50">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
       
       <div className="flex flex-col gap-2 mt-4">
         <Button
