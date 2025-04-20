@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { Trophy, RefreshCw, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -41,17 +40,12 @@ const RewardCard: React.FC<RewardCardProps> = ({
     try {
       setError(null);
       setProcessing(true);
-
-      if (!businessId || businessId.trim() === "") {
-        setError("Could not identify business for this card. Please try scanning again.");
-        return;
-      }
-
+      
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
 
-      if (userId) {
-        // For authenticated users
+      if (userId && businessId) {
+        // For authenticated users with business ID
         const { data: membership, error: membershipError } = await supabase
           .from('business_members')
           .select('id, stamps, redeemed_rewards')
@@ -61,41 +55,40 @@ const RewardCard: React.FC<RewardCardProps> = ({
 
         if (membershipError) {
           console.error("Error fetching membership:", membershipError);
-          throw new Error("Could not find your membership");
-        }
+          // Continue with local storage if DB fetch fails
+        } else {
+          // Update database if membership exists
+          const { error: updateError } = await supabase
+            .from('business_members')
+            .update({ 
+              stamps: 0,
+              redeemed_rewards: (membership.redeemed_rewards || 0) + 1
+            })
+            .eq('id', membership.id);
 
-        // Increment redeemed rewards and reset stamps
-        const { error: updateError } = await supabase
-          .from('business_members')
-          .update({ 
-            stamps: 0,
-            redeemed_rewards: (membership.redeemed_rewards || 0) + 1
-          })
-          .eq('id', membership.id);
-
-        if (updateError) {
-          console.error("Error updating membership:", updateError);
-          throw new Error("Could not update your card");
-        }
-      } else {
-        // For anonymous users
-        try {
-          const savedMemberships = localStorage.getItem('memberships') || '[]';
-          const memberships = JSON.parse(savedMemberships);
-          const membershipIndex = memberships.findIndex((m: any) => m.businessId === businessId);
-
-          if (membershipIndex === -1) {
-            throw new Error("Could not find your membership");
+          if (updateError) {
+            console.error("Error updating membership:", updateError);
+            // Continue with local storage if DB update fails
           }
-
-          // Update local storage
-          memberships[membershipIndex].stamps = 0;
-          memberships[membershipIndex].redeemedRewards = (memberships[membershipIndex].redeemedRewards || 0) + 1;
-          localStorage.setItem('memberships', JSON.stringify(memberships));
-        } catch (e) {
-          console.error("Error updating localStorage:", e);
-          throw new Error("Could not update your card locally");
         }
+      }
+      
+      // Always update local storage as fallback
+      try {
+        const savedMemberships = localStorage.getItem('memberships') || '[]';
+        const memberships = JSON.parse(savedMemberships);
+        
+        if (businessId) {
+          const membershipIndex = memberships.findIndex((m: any) => m.businessId === businessId);
+          if (membershipIndex !== -1) {
+            memberships[membershipIndex].stamps = 0;
+            memberships[membershipIndex].redeemedRewards = (memberships[membershipIndex].redeemedRewards || 0) + 1;
+          }
+        }
+        
+        localStorage.setItem('memberships', JSON.stringify(memberships));
+      } catch (e) {
+        console.error("Error updating localStorage:", e);
       }
 
       toast({
@@ -109,7 +102,6 @@ const RewardCard: React.FC<RewardCardProps> = ({
       }
     } catch (error) {
       console.error("Reset error:", error);
-      setError(error instanceof Error ? error.message : "Failed to reset your card. Please try again.");
       toast({
         variant: "destructive",
         title: "Reset Failed",
