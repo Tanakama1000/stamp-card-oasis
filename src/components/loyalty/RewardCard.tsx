@@ -1,10 +1,9 @@
 
 import React, { useEffect } from "react";
-import { Trophy, RefreshCw, AlertTriangle } from "lucide-react";
+import { Trophy, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface RewardCardProps {
   showReward: boolean;
@@ -26,101 +25,108 @@ const RewardCard: React.FC<RewardCardProps> = ({
   businessId
 }) => {
   const { toast } = useToast();
-  const [error, setError] = React.useState<string | null>(null);
-  const [processing, setProcessing] = React.useState(false);
   
   useEffect(() => {
     if (showReward) {
-      console.log("RewardCard mounted with businessId:", businessId);
+      console.log("RewardCard mounted/updated with businessId:", businessId);
     }
   }, [businessId, showReward]);
   
   if (!showReward) return null;
+  
+  const handleStartNewCard = async () => {
+    console.log("Start New Card button clicked, businessId:", businessId);
+    
+    if (!businessId || businessId.trim() === "") {
+      console.error("No business ID provided or empty string");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not identify business for this card.",
+        duration: 3000,
+      });
+      return;
+    }
 
-  const handleManualReset = async () => {
     try {
-      setError(null);
-      setProcessing(true);
-
-      if (!businessId || businessId.trim() === "") {
-        setError("Could not identify business for this card. Please try scanning again.");
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.user?.id) {
+        console.error("No user session found");
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "You need to be logged in to reset your card.",
+          duration: 3000,
+        });
         return;
       }
 
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user?.id;
+      console.log("Processing card reset for user:", session.user.id, "and business:", businessId);
 
-      if (userId) {
-        // For authenticated users
-        const { data: membership, error: membershipError } = await supabase
-          .from('business_members')
-          .select('id, stamps, redeemed_rewards')
-          .eq('business_id', businessId)
-          .eq('user_id', userId)
-          .single();
-
-        if (membershipError) {
-          console.error("Error fetching membership:", membershipError);
-          throw new Error("Could not find your membership");
-        }
-
-        // Increment redeemed rewards and reset stamps
-        const { error: updateError } = await supabase
-          .from('business_members')
-          .update({ 
-            stamps: 0,
-            redeemed_rewards: (membership.redeemed_rewards || 0) + 1
-          })
-          .eq('id', membership.id);
-
-        if (updateError) {
-          console.error("Error updating membership:", updateError);
-          throw new Error("Could not update your card");
-        }
-      } else {
-        // For anonymous users
-        try {
-          const savedMemberships = localStorage.getItem('memberships') || '[]';
-          const memberships = JSON.parse(savedMemberships);
-          const membershipIndex = memberships.findIndex((m: any) => m.businessId === businessId);
-
-          if (membershipIndex === -1) {
-            throw new Error("Could not find your membership");
-          }
-
-          // Update local storage
-          memberships[membershipIndex].stamps = 0;
-          memberships[membershipIndex].redeemedRewards = (memberships[membershipIndex].redeemedRewards || 0) + 1;
-          localStorage.setItem('memberships', JSON.stringify(memberships));
-        } catch (e) {
-          console.error("Error updating localStorage:", e);
-          throw new Error("Could not update your card locally");
-        }
-      }
-
-      toast({
-        title: "Card Reset Successfully",
-        description: "Your loyalty card has been reset and your reward has been recorded.",
-        duration: 3000,
+      const { data, error: rpcError } = await supabase.rpc('increment_redeemed_rewards', {
+        user_id_param: session.user.id,
+        business_id_param: businessId
       });
 
+      if (rpcError) {
+        console.error("Error incrementing rewards:", rpcError);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to record your reward. Please try again.",
+          duration: 3000,
+        });
+        return;
+      }
+
+      console.log("Increment rewards RPC successful, new count:", data);
+
+      const { error: updateError } = await supabase
+        .from('business_members')
+        .update({ 
+          stamps: 0,
+          redeemed_rewards: data
+        })
+        .eq('business_id', businessId)
+        .eq('user_id', session.user.id);
+
+      if (updateError) {
+        console.error("Error updating business member:", updateError);
+        toast({
+          variant: "destructive",
+          title: "Error", 
+          description: "Failed to reset your card. Please try again.",
+          duration: 3000,
+        });
+        return;
+      }
+
+      console.log("Card reset successful in database");
+      
+      toast({
+        title: "New Card Started!",
+        description: "Your loyalty card has been reset and your reward recorded.",
+        duration: 3000,
+      });
+      
       if (onReset) {
+        console.log("Calling onReset callback");
         onReset();
+      } else {
+        console.warn("No onReset callback provided");
       }
     } catch (error) {
-      console.error("Reset error:", error);
-      setError(error instanceof Error ? error.message : "Failed to reset your card. Please try again.");
+      console.error("Failed to record reward redemption:", error);
       toast({
         variant: "destructive",
-        title: "Reset Failed",
-        description: "Could not reset your card. Please try again.",
+        title: "Error",
+        description: "Failed to reset your card. Please try again.",
         duration: 3000,
       });
-    } finally {
-      setProcessing(false);
     }
   };
-
+  
   return (
     <div 
       className="mt-6 p-4 text-white text-center rounded-lg shadow-lg transform transition-transform"
@@ -145,25 +151,15 @@ const RewardCard: React.FC<RewardCardProps> = ({
       <div className="flex justify-center mt-2">
         <Trophy size={32} className="text-yellow-300 animate-pulse" />
       </div>
-
-      {error && (
-        <Alert variant="destructive" className="mt-4 mb-2 bg-red-50">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
       
-      <div className="flex flex-col gap-2 mt-4">
-        <Button
-          onClick={handleManualReset}
-          disabled={processing}
-          className="w-full bg-white hover:bg-gray-100 text-coffee-dark flex items-center justify-center gap-2"
-          aria-label="Reset card and record reward"
-        >
-          <RefreshCw size={16} className={processing ? "animate-spin" : ""} />
-          {processing ? "Processing..." : "Reset Card & Record Reward"}
-        </Button>
-      </div>
+      <Button
+        onClick={handleStartNewCard}
+        className="mt-4 w-full bg-white hover:bg-gray-100 text-coffee-dark flex items-center justify-center gap-2"
+        aria-label="Start a new loyalty card"
+      >
+        <RefreshCw size={16} />
+        Start New Card
+      </Button>
     </div>
   );
 };

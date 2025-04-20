@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -20,45 +21,37 @@ const Index = () => {
   const [businessId, setBusinessId] = useState<string>("");
 
   useEffect(() => {
+    // Get card configuration from localStorage
     const savedCardStyle = localStorage.getItem('loyaltyCardConfig');
     if (savedCardStyle) {
       try {
         const parsedStyle = JSON.parse(savedCardStyle);
         setCardStyle(parsedStyle);
         
+        // Store businessId from card configuration
         if (parsedStyle.businessId) {
           setBusinessId(parsedStyle.businessId);
           console.log("Business ID set from localStorage:", parsedStyle.businessId);
         } else {
           console.warn("No businessId found in card configuration");
-          const fallbackId = "3967978c-7313-4039-9d80-8b24af9c89fa";
-          setBusinessId(fallbackId);
-          const updatedStyle = { ...parsedStyle, businessId: fallbackId };
-          localStorage.setItem('loyaltyCardConfig', JSON.stringify(updatedStyle));
-          console.log("Using and storing fallback businessId");
+          // Fallback business ID for testing - remove in production
+          setBusinessId("3967978c-7313-4039-9d80-8b24af9c89fa");
+          console.log("Using fallback businessId for testing");
         }
       } catch (error) {
         console.error("Error parsing card style from localStorage", error);
-        handleFallbackBusinessId();
       }
     } else {
-      handleFallbackBusinessId();
+      console.warn("No card configuration found in localStorage");
+      // Fallback business ID for testing - remove in production
+      setBusinessId("3967978c-7313-4039-9d80-8b24af9c89fa");
+      console.log("Using fallback businessId for testing since no localStorage data");
     }
     
+    // Calculate total earned rewards based on stamps
     const earnedRewards = Math.floor(stamps / maxStamps);
     setTotalEarned(earnedRewards);
   }, [stamps, maxStamps]);
-
-  const handleFallbackBusinessId = () => {
-    const fallbackId = "3967978c-7313-4039-9d80-8b24af9c89fa";
-    setBusinessId(fallbackId);
-    const basicConfig = {
-      businessId: fallbackId,
-      maxStamps: 10,
-    };
-    localStorage.setItem('loyaltyCardConfig', JSON.stringify(basicConfig));
-    console.log("Created and stored basic config with fallback businessId");
-  };
 
   const handleStampCollected = () => {
     toast({
@@ -71,10 +64,12 @@ const Index = () => {
   };
   
   const handleCardReset = () => {
+    // Reset stamps to 0
     setStamps(0);
-    console.log("Card reset in Index.tsx with businessId:", businessId);
+    console.log("Card reset in Index.tsx");
   };
   
+  // For debugging
   useEffect(() => {
     console.log("Current business ID:", businessId);
   }, [businessId]);
