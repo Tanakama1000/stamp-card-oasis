@@ -5,7 +5,6 @@ import Confetti from 'react-confetti';
 import useWindowSize from "@/hooks/useWindowSize";
 import { LoyaltyCardConfig } from "./loyalty/types/LoyaltyCardConfig";
 
-// Import refactored components
 import StampGrid from "./loyalty/StampGrid";
 import ProgressBar from "./loyalty/ProgressBar";
 import ProgressRewards from "./loyalty/ProgressRewards";
@@ -40,9 +39,21 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   const [currentReward, setCurrentReward] = useState<{stampNumber: number, description: string, icon: string} | null>(null);
   const [stampsCollected, setStampsCollected] = useState<number[]>([]);
 
+  const handleNewCard = () => {
+    setStamps(0);
+    setShowConfetti(false);
+    setShowRewardDialog(false);
+    setPreviousStamps(0);
+    setCurrentReward(null);
+    setAnimatingStamp(null);
+    setStampsCollected([]);
+    if (onReset) {
+      onReset();
+    }
+  };
+
   useEffect(() => {
     setStamps(currentStamps);
-    
     setStampsCollected(Array.from({ length: currentStamps }, (_, i) => i));
     
     if (currentStamps > previousStamps && currentStamps < maxStamps) {
@@ -80,12 +91,6 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
 
   const handleStampClick = (index: number) => {
     return;
-  };
-  
-  const handleNewCard = () => {
-    if (onReset) {
-      onReset();
-    }
   };
   
   const cardBgColor = cardStyle?.cardBgColor || "#FFFFFF";
