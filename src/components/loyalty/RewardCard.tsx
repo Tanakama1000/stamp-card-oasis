@@ -1,8 +1,9 @@
 
 import React, { useEffect } from "react";
-import { Trophy, AlertTriangle } from "lucide-react";
+import { Trophy, AlertTriangle, RefreshCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 
 interface RewardCardProps {
   showReward: boolean;
@@ -34,6 +35,18 @@ const RewardCard: React.FC<RewardCardProps> = ({
   
   if (!showReward) return null;
 
+  // Reset handler: call parent's onReset
+  const handleReset = () => {
+    if (onReset) onReset();
+    // Optionally, show toast if you want to notify the user
+    toast({
+      title: "Card Reset",
+      description: "Your loyalty card has been reset.",
+      variant: "destructive",
+      duration: 2500,
+    });
+  };
+
   return (
     <div 
       className="mt-6 p-4 text-white text-center rounded-lg shadow-lg transform transition-transform"
@@ -55,7 +68,7 @@ const RewardCard: React.FC<RewardCardProps> = ({
       >
         Show this to a staff member to claim your reward.
       </p>
-      <div className="flex justify-center mt-2">
+      <div className="flex justify-center mt-2 mb-4">
         <Trophy size={32} className="text-yellow-300 animate-pulse" />
       </div>
 
@@ -65,8 +78,22 @@ const RewardCard: React.FC<RewardCardProps> = ({
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+
+      {/* Reset Button */}
+      <div className="flex justify-center">
+        <Button
+          variant="destructive"
+          className="rounded-full font-bold px-6 py-2 flex items-center gap-2 text-base"
+          onClick={handleReset}
+          aria-label="Reset card"
+        >
+          <RefreshCcw size={18} className="mr-1" />
+          Reset Card
+        </Button>
+      </div>
     </div>
   );
 };
 
 export default RewardCard;
+
