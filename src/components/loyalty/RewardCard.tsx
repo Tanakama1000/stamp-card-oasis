@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { Trophy, RefreshCw, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -97,6 +98,7 @@ const RewardCard: React.FC<RewardCardProps> = ({
         duration: 3000,
       });
 
+      // Make sure to call the onReset callback to update parent components
       if (onReset) {
         onReset();
       }

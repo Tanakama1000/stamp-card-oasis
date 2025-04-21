@@ -71,8 +71,8 @@ const Index = () => {
   };
   
   const handleCardReset = () => {
+    console.log("Card reset in Index.tsx");
     setStamps(0);
-    console.log("Card reset in Index.tsx with businessId:", businessId);
   };
   
   useEffect(() => {
