@@ -506,6 +506,56 @@ const JoinPage = () => {
   const toggleAuthMode = () => {
     setIsAuthMode(!isAuthMode);
   };
+  
+  const handleNewCard = async () => {
+    if (businessData?.id && memberId) {
+      try {
+        const { error } = await supabase
+          .from('business_members')
+          .update({ stamps: 0 })
+          .eq('id', memberId);
+          
+        if (error) {
+          console.error("Error resetting stamps:", error);
+          toast({
+            title: "Error",
+            description: "Could not reset your card. Please try again.",
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        setStamps(0);
+        
+        if (!userId) {
+          try {
+            const savedMemberships = localStorage.getItem('memberships') || '[]';
+            const memberships = JSON.parse(savedMemberships);
+            const membershipIndex = memberships.findIndex((m: any) => m.id === memberId);
+            
+            if (membershipIndex !== -1) {
+              memberships[membershipIndex].stamps = 0;
+              localStorage.setItem('memberships', JSON.stringify(memberships));
+            }
+          } catch (e) {
+            console.error("Error updating localStorage:", e);
+          }
+        }
+        
+        toast({
+          title: "Card Reset",
+          description: "Your loyalty card has been reset."
+        });
+      } catch (e) {
+        console.error("Error resetting card:", e);
+        toast({
+          title: "Error",
+          description: "Could not reset your card. Please try again.",
+          variant: "destructive"
+        });
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -675,7 +725,8 @@ const JoinPage = () => {
                 currentStamps={stamps}
                 cardStyle={loyaltyCardConfig}
                 onStampCollected={() => {}}
-                onReset={() => {}}
+                onReset={handleNewCard}
+                businessId={businessData.id}
               />
             </div>
             
