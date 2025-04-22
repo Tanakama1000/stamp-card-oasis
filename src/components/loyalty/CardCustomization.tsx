@@ -224,6 +224,14 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
     return text.trim().split(/\s+/).filter(word => word.length > 0).length;
   };
 
+  const handleCardReset = () => {
+    setPreviewStamps(0);
+    toast({
+      title: "Card Reset",
+      description: "Card has been reset to 0 stamps"
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-full">
@@ -803,6 +811,8 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
                 maxStamps={config.maxStamps}
                 currentStamps={previewStamps}
                 cardStyle={config}
+                onReset={handleCardReset}
+                businessId="preview"
               />
             </div>
           </div>
