@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { GeneralSettings } from "./customization/GeneralSettings";
 import { ColorSettings } from "./customization/ColorSettings";
 import { StampSettings } from "./customization/StampSettings";
+import { Slider } from "@/components/ui/slider";
 
 interface CardCustomizationProps {
   onSave: (config: LoyaltyCardConfig) => void;
