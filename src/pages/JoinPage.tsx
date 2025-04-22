@@ -10,6 +10,11 @@ import { supabase } from "@/integrations/supabase/client";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import QRScannerDialog from "@/components/QRScannerDialog";
 import RewardsCard from "@/components/loyalty/RewardsCard";
+import JoinForm from "@/components/join/JoinForm";
+import MemberCard from "@/components/join/MemberCard";
+import LoginForm from "@/components/join/LoginForm";
+import LoadingState from "@/components/join/LoadingState";
+import ErrorState from "@/components/join/ErrorState";
 
 const JoinPage = () => {
   const { businessSlug } = useParams();
@@ -223,7 +228,9 @@ const JoinPage = () => {
             business_id: businessData.id,
             stamps: 0,
             customer_name: customerName,
-            is_anonymous: !userId
+            is_anonymous: !userId,
+            total_stamps_collected: 0,
+            total_rewards_earned: 0
           };
           
           if (userId) {
@@ -258,7 +265,9 @@ const JoinPage = () => {
               businessSlug: businessSlug,
               customerName: customerName,
               joinedAt: new Date().toISOString(),
-              stamps: 0
+              stamps: 0,
+              totalStampsCollected: 0,
+              totalRewardsEarned: 0
             };
             
             const savedMemberships = localStorage.getItem('memberships') || '[]';
@@ -282,6 +291,8 @@ const JoinPage = () => {
           stamps: 0
         });
         setStamps(0);
+        setTotalStampsCollected(0);
+        setTotalRewardsEarned(0);
       } catch (e) {
         console.error("Error joining:", e);
         toast({
@@ -332,7 +343,9 @@ const JoinPage = () => {
                 stamps: 0,
                 customer_name: customerName,
                 user_id: data.user.id,
-                is_anonymous: false
+                is_anonymous: false,
+                total_stamps_collected: 0,
+                total_rewards_earned: 0
               };
               
               const { data: membership, error: membershipError } = await supabase
@@ -352,6 +365,8 @@ const JoinPage = () => {
                   stamps: 0
                 });
                 setStamps(0);
+                setTotalStampsCollected(0);
+                setTotalRewardsEarned(0);
               }
             } catch (e) {
               console.error("Error auto-joining loyalty program:", e);
@@ -399,6 +414,8 @@ const JoinPage = () => {
                 stamps: membership.stamps || 0
               });
               setStamps(membership.stamps || 0);
+              setTotalStampsCollected(membership.total_stamps_collected || 0);
+              setTotalRewardsEarned(membership.total_rewards_earned || 0);
             } else {
               try {
                 const memberData = {
@@ -406,7 +423,9 @@ const JoinPage = () => {
                   stamps: 0,
                   customer_name: customerName || data.user.email?.split('@')[0] || "Member",
                   user_id: data.user.id,
-                  is_anonymous: false
+                  is_anonymous: false,
+                  total_stamps_collected: 0,
+                  total_rewards_earned: 0
                 };
                 
                 const { data: newMembership, error: newMembershipError } = await supabase
@@ -424,6 +443,8 @@ const JoinPage = () => {
                     stamps: 0
                   });
                   setStamps(0);
+                  setTotalStampsCollected(0);
+                  setTotalRewardsEarned(0);
                   
                   toast({
                     title: "Welcome!",
@@ -463,7 +484,15 @@ const JoinPage = () => {
     }
     
     const newStamps = Math.min(stamps + stampCount, loyaltyCardConfig?.maxStamps || 10);
+    const newTotalStamps = totalStampsCollected + stampCount;
+    
+    const oldRewards = Math.floor(stamps / (loyaltyCardConfig?.maxStamps || 10));
+    const newRewards = Math.floor(newStamps / (loyaltyCardConfig?.maxStamps || 10));
+    const newEarnedRewards = totalRewardsEarned + (newRewards > oldRewards ? 1 : 0);
+    
     setStamps(newStamps);
+    setTotalStampsCollected(newTotalStamps);
+    setTotalRewardsEarned(newEarnedRewards);
     
     setCustomer(prev => ({
       ...prev,
@@ -478,7 +507,11 @@ const JoinPage = () => {
     if (businessData?.id && memberId) {
       supabase
         .from('business_members')
-        .update({ stamps: newStamps })
+        .update({ 
+          stamps: newStamps,
+          total_stamps_collected: newTotalStamps,
+          total_rewards_earned: newEarnedRewards
+        })
         .eq('id', memberId)
         .then(({ error }) => {
           if (error) {
@@ -494,6 +527,8 @@ const JoinPage = () => {
           
           if (membershipIndex !== -1) {
             memberships[membershipIndex].stamps = newStamps;
+            memberships[membershipIndex].totalStampsCollected = newTotalStamps;
+            memberships[membershipIndex].totalRewardsEarned = newEarnedRewards;
             localStorage.setItem('memberships', JSON.stringify(memberships));
           }
         } catch (e) {
@@ -510,9 +545,15 @@ const JoinPage = () => {
   const handleNewCard = async () => {
     if (businessData?.id && memberId) {
       try {
+        const wasRewardEarned = stamps >= (loyaltyCardConfig?.maxStamps || 10);
+        const newTotalRewards = wasRewardEarned ? totalRewardsEarned + 1 : totalRewardsEarned;
+        
         const { error } = await supabase
           .from('business_members')
-          .update({ stamps: 0 })
+          .update({ 
+            stamps: 0,
+            total_rewards_earned: newTotalRewards
+          })
           .eq('id', memberId);
           
         if (error) {
@@ -526,6 +567,7 @@ const JoinPage = () => {
         }
         
         setStamps(0);
+        setTotalRewardsEarned(newTotalRewards);
         
         if (!userId) {
           try {
@@ -535,6 +577,7 @@ const JoinPage = () => {
             
             if (membershipIndex !== -1) {
               memberships[membershipIndex].stamps = 0;
+              memberships[membershipIndex].totalRewardsEarned = newTotalRewards;
               localStorage.setItem('memberships', JSON.stringify(memberships));
             }
           } catch (e) {
@@ -544,7 +587,7 @@ const JoinPage = () => {
         
         toast({
           title: "Card Reset",
-          description: "Your loyalty card has been reset."
+          description: "Your loyalty card has been reset. Your rewards history is maintained!"
         });
       } catch (e) {
         console.error("Error resetting card:", e);
@@ -558,282 +601,58 @@ const JoinPage = () => {
   };
 
   if (loading) {
-    return (
-      <Layout>
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <Loader2 className="h-8 w-8 animate-spin text-coffee-dark" />
-          <p className="mt-4 text-coffee-light">Loading business details...</p>
-        </div>
-      </Layout>
-    );
+    return <LoadingState />;
   }
 
   if (error) {
-    return (
-      <Layout>
-        <div className="max-w-md mx-auto mt-12 text-center">
-          <Card className="p-6 bg-white card-shadow">
-            <div className="text-red-500 text-xl mb-4">Business Not Found</div>
-            <p className="mb-6">The business you're looking for doesn't exist or the link is invalid.</p>
-            <Link to="/">
-              <Button>Return Home</Button>
-            </Link>
-          </Card>
-        </div>
-      </Layout>
-    );
+    return <ErrorState errorMessage={error} />;
   }
 
   if (isAuthMode) {
     return (
-      <Layout>
-        <div className="max-w-md mx-auto mt-8">
-          <Card className="p-6 bg-white card-shadow">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold mb-1">
-                {isSignup ? 'Create an Account' : 'Login'}
-              </h2>
-              <p className="text-gray-600">
-                {isSignup 
-                  ? 'Join with an account to access loyalty cards and rewards' 
-                  : 'Welcome back! Login to access your loyalty cards'}
-              </p>
-            </div>
-            
-            {authError && (
-              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
-                {authError}
-              </div>
-            )}
-            
-            <form onSubmit={handleAuthSubmit} className="space-y-4">
-              {isSignup && (
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium mb-1">
-                    Your Name
-                  </label>
-                  <Input
-                    id="name"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="Enter your name"
-                    required
-                  />
-                </div>
-              )}
-              
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-1">
-                  Email Address
-                </label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium mb-1">
-                  Password
-                </label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  minLength={6}
-                />
-              </div>
-              
-              <Button 
-                type="submit" 
-                className="w-full"
-                disabled={authLoading}
-              >
-                {authLoading 
-                  ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
-                  : isSignup ? 'Create Account' : 'Login'}
-              </Button>
-              
-              <div className="text-center mt-4">
-                <Button 
-                  type="button" 
-                  variant="link"
-                  onClick={() => setIsSignup(!isSignup)}
-                >
-                  {isSignup 
-                    ? 'Already have an account? Login' 
-                    : "Don't have an account? Sign Up"}
-                </Button>
-              </div>
-            </form>
-          </Card>
-        </div>
-      </Layout>
+      <LoginForm 
+        isSignup={isSignup}
+        setIsSignup={setIsSignup}
+        email={email}
+        setEmail={setEmail}
+        password={password}
+        setPassword={setPassword}
+        customerName={customerName}
+        setCustomerName={setCustomerName}
+        onSubmit={handleAuthSubmit}
+        authLoading={authLoading}
+        authError={authError}
+      />
     );
   }
 
   if (joined && customer && businessData) {
-    return (
-      <Layout>
-        <div className="max-w-md mx-auto mt-8 mb-12">
-          <Card className="p-6 bg-white card-shadow">
-            <div className="text-center mb-6">
-              {loyaltyCardConfig?.businessLogo ? (
-                <img 
-                  src={loyaltyCardConfig.businessLogo} 
-                  alt={businessName}
-                  className="h-12 w-12 object-contain mx-auto mb-2"
-                />
-              ) : (
-                <Coffee size={40} className="mx-auto text-coffee-dark mb-2" />
-              )}
-              <h2 
-                className="text-2xl font-bold mb-1"
-                style={{ color: loyaltyCardConfig?.businessNameColor || "#2563EB" }}
-              >
-                Welcome to {businessName}!
-              </h2>
-              <p 
-                style={{ color: loyaltyCardConfig?.cardTitleColor || "#2563EB" }}
-              >
-                Here's your loyalty card
-              </p>
-              
-              {userId ? (
-                <div className="mt-2 text-sm text-green-600 flex items-center justify-center gap-1">
-                  <span className="w-2 h-2 bg-green-600 rounded-full"></span>
-                  Signed in as member
-                </div>
-              ) : (
-                <div className="mt-2 text-sm text-gray-500">
-                  Guest mode - card stored on this device only
-                </div>
-              )}
-            </div>
-            
-            <div className="mb-6">
-              <LoyaltyCard 
-                customerName={customerName || customer.name}
-                maxStamps={loyaltyCardConfig?.maxStamps || 10}
-                currentStamps={stamps}
-                cardStyle={loyaltyCardConfig}
-                onStampCollected={() => {}}
-                onReset={handleNewCard}
-                businessId={businessData.id}
-              />
-            </div>
-            
-            <div className="mt-6 mb-6">
-              <RewardsCard 
-                rewardsCount={Math.floor(stamps / (loyaltyCardConfig?.maxStamps || 10))}
-                totalEarned={Math.floor(stamps / (loyaltyCardConfig?.maxStamps || 10))}
-                totalStamps={stamps}
-                textColor={loyaltyCardConfig?.businessNameColor || "#2563EB"}
-                accentColor={loyaltyCardConfig?.stampBgColor || "#E5F0FF"}
-              />
-            </div>
-
-            <div className="text-center space-y-4">
-              <p 
-                className="text-sm"
-                style={{ color: loyaltyCardConfig?.rewardTextColor || "#2563EB" }}
-              >
-                Show this card when you visit {businessName} to collect stamps
-              </p>
-              
-              <Button
-                onClick={handleCollectStamp}
-                className="w-full flex items-center justify-center gap-2 bg-[#5271ff] hover:bg-[#3a5dff] text-white"
-              >
-                <QrCode size={20} />
-                Scan QR Code to Collect Stamp
-              </Button>
-            </div>
-          </Card>
-        </div>
-
-        <QRScannerDialog 
-          isOpen={scannerOpen} 
-          onClose={() => setScannerOpen(false)}
-          onSuccessfulScan={handleSuccessfulScan}
-        />
-      </Layout>
-    );
+    return <MemberCard 
+      businessName={businessName}
+      businessData={businessData}
+      loyaltyCardConfig={loyaltyCardConfig}
+      customerName={customerName || customer.name}
+      stamps={stamps}
+      totalStampsCollected={totalStampsCollected}
+      totalRewardsEarned={totalRewardsEarned}
+      userId={userId}
+      onCollectStamp={handleCollectStamp}
+      onResetCard={handleNewCard}
+      scannerOpen={scannerOpen}
+      onScannerClose={() => setScannerOpen(false)}
+      onSuccessfulScan={handleSuccessfulScan}
+    />;
   }
 
-  return (
-    <Layout>
-      <div className="max-w-md mx-auto mt-8">
-        <Card className="p-6 bg-white card-shadow">
-          <div className="text-center mb-6">
-            {loyaltyCardConfig?.businessLogo ? (
-              <img 
-                src={loyaltyCardConfig.businessLogo} 
-                alt={businessName}
-                className="h-16 w-16 object-contain mx-auto mb-2"
-              />
-            ) : (
-              <Coffee size={40} className="mx-auto text-coffee-dark mb-2" />
-            )}
-            <h2 
-              className="text-2xl font-bold"
-              style={{ color: loyaltyCardConfig?.businessNameColor || "#2563EB" }}
-            >
-              Join {businessName}
-            </h2>
-            <p 
-              className="text-coffee-light mt-1"
-              style={{ color: loyaltyCardConfig?.textColor || "#6F4E37" }}
-            >
-              Create an account to join the loyalty program
-            </p>
-          </div>
-
-          <div className="mb-6">
-            <p className="text-sm text-center mb-2 text-gray-500">Here's what your loyalty card will look like:</p>
-            <LoyaltyCard 
-              customerName="Your Name"
-              maxStamps={loyaltyCardConfig?.maxStamps || 10}
-              currentStamps={0}
-              cardStyle={loyaltyCardConfig}
-              onStampCollected={() => {}}
-              onReset={() => {}}
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Button
-              onClick={() => { setIsSignup(true); setIsAuthMode(true); }}
-              className="w-full bg-coffee-medium hover:bg-coffee-dark text-white flex items-center justify-center gap-2"
-              style={{ 
-                backgroundColor: loyaltyCardConfig?.stampActiveColor || "#F97316",
-                borderColor: loyaltyCardConfig?.stampActiveColor || "#F97316"
-              }}
-            >
-              <UserPlus size={18} />
-              Create Account
-            </Button>
-            
-            <Button
-              onClick={() => { setIsSignup(false); setIsAuthMode(true); }}
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2"
-            >
-              <LogIn size={18} />
-              Login
-            </Button>
-          </div>
-        </Card>
-      </div>
-    </Layout>
-  );
+  return <JoinForm 
+    businessName={businessName}
+    loyaltyCardConfig={loyaltyCardConfig}
+    customerName={customerName}
+    setCustomerName={setCustomerName}
+    onJoin={handleJoin}
+    setIsAuthMode={setIsAuthMode}
+    setIsSignup={setIsSignup}
+  />;
 };
 
 export default JoinPage;

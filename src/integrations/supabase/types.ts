@@ -18,6 +18,8 @@ export type Database = {
           joined_at: string
           redeemed_rewards: number | null
           stamps: number | null
+          total_rewards_earned: number | null
+          total_stamps_collected: number | null
           user_id: string | null
         }
         Insert: {
@@ -28,6 +30,8 @@ export type Database = {
           joined_at?: string
           redeemed_rewards?: number | null
           stamps?: number | null
+          total_rewards_earned?: number | null
+          total_stamps_collected?: number | null
           user_id?: string | null
         }
         Update: {
@@ -38,6 +42,8 @@ export type Database = {
           joined_at?: string
           redeemed_rewards?: number | null
           stamps?: number | null
+          total_rewards_earned?: number | null
+          total_stamps_collected?: number | null
           user_id?: string | null
         }
         Relationships: [
