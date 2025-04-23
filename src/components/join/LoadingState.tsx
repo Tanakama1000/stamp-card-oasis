@@ -22,14 +22,26 @@ const LoadingState: React.FC = () => {
               100% { width: 100%; }
             }
             .animate-progress {
-              animation: progress 1.5s ease-in-out infinite;
+              animation: progress 0.5s linear infinite; /* Was 1.5s, now 0.5s */
             }
             .animate-fade-in {
-              animation: fadeIn 0.5s ease-in-out;
+              animation: fadeIn 0.25s ease-in-out; /* Was 0.5s */
             }
             @keyframes fadeIn {
               from { opacity: 0; transform: translateY(10px); }
               to { opacity: 1; transform: translateY(0); }
+            }
+            .animate-ping {
+              animation: ping 0.6s cubic-bezier(0, 0, 0.2, 1) infinite; /* Was 1s */
+            }
+            @keyframes ping {
+              75%, 100% { transform: scale(1.3); opacity: 0; }
+            }
+            .animate-spin {
+              animation-duration: 0.6s !important; /* Default is 1s */
+            }
+            .animate-pulse {
+              animation-duration: 0.7s !important; /* Default is 1.5s */
             }
           `}
         </style>
@@ -39,3 +51,4 @@ const LoadingState: React.FC = () => {
 };
 
 export default LoadingState;
+

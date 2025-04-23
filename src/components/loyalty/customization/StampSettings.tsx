@@ -1,4 +1,5 @@
 
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -30,13 +31,12 @@ export const StampSettings = ({ config, onChange }: StampSettingsProps) => {
                 key={iconName}
                 type="button"
                 variant={config.stampIcon === iconName ? "default" : "outline"}
-                className={`flex flex-col items-center justify-center p-2 h-16 w-16 border transition ring-offset-2 ${config.stampIcon === iconName ? 'bg-orange text-white scale-105 ring-2 ring-orange' : ''}`}
+                className={`flex items-center justify-center p-2 h-16 w-16 border transition ring-offset-2 ${config.stampIcon === iconName ? 'bg-orange text-white scale-105 ring-2 ring-orange' : ''}`}
                 onClick={() => onChange('stampIcon', iconName)}
                 style={{ boxShadow: config.stampIcon === iconName ? "0 0 8px #F97316a0" : undefined, minWidth: 0 }}
                 aria-label={iconName}
               >
-                <IconComponent size={24} />
-                <span className="text-xs mt-1 whitespace-nowrap truncate">{iconName.replace(/([A-Z])/g, ' $1').trim()}</span>
+                <IconComponent size={32} /> {/* Increased size, removed label below */}
               </Button>
             );
           })}
@@ -104,3 +104,4 @@ export const StampSettings = ({ config, onChange }: StampSettingsProps) => {
     </div>
   );
 };
+

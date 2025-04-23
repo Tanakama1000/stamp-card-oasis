@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { LoyaltyCardConfig } from "../types/LoyaltyCardConfig";
 
@@ -6,17 +7,39 @@ interface ColorPresetsProps {
 }
 
 export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
+  // When a color preset is selected, also update the lastStampTextColor to match the rewardTextColor for better harmony,
+  // default to #FFFFFF if not set for "Dark" theme, or set to rewardTextColor for other themes.
+
+  const handlePresetSelect = (preset: Partial<LoyaltyCardConfig>) => {
+    // If present, rewardTextColor will be used for lastStampTextColor.
+    // If a dark theme, set lastStampTextColor to #FFFFFF unless preset says otherwise.
+    let lastStampTextColor = preset.rewardTextColor || "#FFFFFF";
+    // For very dark card backgrounds, force white last stamp text
+    if (
+      preset.cardBgColor &&
+      (
+        preset.cardBgColor === "#1F2937" || // Dark
+        preset.cardBgColor === "#403E43"    // Charcoal
+      )
+    ) {
+      lastStampTextColor = "#FFFFFF";
+    }
+    onPresetSelect({
+      ...preset,
+      lastStampTextColor,
+    });
+  };
+
   return (
     <div className="mt-4 pt-4 border-t">
       <h3 className="text-sm font-medium mb-2">Color Presets</h3>
       <div className="flex flex-wrap gap-2">
 
-        {/* Existing presets... */}
         {/* Classic */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-white text-coffee-dark border-coffee-light"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#FFFFFF',
             textColor: '#6F4E37',
             businessNameColor: '#6F4E37',
@@ -31,10 +54,10 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
           Classic
         </Button>
         {/* Blue */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-blue-50 text-blue-800 border-blue-200"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#EFF6FF',
             textColor: '#1E40AF',
             businessNameColor: '#1E3A8A',
@@ -49,10 +72,10 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
           Blue
         </Button>
         {/* Green */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-green-50 text-green-800 border-green-200"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#ECFDF5',
             textColor: '#065F46',
             businessNameColor: '#064E3B',
@@ -67,10 +90,10 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
           Green
         </Button>
         {/* Purple */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-purple-50 text-purple-800 border-purple-200"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#F5F3FF',
             textColor: '#5B21B6',
             businessNameColor: '#4C1D95',
@@ -85,10 +108,10 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
           Purple
         </Button>
         {/* Orange */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-orange-50 text-orange-800 border-orange-200"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#FFF7ED',
             textColor: '#9A3412',
             businessNameColor: '#7C2D12',
@@ -103,10 +126,10 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
           Orange
         </Button>
         {/* Dark */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-gray-900 text-gray-200 border-gray-700"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#1F2937',
             textColor: '#F3F4F6',
             businessNameColor: '#F9FAFB',
@@ -121,10 +144,10 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
           Dark
         </Button>
         {/* Red */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-red-50 text-red-800 border-red-200"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#FEF2F2',
             textColor: '#991B1B',
             businessNameColor: '#7F1D1D',
@@ -139,10 +162,10 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
           Red
         </Button>
         {/* Pink */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-pink-50 text-pink-800 border-pink-200"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#FDF2F8',
             textColor: '#9D174D',
             businessNameColor: '#831843',
@@ -156,13 +179,11 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
           <div className="w-3 h-3 rounded-full bg-pink-500"></div>
           Pink
         </Button>
-
-        {/* Additional modern & creative color presets */}
         {/* Sky Blue */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-[#D3E4FD] text-[#1EAEDB] border-[#33C3F0]"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#D3E4FD',
             textColor: '#1EAEDB',
             businessNameColor: '#0FA0CE',
@@ -177,10 +198,10 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
           Sky Blue
         </Button>
         {/* Soft Peach */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-[#FDE1D3] text-[#AA735D] border-[#FEC6A1]"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#FDE1D3',
             textColor: '#AA735D',
             businessNameColor: '#AA735D',
@@ -195,10 +216,10 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
           Soft Peach
         </Button>
         {/* Magenta */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-[#FFDEE2] text-[#D946EF] border-[#D946EF]"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#FFDEE2',
             textColor: '#D946EF',
             businessNameColor: '#D946EF',
@@ -213,10 +234,10 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
           Magenta
         </Button>
         {/* Charcoal */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-[#403E43] text-[#F3F4F6] border-[#221F26]"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#403E43',
             textColor: '#F3F4F6',
             businessNameColor: '#F3F4F6',
@@ -231,10 +252,10 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
           Charcoal
         </Button>
         {/* Soft Green */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-[#F2FCE2] text-[#555F41] border-[#BEDB8B]"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#F2FCE2',
             textColor: '#555F41',
             businessNameColor: '#555F41',
@@ -249,10 +270,10 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
           Soft Green
         </Button>
         {/* Yellow */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-[#FEF7CD] text-[#A37B00] border-[#FFC300]"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#FEF7CD',
             textColor: '#A37B00',
             businessNameColor: '#A37B00',
@@ -267,10 +288,10 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
           Yellow
         </Button>
         {/* Ocean Blue */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-[#CFFAFE] text-[#0EA5E9] border-[#0EA5E9]"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#CFFAFE',
             textColor: '#0EA5E9',
             businessNameColor: '#0EA5E9',
@@ -285,10 +306,10 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
           Ocean Blue
         </Button>
         {/* Soft Purple */}
-        <Button 
+        <Button
           variant="outline" size="sm"
           className="flex items-center gap-1 bg-[#E5DEFF] text-[#6E59A5] border-[#9b87f5]"
-          onClick={() => onPresetSelect({
+          onClick={() => handlePresetSelect({
             cardBgColor: '#E5DEFF',
             textColor: '#6E59A5',
             businessNameColor: '#7E69AB',
@@ -306,3 +327,4 @@ export const ColorPresets = ({ onPresetSelect }: ColorPresetsProps) => {
     </div>
   );
 };
+
