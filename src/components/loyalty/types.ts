@@ -1,6 +1,6 @@
 import {
   Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy, Sparkles, Cake, Pizza, IceCream, Flower, Diamond, Bell, Medal, ThumbsUp,
-  Scissors, Snail, Utensils, Beer, GlassWater, ShoppingCart, Dumbbell, Target, Brush, Palette, Hammer, Wrench, BookOpen, Car, Dog,
+  Scissors, NailPolish, Utensils, Beer, GlassWater, ShoppingCart, Dumbbell, Target, Brush, Palette, Hammer, Wrench, BookOpen, Car, Dog,
   Luggage, BrickWall, Flame, Gem, BanknoteIcon, Coins, UtensilsCrossed, Package, Scale
 } from "lucide-react";
 import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
@@ -22,7 +22,6 @@ export interface LoyaltyCardProps {
   businessId?: string;
 }
 
-// Expanded icon library
 export const STAMP_ICONS = {
   Gift,
   Star,
@@ -41,9 +40,8 @@ export const STAMP_ICONS = {
   Coffee,
   Zap,
   Battery,
-  // NEW ICONS BELOW
   Scissors,
-  Nail,            // Nail polish icon (replaces Snail)
+  NailPolish,
   Utensils,
   Beer,
   GlassWater,
