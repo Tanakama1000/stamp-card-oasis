@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 const Index = () => {
   const { toast } = useToast();
   const [customerName, setCustomerName] = useState<string>("");
-  const [stamps, setStamps] = useState<number>(3);
+  const [stamps, setStamps] = useState<number>(0);
   const [cardStyle, setCardStyle] = useState<LoyaltyCardConfig | null>(null);
   const maxStamps = cardStyle?.maxStamps || 10;
   const [totalEarned, setTotalEarned] = useState<number>(0);
@@ -44,9 +44,29 @@ const Index = () => {
     } else {
       handleFallbackBusinessId();
     }
-    
+
+    const savedName = localStorage.getItem('customerName');
+    if (savedName) {
+      setCustomerName(savedName);
+    }
+
+    const savedStamps = localStorage.getItem('stamps');
+    if (savedStamps) {
+      setStamps(parseInt(savedStamps, 10));
+    }
+
+    const savedTotalEarned = localStorage.getItem('totalEarned');
+    if (savedTotalEarned) {
+      setTotalEarned(parseInt(savedTotalEarned, 10));
+    }
+  }, []);
+
+  useEffect(() => {
     const earnedRewards = Math.floor(stamps / maxStamps);
     setTotalEarned(earnedRewards);
+    
+    localStorage.setItem('stamps', stamps.toString());
+    localStorage.setItem('totalEarned', earnedRewards.toString());
   }, [stamps, maxStamps]);
 
   const handleFallbackBusinessId = () => {
@@ -67,12 +87,18 @@ const Index = () => {
       duration: 2000,
     });
     
-    setStamps(prev => prev + 1);
+    const newStamps = stamps + 1;
+    setStamps(newStamps);
+    localStorage.setItem('stamps', newStamps.toString());
   };
   
   const handleCardReset = () => {
     console.log("Card reset in Index.tsx");
     setStamps(0);
+    localStorage.setItem('stamps', '0');
+    
+    const historicalEarned = totalEarned;
+    localStorage.setItem('totalEarned', historicalEarned.toString());
   };
   
   useEffect(() => {
@@ -80,6 +106,8 @@ const Index = () => {
   }, [businessId]);
   
   const handleSaveName = () => {
+    localStorage.setItem('customerName', customerName);
+    
     if (customerName.trim()) {
       toast({
         title: "Name Updated",

@@ -30,6 +30,14 @@ const RewardCard: React.FC<RewardCardProps> = ({
   useEffect(() => {
     if (showReward) {
       console.log("RewardCard mounted with businessId:", businessId);
+      // Save reward state in localStorage
+      if (businessId) {
+        const rewardsData = JSON.parse(localStorage.getItem('businessRewards') || '{}');
+        rewardsData[businessId] = rewardsData[businessId] || { count: 0, lastReward: Date.now() };
+        rewardsData[businessId].count = (rewardsData[businessId].count || 0) + 1;
+        rewardsData[businessId].lastReward = Date.now();
+        localStorage.setItem('businessRewards', JSON.stringify(rewardsData));
+      }
     }
   }, [businessId, showReward]);
   
@@ -38,6 +46,15 @@ const RewardCard: React.FC<RewardCardProps> = ({
   // Reset handler: call parent's onReset
   const handleReset = () => {
     if (onReset) onReset();
+    // Update localStorage to reflect card reset
+    if (businessId) {
+      const rewardsData = JSON.parse(localStorage.getItem('businessRewards') || '{}');
+      if (rewardsData[businessId]) {
+        rewardsData[businessId].lastReset = Date.now();
+        localStorage.setItem('businessRewards', JSON.stringify(rewardsData));
+      }
+    }
+    
     // Optionally, show toast if you want to notify the user
     toast({
       title: "Card Reset",
@@ -96,4 +113,3 @@ const RewardCard: React.FC<RewardCardProps> = ({
 };
 
 export default RewardCard;
-

@@ -58,11 +58,45 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
   });
   const [isLoading, setIsLoading] = useState(true);
   
+  // Function to save stats to localStorage
+  const saveStatsToStorage = (newStats: any) => {
+    if (!businessId) return;
+    
+    const allStats = JSON.parse(localStorage.getItem('businessStats') || '{}');
+    allStats[businessId] = newStats;
+    localStorage.setItem('businessStats', JSON.stringify(allStats));
+  };
+  
+  // Function to load stats from localStorage
+  const loadStatsFromStorage = () => {
+    if (!businessId) return null;
+    
+    const allStats = JSON.parse(localStorage.getItem('businessStats') || '{}');
+    return allStats[businessId];
+  };
+  
   useEffect(() => {
     if (!businessId) return;
     
     const fetchStats = async () => {
       setIsLoading(true);
+      
+      // Try to load from localStorage first
+      const savedStats = loadStatsFromStorage();
+      if (savedStats) {
+        setStats(savedStats);
+        setIsLoading(false);
+        
+        // Still fetch fresh data but don't show loading state
+        await updateStatsFromSupabase();
+        return;
+      }
+      
+      // If no saved stats, fetch from Supabase
+      await updateStatsFromSupabase();
+    };
+    
+    const updateStatsFromSupabase = async () => {
       try {
         // Get total customers
         const { count: customerCount, error: customerError } = await supabase
@@ -104,21 +138,37 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
           const totalCustomers = customerCount || 0;
           const conversionRate = totalCustomers ? Math.round((activeCustomers / totalCustomers) * 100) + "%" : "0%";
           
-          setStats({
+          const newStats = {
             customerCount: customerCount || 0,
             rewardsRedeemed: totalRedeemedRewards,
             totalStamps: currentStamps,
             conversionRate,
-          });
+            lastUpdated: new Date().toISOString()
+          };
+          
+          setStats(newStats);
+          
+          // Save to localStorage
+          saveStatsToStorage(newStats);
         }
       } catch (error) {
         console.error("Error fetching business stats:", error);
+        // Don't update stats on error
       } finally {
         setIsLoading(false);
       }
     };
     
     fetchStats();
+    
+    // Set up periodic refresh (every 5 minutes)
+    const intervalId = setInterval(() => {
+      updateStatsFromSupabase();
+    }, 5 * 60 * 1000);
+    
+    return () => {
+      clearInterval(intervalId);
+    };
   }, [businessId]);
   
   return (
