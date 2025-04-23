@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
@@ -29,6 +30,8 @@ const JoinPage = () => {
   const [customer, setCustomer] = useState<any>(null);
   const [scannerOpen, setScannerOpen] = useState<boolean>(false);
   const [stamps, setStamps] = useState<number>(0);
+  const [totalStampsCollected, setTotalStampsCollected] = useState<number>(0);
+  const [totalRewardsEarned, setTotalRewardsEarned] = useState<number>(0);
   const [loyaltyCardConfig, setLoyaltyCardConfig] = useState<any>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [memberId, setMemberId] = useState<string | null>(null);
