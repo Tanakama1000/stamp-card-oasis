@@ -1,8 +1,7 @@
-
 import {
   Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy, Sparkles, Cake, Pizza, IceCream, Flower, Diamond, Bell, Medal, ThumbsUp,
-  Scissors, Snail, Utensils, Beer, GlassWater, ShoppingCart, Dumbbell, Fencing, Brush, Palette, Hammer, Wrench, BookOpen, Car, Dog,
-  Luggage, BrickWall, Target, Flame, Gem, BanknoteIcon, Coins, UtensilsCrossed, Package, Scale
+  Scissors, Snail, Utensils, Beer, GlassWater, ShoppingCart, Dumbbell, Target, Brush, Palette, Hammer, Wrench, BookOpen, Car, Dog,
+  Luggage, BrickWall, Target as RepeatTarget, Flame, Gem, BanknoteIcon, Coins, UtensilsCrossed, Package, Scale
 } from "lucide-react";
 import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 
@@ -50,7 +49,7 @@ export const STAMP_ICONS = {
   GlassWater,      // Renamed from Drink to GlassWater
   ShoppingCart,
   Dumbbell,
-  Fencing,         // Using Fencing instead of Boxing
+  Target,         // Using Fencing instead of Boxing
   Brush,           // Renamed from Broom to Brush
   Palette,         // Renamed from PaintPalette to Palette
   Hammer,
