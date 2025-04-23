@@ -15,22 +15,24 @@ const LoadingState: React.FC = () => {
         <div className="mt-4 w-48 h-2 bg-slate-200 rounded-full overflow-hidden">
           <div className="h-full bg-[#5271ff] animate-progress"></div>
         </div>
-        <style jsx>{`
-          @keyframes progress {
-            0% { width: 0%; }
-            100% { width: 100%; }
-          }
-          .animate-progress {
-            animation: progress 1.5s ease-in-out infinite;
-          }
-          .animate-fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-          }
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-        `}</style>
+        <style>
+          {`
+            @keyframes progress {
+              0% { width: 0%; }
+              100% { width: 100%; }
+            }
+            .animate-progress {
+              animation: progress 1.5s ease-in-out infinite;
+            }
+            .animate-fade-in {
+              animation: fadeIn 0.5s ease-in-out;
+            }
+            @keyframes fadeIn {
+              from { opacity: 0; transform: translateY(10px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+          `}
+        </style>
       </div>
     </Layout>
   );
