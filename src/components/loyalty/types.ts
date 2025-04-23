@@ -43,27 +43,27 @@ export const STAMP_ICONS = {
   Battery,
   // NEW ICONS BELOW
   Scissors,
-  Snail,           // Using Snail instead of Nail
-  Utensils,        // Instead of Burger (using a more general food icon)
+  Nail,            // Nail polish icon (replaces Snail)
+  Utensils,
   Beer,
-  GlassWater,      // Renamed from Drink to GlassWater
+  GlassWater,
   ShoppingCart,
   Dumbbell,
-  Target,          // Using Target instead of Fencing/Boxing
-  Brush,           // Renamed from Broom to Brush
-  Palette,         // Renamed from PaintPalette to Palette
+  Target,
+  Brush,
+  Palette,
   Hammer,
   Wrench,
-  BookOpen,        // Renamed from StackOfBooks to BookOpen
+  BookOpen,
   Car,
-  Dog,             // Using Dog instead of Paw
-  Luggage,         // Renamed from Suitcase to Luggage
-  BrickWall,       // Renamed from Brick to BrickWall
-  Flame,           // Renamed from Fire to Flame
-  Gem,             // Renamed from Gemstone to Gem
-  BanknoteIcon,    // Renamed from Cash to BanknoteIcon
-  Coins,           // Fixed spelling from Coin to Coins
-  UtensilsCrossed, // Renamed from PlateUtensils to UtensilsCrossed
+  Dog,
+  Luggage,
+  BrickWall,
+  Flame,
+  Gem,
+  BanknoteIcon,
+  Coins,
+  UtensilsCrossed,
   Package,
-  Scale            // Renamed from Scales to Scale
+  Scale
 };

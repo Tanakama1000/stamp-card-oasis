@@ -7,9 +7,22 @@ import QRCode from "react-qr-code";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+// Helper to generate a numeric unique ID (10 digits) from a UUID
+function uuidToNumericId(uuid: string): string {
+  // Use a hash of the UUID, mod to fit 10 digits.
+  let num = 0;
+  for (let i = 0; i < uuid.length; i++) {
+    num = ((num << 5) - num) + uuid.charCodeAt(i);
+    num = num & num; // Convert to 32bit integer
+  }
+  // Ensure positive and pad to 10 digits
+  num = Math.abs(num) % 1_000_000_0000;
+  return num.toString().padStart(10, "0");
+}
+
 interface QRCodeGeneratorProps {
   onGenerate?: (codeData: string) => void;
-  businessId: string;  // Changed from optional to required
+  businessId: string;
 }
 
 const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessId }) => {
@@ -17,50 +30,44 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
   const [qrValue, setQrValue] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const qrCodeRef = useRef<HTMLDivElement>(null);
+  const [businessNumericId, setBusinessNumericId] = useState<string>("");
 
   useEffect(() => {
-    // Validate businessId
     if (!businessId || businessId.trim() === "") {
       setError("Business ID is required to generate a QR code");
       return;
     }
 
-    // Generate a unique, persistent QR code for the business
-    const generateQRCode = () => {
-      const qrData = {
-        type: "business_stamp",
-        businessId: businessId,
-        // Add a unique identifier for the business, but not a changing timestamp
-        uniqueId: `business-${businessId}`
-      };
+    // Compute numeric unique business ID
+    const numericId = uuidToNumericId(businessId);
+    setBusinessNumericId(numericId);
 
-      try {
-        const qrValue = JSON.stringify(qrData);
-        setQrValue(qrValue);
-        setError(null);
-        
-        console.log("Business QR code generated:", qrData);
-
-        if (onGenerate) {
-          onGenerate(qrValue);
-        }
-      } catch (error) {
-        console.error("Error generating QR code:", error);
-        setError("Could not generate QR code. Please try again.");
-        toast({
-          title: "QR Code Error",
-          description: "Could not generate QR code. Please try again.",
-          variant: "destructive",
-        });
-      }
+    // Business QR code embeds both UUID and numeric id
+    const qrData = {
+      type: "business_stamp",
+      businessId: businessId,
+      businessNumericId: numericId
     };
+    try {
+      const qrValue = JSON.stringify(qrData);
+      setQrValue(qrValue);
+      setError(null);
 
-    generateQRCode();
-    // No interval needed since the QR code doesn't change over time
-  }, [businessId, onGenerate, toast]); // Added toast to dependencies
-  
+      if (onGenerate) {
+        onGenerate(qrValue);
+      }
+    } catch (error) {
+      setError("Could not generate QR code. Please try again.");
+      toast({
+        title: "QR Code Error",
+        description: "Could not generate QR code. Please try again.",
+        variant: "destructive",
+      });
+    }
+    // eslint-disable-next-line
+  }, [businessId, onGenerate, toast]);
+
   const downloadQRCode = () => {
-    // Check if there's an error
     if (error) {
       toast({
         title: "Cannot Download QR Code",
@@ -70,7 +77,6 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
       return;
     }
 
-    // Check if the div containing the SVG is available
     if (!qrCodeRef.current) {
       toast({
         title: "Download Failed",
@@ -79,9 +85,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
       });
       return;
     }
-    
     try {
-      // Get the SVG element from the div
       const svg = qrCodeRef.current.querySelector('svg');
       if (!svg) {
         toast({
@@ -91,22 +95,13 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
         });
         return;
       }
-      
-      // Create a canvas element
       const canvas = document.createElement("canvas");
       const box = svg.getBoundingClientRect();
-      
-      // Set canvas dimensions
       canvas.width = box.width;
       canvas.height = box.height;
-      
-      // Convert SVG to string
       const svgData = new XMLSerializer().serializeToString(svg);
       const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
-      
       const blobUrl = URL.createObjectURL(svgBlob);
-      
-      // Create image from SVG blob
       const img = new Image();
       img.onload = () => {
         const context = canvas.getContext("2d");
@@ -119,34 +114,24 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
           URL.revokeObjectURL(blobUrl);
           return;
         }
-        
-        // Draw image to canvas
         context.fillStyle = "white";
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.drawImage(img, 0, 0);
-        
-        // Convert canvas to PNG
         const pngUrl = canvas.toDataURL("image/png");
-        
-        // Create download link
         const downloadLink = document.createElement("a");
         downloadLink.href = pngUrl;
-        downloadLink.download = `business-qrcode-${businessId}.png`;
+        downloadLink.download = `business-qrcode-${businessNumericId}.png`;
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
-        
         URL.revokeObjectURL(blobUrl);
-        
         toast({
           title: "QR Code Downloaded",
           description: "The QR code has been downloaded to your device.",
         });
       };
-      
       img.src = blobUrl;
     } catch (error) {
-      console.error("Error downloading QR code:", error);
       toast({
         title: "Download Failed",
         description: "Could not download the QR code. Please try again.",
@@ -173,13 +158,21 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
         {!error && (
           <div className="p-4 bg-white rounded-lg" ref={qrCodeRef}>
             <QRCode 
-              id="qr-code" 
-              value={qrValue} 
-              size={200} 
+              id="qr-code"
+              value={qrValue}
+              size={200}
             />
+            {/* Numeric Business ID visible under the QR */}
+            <div className="flex justify-center mt-3">
+              <span
+                className="inline-block bg-gray-700 text-white px-4 py-1 rounded-full text-xs tracking-widest font-semibold shadow"
+                style={{ letterSpacing: "0.2em" }}
+              >
+                ID : {businessNumericId}
+              </span>
+            </div>
           </div>
         )}
-        
         <Button
           onClick={downloadQRCode}
           variant="outline"
