@@ -1,8 +1,8 @@
 
 import {
   Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy, Sparkles, Cake, Pizza, IceCream, Flower, Diamond, Bell, Medal, ThumbsUp,
-  Scissors, NailPolish, Burger, Beer, Drink, ShoppingCart, Dumbbell, BoxingGlove, Broom, PaintPalette, Hammer, Wrench, StackOfBooks, Car, PawPrint,
-  Suitcase, Brick, Dartboard, Fire, Gemstone, Cash, Coin, PlateUtensils, Package, Scales
+  Scissors, Nail, Utensils, Beer, GlassWater, ShoppingCart, Dumbbell, Boxing, Brush, Palette, Hammer, Wrench, BookOpen, Car, Paw,
+  Luggage, BrickWall, Target, Flame, Gem, BanknoteIcon, Coins, UtensilsCrossed, Package, Scale
 } from "lucide-react";
 import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 
@@ -44,28 +44,28 @@ export const STAMP_ICONS = {
   Battery,
   // NEW ICONS BELOW
   Scissors,
-  NailPolish,
-  Burger,
+  Nail,           // Renamed from NailPolish to Nail
+  Utensils,       // Instead of Burger (using a more general food icon)
   Beer,
-  Drink,
+  GlassWater,     // Renamed from Drink to GlassWater
   ShoppingCart,
   Dumbbell,
-  BoxingGlove,
-  Broom,
-  PaintPalette,
+  Boxing,         // Renamed from BoxingGlove to Boxing
+  Brush,          // Renamed from Broom to Brush
+  Palette,        // Renamed from PaintPalette to Palette
   Hammer,
   Wrench,
-  StackOfBooks,
+  BookOpen,       // Renamed from StackOfBooks to BookOpen
   Car,
-  PawPrint,
-  Suitcase,
-  Brick,
-  Dartboard,
-  Fire,
-  Gemstone,
-  Cash,
-  Coin,
-  PlateUtensils,
+  Paw,            // Renamed from PawPrint to Paw
+  Luggage,        // Renamed from Suitcase to Luggage
+  BrickWall,      // Renamed from Brick to BrickWall
+  Target,         // Renamed from Dartboard to Target
+  Flame,          // Renamed from Fire to Flame
+  Gem,            // Renamed from Gemstone to Gem
+  BanknoteIcon,   // Renamed from Cash to BanknoteIcon
+  Coins,          // Fixed spelling from Coin to Coins
+  UtensilsCrossed, // Renamed from PlateUtensils to UtensilsCrossed
   Package,
-  Scales
+  Scale           // Renamed from Scales to Scale
 };
