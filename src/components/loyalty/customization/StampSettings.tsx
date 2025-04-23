@@ -1,12 +1,13 @@
 
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LoyaltyCardConfig } from "../types/LoyaltyCardConfig";
 import { STAMP_ICONS } from "../types";
 import { useToast } from "@/hooks/use-toast";
+import React, { useEffect, useRef } from "react";
 
+// We'll use a ref to detect colorPreset changes and update 'lastStampTextColor' accordingly.
 interface StampSettingsProps {
   config: LoyaltyCardConfig;
   onChange: (field: keyof LoyaltyCardConfig, value: any) => void;
@@ -14,10 +15,26 @@ interface StampSettingsProps {
 
 export const StampSettings = ({ config, onChange }: StampSettingsProps) => {
   const { toast } = useToast();
+  const prevPreset = useRef<string | undefined>();
 
   const countWords = (text: string): number => {
     return text.trim().split(/\s+/).filter(word => word.length > 0).length;
   };
+
+  // Auto-update Last Stamp Text Color if colorPreset changes
+  useEffect(() => {
+    if (
+      config.colorPreset &&
+      config.colorPreset !== prevPreset.current &&
+      config.presets &&
+      config.presets[config.colorPreset]
+    ) {
+      const presetColor = config.presets[config.colorPreset].mainColor;
+      onChange('lastStampTextColor', presetColor);
+    }
+    prevPreset.current = config.colorPreset;
+    // eslint-disable-next-line
+  }, [config.colorPreset]); // Only when colorPreset actually changes
 
   return (
     <div className="space-y-4">
@@ -36,7 +53,8 @@ export const StampSettings = ({ config, onChange }: StampSettingsProps) => {
                 style={{ boxShadow: config.stampIcon === iconName ? "0 0 8px #F97316a0" : undefined, minWidth: 0 }}
                 aria-label={iconName}
               >
-                <IconComponent size={32} /> {/* Increased size, removed label below */}
+                <IconComponent size={32} />
+                {/* INTENTIONALLY REMOVED ICON NAME TEXT FOR VISUAL CLEANLINESS */}
               </Button>
             );
           })}
@@ -104,4 +122,3 @@ export const StampSettings = ({ config, onChange }: StampSettingsProps) => {
     </div>
   );
 };
-
