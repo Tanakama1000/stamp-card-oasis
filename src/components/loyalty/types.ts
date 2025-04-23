@@ -1,6 +1,7 @@
+
 import {
   Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy, Sparkles, Cake, Pizza, IceCream, Flower, Diamond, Bell, Medal, ThumbsUp,
-  Scissors, NailPolish, Utensils, Beer, GlassWater, ShoppingCart, Dumbbell, Target, Brush, Palette, Hammer, Wrench, BookOpen, Car, Dog,
+  Scissors, NailPolish as NailPolishIcon, Utensils, Beer, GlassWater, ShoppingCart, Dumbbell, Target, Brush, Palette, Hammer, Wrench, BookOpen, Car, Dog,
   Luggage, BrickWall, Flame, Gem, BanknoteIcon, Coins, UtensilsCrossed, Package, Scale
 } from "lucide-react";
 import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
@@ -41,7 +42,7 @@ export const STAMP_ICONS = {
   Zap,
   Battery,
   Scissors,
-  NailPolish,
+  NailPolish: NailPolishIcon,  // Use the aliased import
   Utensils,
   Beer,
   GlassWater,
