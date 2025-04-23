@@ -1,4 +1,3 @@
-
 import {
   Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy, Sparkles, Cake, Pizza, IceCream, Flower, Diamond, Bell, Medal, ThumbsUp,
   Scissors, NailPolish as NailPolishIcon, Utensils, Beer, GlassWater, ShoppingCart, Dumbbell, Target, Brush, Palette, Hammer, Wrench, BookOpen, Car, Dog,
@@ -42,7 +41,7 @@ export const STAMP_ICONS = {
   Zap,
   Battery,
   Scissors,
-  NailPolish: NailPolishIcon,  // Use the aliased import
+  NailPolish: NailPolishIcon,
   Utensils,
   Beer,
   GlassWater,
