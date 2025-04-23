@@ -1,4 +1,9 @@
-import { Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy, Sparkles, Cake, Pizza, IceCream, Flower, Diamond, Bell, Medal, ThumbsUp } from "lucide-react";
+
+import {
+  Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy, Sparkles, Cake, Pizza, IceCream, Flower, Diamond, Bell, Medal, ThumbsUp,
+  Scissors, NailPolish, Burger, Beer, Drink, ShoppingCart, Dumbbell, BoxingGlove, Broom, PaintPalette, Hammer, Wrench, StackOfBooks, Car, PawPrint,
+  Suitcase, Brick, Dartboard, Fire, Gemstone, Cash, Coin, PlateUtensils, Package, Scales
+} from "lucide-react";
 import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 
 export interface Reward {
@@ -18,9 +23,10 @@ export interface LoyaltyCardProps {
   businessId?: string;
 }
 
+// Expanded icon library
 export const STAMP_ICONS = {
   Gift,
-  Star, 
+  Star,
   Heart,
   Award,
   Trophy,
@@ -35,5 +41,31 @@ export const STAMP_ICONS = {
   Bell,
   Coffee,
   Zap,
-  Battery
+  Battery,
+  // NEW ICONS BELOW
+  Scissors,
+  NailPolish,
+  Burger,
+  Beer,
+  Drink,
+  ShoppingCart,
+  Dumbbell,
+  BoxingGlove,
+  Broom,
+  PaintPalette,
+  Hammer,
+  Wrench,
+  StackOfBooks,
+  Car,
+  PawPrint,
+  Suitcase,
+  Brick,
+  Dartboard,
+  Fire,
+  Gemstone,
+  Cash,
+  Coin,
+  PlateUtensils,
+  Package,
+  Scales
 };

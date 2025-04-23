@@ -194,8 +194,23 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-full">
-        <p>Loading card configuration...</p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] bg-slate-50 animate-fade-in">
+        <svg className="animate-spin text-coffee-dark h-10 w-10" viewBox="0 0 24 24" fill="none">
+          <circle
+            className="opacity-20"
+            cx="12" cy="12" r="10"
+            stroke="#5271ff"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-70"
+            fill="#5271ff"
+            d="M22 12a10 10 0 01-10 10v-4a6 6 0 006-6h4Z"
+          />
+        </svg>
+        <span className="mt-4 text-lg text-coffee-dark font-medium">
+          Loading card configuration...
+        </span>
       </div>
     );
   }

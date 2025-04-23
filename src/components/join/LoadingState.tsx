@@ -6,9 +6,9 @@ import { Loader2 } from "lucide-react";
 const LoadingState: React.FC = () => {
   return (
     <Layout>
-      <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-coffee-dark" />
-        <p className="mt-4 text-coffee-light">Loading business details...</p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] bg-slate-50 animate-fade-in">
+        <Loader2 className="h-10 w-10 animate-spin text-[#5271ff]" />
+        <p className="mt-6 text-lg text-[#5271ff] font-medium">Loading business details...</p>
       </div>
     </Layout>
   );
