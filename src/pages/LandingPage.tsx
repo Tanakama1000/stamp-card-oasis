@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
 import { Image, Star, Gift, PieChart, ShieldCheck, Smartphone, Users, ChevronRight, Clock, Award, Mail, Phone } from "lucide-react";
+
 const LandingPage = () => {
   const navigate = useNavigate();
   return <div className="min-h-screen bg-white">
@@ -49,129 +50,132 @@ const LandingPage = () => {
       </section>
 
       {/* Problem → Solution Section */}
-      <section className="py-16 px-4 bg-white">
-        <div className="container mx-auto text-center max-w-3xl">
-          <h2 className="text-3xl font-bold text-coffee-dark mb-8">
+      <section className="py-24 px-4 bg-gradient-to-br from-slate-50 to-white">
+        <div className="container mx-auto text-center max-w-4xl">
+          <h2 className="text-4xl font-bold text-coffee-dark mb-4">
             Say Goodbye to Paper Loyalty Cards
           </h2>
+          <p className="text-xl text-coffee-light/80 mb-12 max-w-2xl mx-auto">
+            Join thousands of businesses revolutionizing their loyalty programs
+          </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <Card className="p-6 text-left shadow-md border-coffee-light/20">
-              <h3 className="text-xl font-semibold mb-4 text-coffee-dark">The Problems</h3>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2">
-                  <span className="text-red-500 mt-1">✗</span>
-                  <span>Customers always forget or lose paper cards</span>
+            <Card className="p-8 text-left shadow-lg hover:shadow-xl transition-shadow border-coffee-light/10">
+              <h3 className="text-2xl font-semibold mb-6 text-coffee-dark">The Problems</h3>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <span className="text-red-500 bg-red-50 p-1 rounded-full mt-1">✗</span>
+                  <span className="text-gray-700">Customers always forget or lose paper cards</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-red-500 mt-1">✗</span>
-                  <span>No data insights on your loyalty program</span>
+                <li className="flex items-start gap-3">
+                  <span className="text-red-500 bg-red-50 p-1 rounded-full mt-1">✗</span>
+                  <span className="text-gray-700">No data insights on your loyalty program</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-red-500 mt-1">✗</span>
-                  <span>No way to message loyal customers</span>
+                <li className="flex items-start gap-3">
+                  <span className="text-red-500 bg-red-50 p-1 rounded-full mt-1">✗</span>
+                  <span className="text-gray-700">No way to message loyal customers</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-red-500 mt-1">✗</span>
-                  <span>Stamp fraud and forgery concerns</span>
+                <li className="flex items-start gap-3">
+                  <span className="text-red-500 bg-red-50 p-1 rounded-full mt-1">✗</span>
+                  <span className="text-gray-700">Stamp fraud and forgery concerns</span>
                 </li>
               </ul>
             </Card>
             
-            <Card className="p-6 text-left shadow-md border-coffee-light/20 bg-gradient-to-br from-slate-50 to-white">
-              <h3 className="text-xl font-semibold mb-4 text-coffee-dark">Our Solution</h3>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 mt-1">✓</span>
-                  <span>Digital cards that customers can't lose</span>
+            <Card className="p-8 text-left shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-white to-slate-50 border-coffee-light/10">
+              <h3 className="text-2xl font-semibold mb-6 text-coffee-dark">Our Solution</h3>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <span className="text-emerald-500 bg-emerald-50 p-1 rounded-full mt-1">✓</span>
+                  <span className="text-gray-700">Digital cards that customers can't lose</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 mt-1">✓</span>
-                  <span>Detailed analytics on your loyalty program</span>
+                <li className="flex items-start gap-3">
+                  <span className="text-emerald-500 bg-emerald-50 p-1 rounded-full mt-1">✓</span>
+                  <span className="text-gray-700">Detailed analytics on your loyalty program</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 mt-1">✓</span>
-                  <span>Direct messaging to loyal customers</span>
+                <li className="flex items-start gap-3">
+                  <span className="text-emerald-500 bg-emerald-50 p-1 rounded-full mt-1">✓</span>
+                  <span className="text-gray-700">Direct messaging to loyal customers</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 mt-1">✓</span>
-                  <span>Secure, tamper-proof digital stamps</span>
+                <li className="flex items-start gap-3">
+                  <span className="text-emerald-500 bg-emerald-50 p-1 rounded-full mt-1">✓</span>
+                  <span className="text-gray-700">Secure, tamper-proof digital stamps</span>
                 </li>
               </ul>
             </Card>
           </div>
           
-          <Button className="bg-coffee-dark hover:bg-coffee-medium text-white text-lg px-8 py-6" onClick={() => navigate("/admin")}>
-            Start Solving These Problems Today
+          <Button size="lg" className="bg-coffee-dark hover:bg-coffee-medium text-white text-lg px-12 py-6 rounded-full shadow-lg hover:shadow-xl transition-all" onClick={() => navigate("/admin")}>
+            Start Your Digital Loyalty Program
           </Button>
         </div>
       </section>
 
       {/* Key Features */}
-      <section className="py-16 px-4 bg-cream-light">
+      <section className="py-24 px-4 bg-gradient-to-br from-white to-slate-50">
         <div className="container mx-auto text-center">
-          <h2 className="text-3xl font-bold text-coffee-dark mb-2">Powerful Features for Your Business</h2>
-          <p className="text-coffee-light mb-12 max-w-2xl mx-auto">
+          <h2 className="text-4xl font-bold text-coffee-dark mb-4">Powerful Features for Your Business</h2>
+          <p className="text-xl text-coffee-light/80 mb-16 max-w-2xl mx-auto">
             Everything you need to run an effective loyalty program that keeps customers coming back
           </p>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="p-8 hover:shadow-lg transition-shadow bg-white card-shadow">
-              <div className="mb-4 text-coffee-dark">
-                <Gift size={42} className="mx-auto" />
+            <Card className="p-10 hover:shadow-xl transition-all duration-300 bg-white border-coffee-light/10 hover:-translate-y-1">
+              <div className="mb-6 text-coffee-dark bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto">
+                <Gift size={32} />
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-coffee-dark">Digital Stamp Cards</h3>
-              <p className="text-coffee-light">
+              <h3 className="text-xl font-semibold mb-4 text-coffee-dark">Digital Stamp Cards</h3>
+              <p className="text-gray-600">
                 Fully customizable digital cards that match your brand and reward structure
               </p>
             </Card>
             
-            <Card className="p-8 hover:shadow-lg transition-shadow bg-white card-shadow">
-              <div className="mb-4 text-coffee-dark">
-                <PieChart size={42} className="mx-auto" />
+            <Card className="p-10 hover:shadow-xl transition-all duration-300 bg-white border-coffee-light/10 hover:-translate-y-1">
+              <div className="mb-6 text-coffee-dark bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto">
+                <PieChart size={32} />
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-coffee-dark">Analytics Dashboard</h3>
-              <p className="text-coffee-light">
+              <h3 className="text-xl font-semibold mb-4 text-coffee-dark">Analytics Dashboard</h3>
+              <p className="text-gray-600">
                 Track program performance with data on stamps, rewards and customer engagement
               </p>
             </Card>
             
-            <Card className="p-8 hover:shadow-lg transition-shadow bg-white card-shadow">
-              <div className="mb-4 text-coffee-dark">
-                <Smartphone size={42} className="mx-auto" />
+            <Card className="p-10 hover:shadow-xl transition-all duration-300 bg-white border-coffee-light/10 hover:-translate-y-1">
+              <div className="mb-6 text-coffee-dark bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto">
+                <Smartphone size={32} />
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-coffee-dark">QR Code System</h3>
-              <p className="text-coffee-light">
+              <h3 className="text-xl font-semibold mb-4 text-coffee-dark">QR Code System</h3>
+              <p className="text-gray-600">
                 Simple scan-to-stamp system through QR codes - no app download required
               </p>
             </Card>
             
-            <Card className="p-8 hover:shadow-lg transition-shadow bg-white card-shadow">
-              <div className="mb-4 text-coffee-dark">
-                <Users size={42} className="mx-auto" />
+            <Card className="p-10 hover:shadow-xl transition-all duration-300 bg-white border-coffee-light/10 hover:-translate-y-1">
+              <div className="mb-6 text-coffee-dark bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto">
+                <Users size={32} />
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-coffee-dark">Customer Management</h3>
-              <p className="text-coffee-light">
+              <h3 className="text-xl font-semibold mb-4 text-coffee-dark">Customer Management</h3>
+              <p className="text-gray-600">
                 Build customer profiles and track their loyalty program engagement
               </p>
             </Card>
             
-            <Card className="p-8 hover:shadow-lg transition-shadow bg-white card-shadow">
-              <div className="mb-4 text-coffee-dark">
-                <Award size={42} className="mx-auto" />
+            <Card className="p-10 hover:shadow-xl transition-all duration-300 bg-white border-coffee-light/10 hover:-translate-y-1">
+              <div className="mb-6 text-coffee-dark bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto">
+                <Award size={32} />
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-coffee-dark">Flexible Rewards</h3>
-              <p className="text-coffee-light">
+              <h3 className="text-xl font-semibold mb-4 text-coffee-dark">Flexible Rewards</h3>
+              <p className="text-gray-600">
                 Create milestone rewards, bonus stamps, and special promotions easily
               </p>
             </Card>
             
-            <Card className="p-8 hover:shadow-lg transition-shadow bg-white card-shadow">
-              <div className="mb-4 text-coffee-dark">
-                <ShieldCheck size={42} className="mx-auto" />
+            <Card className="p-10 hover:shadow-xl transition-all duration-300 bg-white border-coffee-light/10 hover:-translate-y-1">
+              <div className="mb-6 text-coffee-dark bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto">
+                <ShieldCheck size={32} />
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-coffee-dark">Secure & Reliable</h3>
-              <p className="text-coffee-light">
+              <h3 className="text-xl font-semibold mb-4 text-coffee-dark">Secure & Reliable</h3>
+              <p className="text-gray-600">
                 Fraud-proof stamp system with data backup and easy recovery
               </p>
             </Card>
@@ -180,38 +184,38 @@ const LandingPage = () => {
       </section>
 
       {/* Screenshots/Demo */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-24 px-4 bg-gradient-to-br from-slate-50 to-white">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center text-coffee-dark mb-2">See It In Action</h2>
-          <p className="text-coffee-light text-center mb-12 max-w-2xl mx-auto">
+          <h2 className="text-4xl font-bold text-center text-coffee-dark mb-4">See It In Action</h2>
+          <p className="text-xl text-coffee-light/80 text-center mb-16 max-w-2xl mx-auto">
             Our intuitive interface makes managing your loyalty program simple
           </p>
           
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="overflow-hidden shadow-lg card-shadow">
-              <div className="bg-coffee-dark text-white p-2 text-center font-semibold">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all group">
+              <div className="bg-coffee-dark text-white p-4 text-center font-semibold">
                 Business Dashboard
               </div>
-              <div className="h-64 bg-gray-100 flex items-center justify-center">
-                <PieChart size={40} className="text-coffee-medium opacity-50" />
+              <div className="h-72 bg-slate-50 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                <PieChart size={48} className="text-coffee-medium opacity-50" />
               </div>
             </Card>
             
-            <Card className="overflow-hidden shadow-lg card-shadow">
-              <div className="bg-coffee-dark text-white p-2 text-center font-semibold">
+            <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all group">
+              <div className="bg-coffee-dark text-white p-4 text-center font-semibold">
                 Customer View
               </div>
-              <div className="h-64 bg-gray-100 flex items-center justify-center">
-                <Smartphone size={40} className="text-coffee-medium opacity-50" />
+              <div className="h-72 bg-slate-50 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                <Smartphone size={48} className="text-coffee-medium opacity-50" />
               </div>
             </Card>
             
-            <Card className="overflow-hidden shadow-lg card-shadow">
-              <div className="bg-coffee-dark text-white p-2 text-center font-semibold">
+            <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all group">
+              <div className="bg-coffee-dark text-white p-4 text-center font-semibold">
                 Mobile Experience
               </div>
-              <div className="h-64 bg-gray-100 flex items-center justify-center">
-                <Users size={40} className="text-coffee-medium opacity-50" />
+              <div className="h-72 bg-slate-50 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                <Users size={48} className="text-coffee-medium opacity-50" />
               </div>
             </Card>
           </div>
@@ -219,68 +223,68 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 px-4 bg-coffee-dark text-white">
+      <section className="py-24 px-4 bg-coffee-dark text-white">
         <div className="container mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-2">What Our Customers Say</h2>
-          <p className="opacity-80 mb-12 max-w-2xl mx-auto">
+          <h2 className="text-4xl font-bold mb-4">What Our Customers Say</h2>
+          <p className="text-xl opacity-80 mb-16 max-w-2xl mx-auto">
             Businesses like yours are loving our digital loyalty solution
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="p-6 bg-white/10 backdrop-blur-sm border-white/20 text-left">
-              <div className="flex items-center gap-1 mb-3 text-yellow-300">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card className="p-8 bg-white/5 backdrop-blur-sm border-white/10 text-left hover:bg-white/10 transition-colors">
+              <div className="flex items-center gap-1 mb-4 text-yellow-300">
                 <Star size={20} fill="currentColor" />
                 <Star size={20} fill="currentColor" />
                 <Star size={20} fill="currentColor" />
                 <Star size={20} fill="currentColor" />
                 <Star size={20} fill="currentColor" />
               </div>
-              <p className="mb-4">
+              <p className="mb-6 text-lg">
                 "Our customers love the digital cards! We've seen a 30% increase in repeat visits since switching from paper cards."
               </p>
               <div>
-                <p className="font-semibold">Sarah Johnson</p>
+                <p className="font-semibold text-lg">Sarah Johnson</p>
                 <p className="text-sm opacity-80">Bloom Coffee House</p>
               </div>
             </Card>
             
-            <Card className="p-6 bg-white/10 backdrop-blur-sm border-white/20 text-left">
-              <div className="flex items-center gap-1 mb-3 text-yellow-300">
+            <Card className="p-8 bg-white/5 backdrop-blur-sm border-white/10 text-left hover:bg-white/10 transition-colors">
+              <div className="flex items-center gap-1 mb-4 text-yellow-300">
                 <Star size={20} fill="currentColor" />
                 <Star size={20} fill="currentColor" />
                 <Star size={20} fill="currentColor" />
                 <Star size={20} fill="currentColor" />
                 <Star size={20} fill="currentColor" />
               </div>
-              <p className="mb-4">
+              <p className="mb-6 text-lg">
                 "The analytics alone made it worth switching. I finally understand which rewards drive the most business!"
               </p>
               <div>
-                <p className="font-semibold">Michael Chen</p>
+                <p className="font-semibold text-lg">Michael Chen</p>
                 <p className="text-sm opacity-80">Urban Bakery</p>
               </div>
             </Card>
             
-            <Card className="p-6 bg-white/10 backdrop-blur-sm border-white/20 text-left">
-              <div className="flex items-center gap-1 mb-3 text-yellow-300">
+            <Card className="p-8 bg-white/5 backdrop-blur-sm border-white/10 text-left hover:bg-white/10 transition-colors">
+              <div className="flex items-center gap-1 mb-4 text-yellow-300">
                 <Star size={20} fill="currentColor" />
                 <Star size={20} fill="currentColor" />
                 <Star size={20} fill="currentColor" />
                 <Star size={20} fill="currentColor" />
                 <Star size={20} />
               </div>
-              <p className="mb-4">
+              <p className="mb-6 text-lg">
                 "Setup was incredibly easy and the customer support team was there to help every step of the way."
               </p>
               <div>
-                <p className="font-semibold">Jessica Williams</p>
+                <p className="font-semibold text-lg">Jessica Williams</p>
                 <p className="text-sm opacity-80">Sunset Salon</p>
               </div>
             </Card>
           </div>
           
-          <div className="mt-12 inline-block border border-white/20 rounded-full px-6 py-2 bg-white/5">
-            Trusted by 500+ businesses around the world
+          <div className="mt-12 inline-block border border-white/20 rounded-full px-8 py-3 bg-white/5 hover:bg-white/10 transition-colors">
+            Trusted by 500+ businesses worldwide
           </div>
         </div>
       </section>
