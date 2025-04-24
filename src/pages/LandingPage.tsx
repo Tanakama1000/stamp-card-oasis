@@ -3,7 +3,6 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
 import { Image, Star, Gift, PieChart, ShieldCheck, Smartphone, Users, ChevronRight, Clock, Award, Mail, Phone } from "lucide-react";
-
 const LandingPage = () => {
   const navigate = useNavigate();
   return <div className="min-h-screen bg-white">
@@ -36,21 +35,14 @@ const LandingPage = () => {
               Increase customer retention and repeat business with our easy-to-use digital stamp card system.
             </p>
             <div className="pt-4">
-              <Button 
-                className="bg-[#4F46E5] hover:bg-[#4338CA] text-lg px-8 py-6 rounded-full" 
-                onClick={() => navigate("/admin")}
-              >
+              <Button className="bg-[#4F46E5] hover:bg-[#4338CA] text-lg px-8 py-6 rounded-full" onClick={() => navigate("/admin")}>
                 Get Started
               </Button>
             </div>
           </div>
           <div className="lg:w-1/2">
             <div className="relative">
-              <img 
-                src="/lovable-uploads/348116ea-d44c-464e-9a99-5ff102ca108b.png" 
-                alt="Loyalty Cards Preview" 
-                className="w-full transform rotate-[-5deg] hover:rotate-0 transition-transform duration-300"
-              />
+              <img alt="Loyalty Cards Preview" className="w-full transform rotate-[-5deg] hover:rotate-0 transition-transform duration-300" src="/lovable-uploads/ec60039d-0d09-4ec3-94ff-8e66e6c380a5.png" />
             </div>
           </div>
         </div>
@@ -504,5 +496,4 @@ const LandingPage = () => {
       </footer>
     </div>;
 };
-
 export default LandingPage;
