@@ -20,46 +20,71 @@ const Index = () => {
   const [businessId, setBusinessId] = useState<string>("");
 
   useEffect(() => {
-    const savedCardStyle = localStorage.getItem('loyaltyCardConfig');
-    if (savedCardStyle) {
+    const fetchUserStats = async () => {
       try {
-        const parsedStyle = JSON.parse(savedCardStyle);
-        setCardStyle(parsedStyle);
-        
-        if (parsedStyle.businessId) {
-          setBusinessId(parsedStyle.businessId);
-          console.log("Business ID set from localStorage:", parsedStyle.businessId);
+        const { data: { session } } = await supabase.auth.getSession();
+        const userId = session?.user?.id;
+
+        const savedCardStyle = localStorage.getItem('loyaltyCardConfig');
+        if (savedCardStyle) {
+          try {
+            const parsedStyle = JSON.parse(savedCardStyle);
+            setCardStyle(parsedStyle);
+            
+            if (parsedStyle.businessId) {
+              setBusinessId(parsedStyle.businessId);
+              console.log("Business ID set from localStorage:", parsedStyle.businessId);
+            } else {
+              console.warn("No businessId found in card configuration");
+              const fallbackId = "3967978c-7313-4039-9d80-8b24af9c89fa";
+              setBusinessId(fallbackId);
+              const updatedStyle = { ...parsedStyle, businessId: fallbackId };
+              localStorage.setItem('loyaltyCardConfig', JSON.stringify(updatedStyle));
+              console.log("Using and storing fallback businessId");
+            }
+          } catch (error) {
+            console.error("Error parsing card style from localStorage", error);
+            handleFallbackBusinessId();
+          }
         } else {
-          console.warn("No businessId found in card configuration");
-          const fallbackId = "3967978c-7313-4039-9d80-8b24af9c89fa";
-          setBusinessId(fallbackId);
-          const updatedStyle = { ...parsedStyle, businessId: fallbackId };
-          localStorage.setItem('loyaltyCardConfig', JSON.stringify(updatedStyle));
-          console.log("Using and storing fallback businessId");
+          handleFallbackBusinessId();
+        }
+
+        if (businessId) {
+          const { data: membershipData, error } = await supabase
+            .from('business_members')
+            .select('*')
+            .eq('business_id', businessId)
+            .eq(userId ? 'user_id' : 'is_anonymous', userId || true)
+            .maybeSingle();
+
+          if (!error && membershipData) {
+            setStamps(membershipData.stamps || 0);
+            setTotalEarned(membershipData.total_rewards_earned || 0);
+            setCustomerName(membershipData.customer_name || '');
+          } else {
+            const { error: insertError } = await supabase
+              .from('business_members')
+              .insert({
+                business_id: businessId,
+                user_id: userId,
+                is_anonymous: !userId,
+                stamps: 0,
+                total_rewards_earned: 0
+              });
+
+            if (insertError) {
+              console.error('Error creating membership:', insertError);
+            }
+          }
         }
       } catch (error) {
-        console.error("Error parsing card style from localStorage", error);
-        handleFallbackBusinessId();
+        console.error('Error fetching user stats:', error);
       }
-    } else {
-      handleFallbackBusinessId();
-    }
+    };
 
-    const savedName = localStorage.getItem('customerName');
-    if (savedName) {
-      setCustomerName(savedName);
-    }
-
-    const savedStamps = localStorage.getItem('stamps');
-    if (savedStamps) {
-      setStamps(parseInt(savedStamps, 10));
-    }
-
-    const savedTotalEarned = localStorage.getItem('totalEarned');
-    if (savedTotalEarned) {
-      setTotalEarned(parseInt(savedTotalEarned, 10));
-    }
-  }, []);
+    fetchUserStats();
+  }, [businessId]);
 
   useEffect(() => {
     const earnedRewards = Math.floor(stamps / maxStamps);
@@ -80,16 +105,41 @@ const Index = () => {
     console.log("Created and stored basic config with fallback businessId");
   };
 
-  const handleStampCollected = () => {
-    toast({
-      title: "Stamp Collected!",
-      description: "You're getting closer to your reward!",
-      duration: 2000,
-    });
-    
-    const newStamps = stamps + 1;
-    setStamps(newStamps);
-    localStorage.setItem('stamps', newStamps.toString());
+  const handleStampCollected = async () => {
+    if (!businessId) return;
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+
+      const newStamps = stamps + 1;
+      
+      const { error: updateError } = await supabase
+        .from('business_members')
+        .update({
+          stamps: newStamps,
+          total_stamps_collected: supabase.sql`total_stamps_collected + 1`
+        })
+        .eq('business_id', businessId)
+        .eq(userId ? 'user_id' : 'is_anonymous', userId || true);
+
+      if (updateError) throw updateError;
+
+      setStamps(newStamps);
+      
+      toast({
+        title: "Stamp Collected!",
+        description: "You're getting closer to your reward!",
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error('Error collecting stamp:', error);
+      toast({
+        title: "Error",
+        description: "Failed to collect stamp. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
   
   const handleCardReset = () => {

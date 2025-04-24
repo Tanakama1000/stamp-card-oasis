@@ -1,9 +1,9 @@
-
 import React, { useEffect } from "react";
 import { Trophy, AlertTriangle, RefreshCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 interface RewardCardProps {
   showReward: boolean;
@@ -28,41 +28,99 @@ const RewardCard: React.FC<RewardCardProps> = ({
   const [error, setError] = React.useState<string | null>(null);
   
   useEffect(() => {
-    if (showReward) {
-      console.log("RewardCard mounted with businessId:", businessId);
-      // Save reward state in localStorage
-      if (businessId) {
-        const rewardsData = JSON.parse(localStorage.getItem('businessRewards') || '{}');
-        rewardsData[businessId] = rewardsData[businessId] || { count: 0, lastReward: Date.now() };
-        rewardsData[businessId].count = (rewardsData[businessId].count || 0) + 1;
-        rewardsData[businessId].lastReward = Date.now();
-        localStorage.setItem('businessRewards', JSON.stringify(rewardsData));
-      }
-    }
-  }, [businessId, showReward]);
-  
-  if (!showReward) return null;
+    const updateRewardStats = async () => {
+      if (!showReward || !businessId) return;
 
-  // Reset handler: call parent's onReset
-  const handleReset = () => {
-    if (onReset) onReset();
-    // Update localStorage to reflect card reset
-    if (businessId) {
-      const rewardsData = JSON.parse(localStorage.getItem('businessRewards') || '{}');
-      if (rewardsData[businessId]) {
-        rewardsData[businessId].lastReset = Date.now();
-        localStorage.setItem('businessRewards', JSON.stringify(rewardsData));
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+
+      try {
+        // Check if membership exists
+        const { data: existingMembership, error: fetchError } = await supabase
+          .from('business_members')
+          .select('*')
+          .eq('business_id', businessId)
+          .eq(userId ? 'user_id' : 'is_anonymous', userId || true)
+          .maybeSingle();
+
+        if (fetchError) throw fetchError;
+
+        if (existingMembership) {
+          // Update existing membership
+          const { error: updateError } = await supabase
+            .from('business_members')
+            .update({
+              total_rewards_earned: (existingMembership.total_rewards_earned || 0) + 1,
+            })
+            .eq('id', existingMembership.id);
+
+          if (updateError) throw updateError;
+        } else {
+          // Create new membership
+          const { error: insertError } = await supabase
+            .from('business_members')
+            .insert({
+              business_id: businessId,
+              user_id: userId,
+              is_anonymous: !userId,
+              total_rewards_earned: 1,
+              stamps: 0,
+            });
+
+          if (insertError) throw insertError;
+        }
+      } catch (error) {
+        console.error('Error updating reward stats:', error);
+        setError('Failed to update reward statistics');
       }
+    };
+
+    updateRewardStats();
+  }, [showReward, businessId]);
+
+  // Reset handler
+  const handleReset = async () => {
+    if (!businessId) {
+      console.error('No business ID provided');
+      return;
     }
-    
-    // Optionally, show toast if you want to notify the user
-    toast({
-      title: "Card Reset",
-      description: "Your loyalty card has been reset.",
-      variant: "destructive",
-      duration: 2500,
-    });
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+
+      // Update redeemed rewards count in database
+      const { error: updateError } = await supabase
+        .from('business_members')
+        .update({
+          stamps: 0,
+          redeemed_rewards: supabase.sql`redeemed_rewards + 1`
+        })
+        .eq('business_id', businessId)
+        .eq(userId ? 'user_id' : 'is_anonymous', userId || true);
+
+      if (updateError) throw updateError;
+
+      if (onReset) onReset();
+      
+      toast({
+        title: "Card Reset",
+        description: "Your loyalty card has been reset and your reward has been redeemed.",
+        variant: "default",
+        duration: 2500,
+      });
+    } catch (error) {
+      console.error('Error resetting card:', error);
+      setError('Failed to reset card');
+      toast({
+        title: "Error",
+        description: "Failed to reset card. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
+
+  if (!showReward) return null;
 
   return (
     <div 
