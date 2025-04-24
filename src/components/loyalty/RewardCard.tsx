@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { Trophy, AlertTriangle, RefreshCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -89,17 +90,31 @@ const RewardCard: React.FC<RewardCardProps> = ({
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
 
-      // Update redeemed rewards count in database
-      const { error: updateError } = await supabase
+      // Get the current membership
+      const { data: membership, error: fetchError } = await supabase
         .from('business_members')
-        .update({
-          stamps: 0,
-          redeemed_rewards: supabase.sql`redeemed_rewards + 1`
-        })
+        .select('*')
         .eq('business_id', businessId)
-        .eq(userId ? 'user_id' : 'is_anonymous', userId || true);
+        .eq(userId ? 'user_id' : 'is_anonymous', userId || true)
+        .maybeSingle();
 
-      if (updateError) throw updateError;
+      if (fetchError) throw fetchError;
+
+      if (membership) {
+        // Manually increment the redeemed_rewards counter
+        const newRedeemedRewards = (membership.redeemed_rewards || 0) + 1;
+        
+        // Update redeemed rewards count in database
+        const { error: updateError } = await supabase
+          .from('business_members')
+          .update({
+            stamps: 0,
+            redeemed_rewards: newRedeemedRewards
+          })
+          .eq('id', membership.id);
+
+        if (updateError) throw updateError;
+      }
 
       if (onReset) onReset();
       

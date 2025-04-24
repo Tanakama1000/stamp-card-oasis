@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -112,18 +113,44 @@ const Index = () => {
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
 
-      const newStamps = stamps + 1;
-      
-      const { error: updateError } = await supabase
+      // Get current membership data
+      const { data: membership, error: fetchError } = await supabase
         .from('business_members')
-        .update({
-          stamps: newStamps,
-          total_stamps_collected: supabase.sql`total_stamps_collected + 1`
-        })
+        .select('*')
         .eq('business_id', businessId)
-        .eq(userId ? 'user_id' : 'is_anonymous', userId || true);
+        .eq(userId ? 'user_id' : 'is_anonymous', userId || true)
+        .maybeSingle();
 
-      if (updateError) throw updateError;
+      if (fetchError) throw fetchError;
+
+      const newStamps = stamps + 1;
+      const newTotalStampsCollected = membership ? (membership.total_stamps_collected || 0) + 1 : 1;
+      
+      if (membership) {
+        // Update existing membership
+        const { error: updateError } = await supabase
+          .from('business_members')
+          .update({
+            stamps: newStamps,
+            total_stamps_collected: newTotalStampsCollected
+          })
+          .eq('id', membership.id);
+
+        if (updateError) throw updateError;
+      } else {
+        // Create new membership if it doesn't exist (fallback)
+        const { error: insertError } = await supabase
+          .from('business_members')
+          .insert({
+            business_id: businessId,
+            user_id: userId,
+            is_anonymous: !userId,
+            stamps: newStamps,
+            total_stamps_collected: 1
+          });
+
+        if (insertError) throw insertError;
+      }
 
       setStamps(newStamps);
       
@@ -155,20 +182,44 @@ const Index = () => {
     console.log("Current business ID:", businessId);
   }, [businessId]);
   
-  const handleSaveName = () => {
-    localStorage.setItem('customerName', customerName);
-    
-    if (customerName.trim()) {
+  const handleSaveName = async () => {
+    if (!businessId) return;
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+
+      const { error } = await supabase
+        .from('business_members')
+        .update({
+          customer_name: customerName
+        })
+        .eq('business_id', businessId)
+        .eq(userId ? 'user_id' : 'is_anonymous', userId || true);
+
+      if (error) throw error;
+
+      localStorage.setItem('customerName', customerName);
+      
+      if (customerName.trim()) {
+        toast({
+          title: "Name Updated",
+          description: "Your customer name has been updated.",
+          duration: 2000,
+        });
+      } else {
+        toast({
+          title: "Name Cleared",
+          description: "Customer name has been removed.",
+          duration: 2000,
+        });
+      }
+    } catch (error) {
+      console.error('Error saving customer name:', error);
       toast({
-        title: "Name Updated",
-        description: "Your customer name has been updated.",
-        duration: 2000,
-      });
-    } else {
-      toast({
-        title: "Name Cleared",
-        description: "Customer name has been removed.",
-        duration: 2000,
+        title: "Error",
+        description: "Failed to save your name. Please try again.",
+        variant: "destructive",
       });
     }
   };
