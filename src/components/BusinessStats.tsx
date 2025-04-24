@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Users, Award, Coffee, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -58,7 +57,6 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
   });
   const [isLoading, setIsLoading] = useState(true);
   
-  // Function to save stats to localStorage
   const saveStatsToStorage = (newStats: any) => {
     if (!businessId) return;
     
@@ -67,7 +65,6 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
     localStorage.setItem('businessStats', JSON.stringify(allStats));
   };
   
-  // Function to load stats from localStorage
   const loadStatsFromStorage = () => {
     if (!businessId) return null;
     
@@ -81,24 +78,20 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
     const fetchStats = async () => {
       setIsLoading(true);
       
-      // Try to load from localStorage first
       const savedStats = loadStatsFromStorage();
       if (savedStats) {
         setStats(savedStats);
         setIsLoading(false);
         
-        // Still fetch fresh data but don't show loading state
         await updateStatsFromSupabase();
         return;
       }
       
-      // If no saved stats, fetch from Supabase
       await updateStatsFromSupabase();
     };
     
     const updateStatsFromSupabase = async () => {
       try {
-        // Get total customers
         const { count: customerCount, error: customerError } = await supabase
           .from('business_members')
           .select('id', { count: 'exact', head: true })
@@ -106,7 +99,6 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
         
         if (customerError) throw customerError;
         
-        // Get total stamps and redeemed rewards
         const { data: membersData, error: membersError } = await supabase
           .from('business_members')
           .select('stamps, redeemed_rewards')
@@ -115,20 +107,16 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
         if (membersError) throw membersError;
         
         if (membersData) {
-          // Calculate total stamps and redeemed rewards
           const currentStamps = membersData.reduce((sum, member) => {
-            // Check if stamps is defined before adding
             const memberStamps = member.stamps !== null && member.stamps !== undefined ? member.stamps : 0;
             return sum + memberStamps;
           }, 0);
           
           const totalRedeemedRewards = membersData.reduce((sum, member) => {
-            // Check if redeemed_rewards is defined before adding
-            const memberRewards = member.redeemed_rewards !== null && member.redeemed_rewards !== undefined ? member.redeemed_rewards : 0;
-            return sum + memberRewards;
+            const redeemedRewards = member.redeemed_rewards !== null && member.redeemed_rewards !== undefined ? member.redeemed_rewards : 0;
+            return sum + redeemedRewards;
           }, 0);
           
-          // Calculate conversion rate (customers with at least 1 stamp / total customers)
           const activeCustomers = membersData.filter(member => {
             const hasStamps = member.stamps !== null && member.stamps !== undefined && member.stamps > 0;
             const hasRewards = member.redeemed_rewards !== null && member.redeemed_rewards !== undefined && member.redeemed_rewards > 0;
@@ -147,13 +135,10 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
           };
           
           setStats(newStats);
-          
-          // Save to localStorage
           saveStatsToStorage(newStats);
         }
       } catch (error) {
         console.error("Error fetching business stats:", error);
-        // Don't update stats on error
       } finally {
         setIsLoading(false);
       }
@@ -161,7 +146,6 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
     
     fetchStats();
     
-    // Set up periodic refresh (every 5 minutes)
     const intervalId = setInterval(() => {
       updateStatsFromSupabase();
     }, 5 * 60 * 1000);
@@ -185,7 +169,7 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
         title="Rewards Redeemed"
         value={stats.rewardsRedeemed}
         icon={<Award size={20} />}
-        change={isLoading ? "" : "Actual redemption count"}
+        change={isLoading ? "" : "Total rewards claimed"}
         trend="neutral"
         isLoading={isLoading}
       />
