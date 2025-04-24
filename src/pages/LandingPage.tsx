@@ -3,9 +3,10 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
 import { Image, Star, Gift, PieChart, ShieldCheck, Smartphone, Users, ChevronRight, Clock, Award, Mail, Phone } from "lucide-react";
+
 const LandingPage = () => {
   const navigate = useNavigate();
-  return <div className="min-h-screen bg-cream-light">
+  return <div className="min-h-screen bg-white">
       {/* Header/Navigation */}
       <header className="bg-coffee-dark text-white p-4 shadow-md">
         <div className="container mx-auto flex justify-between items-center">
@@ -25,30 +26,32 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="py-16 px-4 bg-gradient-to-r from-coffee-light to-orange text-white">
+      <section className="py-20 px-4">
         <div className="container mx-auto flex flex-col lg:flex-row items-center gap-12">
           <div className="lg:w-1/2 space-y-6">
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-              Digital Loyalty Cards Made Simple for Your Business
+            <h1 className="text-5xl md:text-6xl font-bold leading-tight tracking-tighter text-black">
+              Go Digital With Your Loyalty Program — Instantly
             </h1>
-            <p className="text-xl opacity-90">
+            <p className="text-xl text-gray-600">
               Increase customer retention and repeat business with our easy-to-use digital stamp card system.
             </p>
-            <div className="flex flex-wrap gap-4 pt-4">
-              <Button className="bg-white text-coffee-dark hover:bg-white/90 text-lg px-8 py-6" onClick={() => navigate("/admin")}>
-                Try It Free
-              </Button>
-              <Button variant="outline" className="border-white text-lg px-8 py-6 text-white bg-white/0">
-                Schedule a Demo
+            <div className="pt-4">
+              <Button 
+                className="bg-[#4F46E5] hover:bg-[#4338CA] text-lg px-8 py-6 rounded-full" 
+                onClick={() => navigate("/admin")}
+              >
+                Get Started
               </Button>
             </div>
           </div>
           <div className="lg:w-1/2">
-            <Card className="overflow-hidden shadow-xl bg-white/10 backdrop-blur-sm border-white/20">
-              <div className="h-64 md:h-80 bg-coffee-dark/20 flex items-center justify-center">
-                <img src="/lovable-uploads/04523b06-63b5-485f-ac7d-8624e600ad0d.png" alt="InStamp Logo" className="h-24 w-24 opacity-75" />
-              </div>
-            </Card>
+            <div className="relative">
+              <img 
+                src="/lovable-uploads/348116ea-d44c-464e-9a99-5ff102ca108b.png" 
+                alt="Loyalty Cards Preview" 
+                className="w-full transform rotate-[-5deg] hover:rotate-0 transition-transform duration-300"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -501,4 +504,5 @@ const LandingPage = () => {
       </footer>
     </div>;
 };
+
 export default LandingPage;
