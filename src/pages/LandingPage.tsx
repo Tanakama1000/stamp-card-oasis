@@ -3,7 +3,6 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
 import { Image, Star, Gift, PieChart, ShieldCheck, Smartphone, Users, ChevronRight, Clock, Award, Mail, Phone } from "lucide-react";
-
 const LandingPage = () => {
   const navigate = useNavigate();
   return <div className="min-h-screen bg-white">
@@ -43,11 +42,7 @@ const LandingPage = () => {
           </div>
           <div className="lg:w-1/2">
             <div className="relative">
-              <img 
-                alt="Loyalty Cards Preview" 
-                className="w-full transform rotate-[-5deg] hover:rotate-0 transition-transform duration-300 shadow-2xl rounded-lg"
-                src="/lovable-uploads/fefd0790-7207-4de5-b1e6-641c76befc89.png"
-              />
+              <img alt="Loyalty Cards Preview" className="w-full transform rotate-[-5deg] hover:rotate-0 transition-transform duration-300" src="/lovable-uploads/ec60039d-0d09-4ec3-94ff-8e66e6c380a5.png" />
             </div>
           </div>
         </div>
