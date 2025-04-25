@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react";
 
 interface LoginFormProps {
   isSignup: boolean;
-  setIsSignup: (value: boolean) => void; // Add this line
+  setIsSignup: (value: boolean) => void;
   email: string;
   setEmail: (value: string) => void;
   password: string;
@@ -22,7 +22,7 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({
   isSignup,
-  setIsSignup, // Add this line
+  setIsSignup,
   email,
   setEmail,
   password,
