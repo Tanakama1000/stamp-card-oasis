@@ -20,6 +20,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
+import BusinessManagement from "@/components/admin/BusinessManagement";
 
 const businessSchema = z.object({
   name: z.string().min(2, {
@@ -438,6 +439,12 @@ const AdminPage = () => {
         <BusinessStats 
           businessId={businessData.id}
         />
+
+        {user && (
+          <div className="mt-8 mb-8">
+            <BusinessManagement />
+          </div>
+        )}
 
         <div className="mt-8">
           <Tabs defaultValue="qr-generator">
