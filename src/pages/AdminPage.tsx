@@ -20,6 +20,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
+import { Link } from 'react-router-dom';
 
 const businessSchema = z.object({
   name: z.string().min(2, {
