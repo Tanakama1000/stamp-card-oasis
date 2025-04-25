@@ -20,7 +20,6 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
-import BusinessManagement from "@/components/admin/BusinessManagement";
 
 const businessSchema = z.object({
   name: z.string().min(2, {
@@ -440,11 +439,19 @@ const AdminPage = () => {
           businessId={businessData.id}
         />
 
-        {user && (
-          <div className="mt-8 mb-8">
-            <BusinessManagement />
+        <Card className="p-4 mb-6 bg-white card-shadow">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+              <h3 className="font-semibold text-coffee-dark">Business Management</h3>
+              <p className="text-coffee-light text-sm">
+                Manage all registered businesses
+              </p>
+            </div>
+            <Button asChild>
+              <Link to="/businesses">Go to Business Dashboard</Link>
+            </Button>
           </div>
-        )}
+        </Card>
 
         <div className="mt-8">
           <Tabs defaultValue="qr-generator">
