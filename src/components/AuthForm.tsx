@@ -26,6 +26,13 @@ const AuthForm: React.FC<AuthFormProps> = ({
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Add a setter for isSignup
+  const setIsSignup = (value: boolean) => {
+    // If called from LoginForm, update isSignup and reset auth error
+    setIsAuthMode(value);
+    setAuthError(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthLoading(true);
@@ -95,10 +102,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
   return (
     <LoginForm 
       isSignup={isSignup}
-      setIsSignup={(value) => {
-        setIsSignup(value);
-        setAuthError(null);
-      }}
+      setIsSignup={setIsSignup} // Pass the setter function
       email={email}
       setEmail={setEmail}
       password={password}
