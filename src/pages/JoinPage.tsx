@@ -28,19 +28,40 @@ const JoinPage = () => {
   useEffect(() => {
     const fetchBusiness = async () => {
       try {
+        console.log("Fetching business with slug:", businessSlug);
+        
+        if (!businessSlug) {
+          setError("Business not found");
+          setLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase
           .from('businesses')
           .select('*, loyalty_card_configs(*)')
           .eq('slug', businessSlug)
           .single();
 
+        console.log("Business data:", data, "Error:", error);
+
         if (error) {
+          console.error("Error fetching business:", error);
           setError("Business not found");
+          setLoading(false);
+          return;
+        }
+
+        if (!data) {
+          console.error("No business data found");
+          setError("Business not found");
+          setLoading(false);
           return;
         }
 
         if (!data.is_active) {
+          console.log("Business is not active");
           setBusinessActive(false);
+          setLoading(false);
           return;
         }
 
@@ -56,6 +77,9 @@ const JoinPage = () => {
 
     if (businessSlug) {
       fetchBusiness();
+    } else {
+      setError("Business not found");
+      setLoading(false);
     }
   }, [businessSlug]);
 
@@ -123,11 +147,10 @@ const JoinPage = () => {
             .select('id')
             .eq('business_id', businessData.id)
             .eq('user_id', signInData.user.id)
-            .single();
+            .maybeSingle();
 
           // If not a member yet, add them
-          if (memberCheckError && memberCheckError.code === 'PGRST116') {
-            // User is not a member yet, add them
+          if (!memberData) {
             const { error: memberAddError } = await supabase
               .from('business_members')
               .insert({
@@ -164,12 +187,20 @@ const JoinPage = () => {
     }
   };
 
+  console.log("JoinPage render state:", {
+    loading,
+    error,
+    businessActive,
+    isAuthMode,
+    businessData: !!businessData
+  });
+
   if (loading) {
     return <LoadingState />;
   }
 
   if (error || !businessActive) {
-    return <ErrorState errorMessage={error} businessActive={businessActive} />;
+    return <ErrorState errorMessage={error || ""} businessActive={businessActive} />;
   }
 
   if (isAuthMode) {
@@ -192,8 +223,8 @@ const JoinPage = () => {
 
   return (
     <JoinForm
-      businessName={businessData?.name}
-      loyaltyCardConfig={loyaltyCardConfig}
+      businessName={businessData?.name || ""}
+      loyaltyCardConfig={loyaltyCardConfig || {}}
       customerName={customerName}
       setCustomerName={setCustomerName}
       onJoin={handleJoin}

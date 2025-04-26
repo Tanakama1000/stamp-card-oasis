@@ -104,9 +104,14 @@ const LoginForm: React.FC<LoginFormProps> = ({
               className="w-full"
               disabled={authLoading}
             >
-              {authLoading 
-                ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
-                : isSignup ? 'Create Account' : 'Login'}
+              {authLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {isSignup ? 'Creating Account...' : 'Logging in...'}
+                </>
+              ) : (
+                isSignup ? 'Create Account' : 'Login'
+              )}
             </Button>
             
             <div className="text-center mt-4">

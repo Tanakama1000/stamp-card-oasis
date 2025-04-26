@@ -31,6 +31,8 @@ const AuthPage = () => {
     try {
       if (isSignup) {
         // Register new user
+        console.log("Signing up with:", { email, password, fullName, userType });
+        
         const { data, error } = await supabase.auth.signUp({ 
           email, 
           password,
@@ -43,11 +45,14 @@ const AuthPage = () => {
         });
 
         if (error) {
+          console.error("Signup error:", error);
           setAuthError(error.message);
           setIsLoading(false);
           return;
         }
 
+        console.log("Signup successful:", data);
+        
         toast({
           title: "Account Created",
           description: "Your account has been created successfully!",
@@ -63,17 +68,22 @@ const AuthPage = () => {
         }
       } else {
         // Login existing user
+        console.log("Logging in with:", { email, password });
+        
         const { data, error } = await supabase.auth.signInWithPassword({ 
           email, 
           password 
         });
 
         if (error) {
+          console.error("Login error:", error);
           setAuthError(error.message);
           setIsLoading(false);
           return;
         }
 
+        console.log("Login successful:", data);
+        
         toast({
           title: "Login Successful",
           description: "You've been logged in successfully!",
