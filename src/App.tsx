@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -15,25 +16,31 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [sessionChecked, setSessionChecked] = useState<boolean>(false);
 
   useEffect(() => {
-    // Check current auth status
+    // Set up auth state listener FIRST
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", event, session ? "Has session" : "No session");
+      setIsAuthenticated(!!session);
+      setSessionChecked(true);
+    });
+
+    // THEN check for existing session
     const checkAuth = async () => {
       try {
         const { data } = await supabase.auth.getSession();
+        console.log("Initial auth check:", data.session ? "Has session" : "No session");
         setIsAuthenticated(!!data.session);
       } catch (error) {
         console.error("Auth check error:", error);
         setIsAuthenticated(false); // Fail safely
+      } finally {
+        setSessionChecked(true);
       }
     };
     
     checkAuth();
-
-    // Listen for auth changes
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      setIsAuthenticated(!!session);
-    });
 
     return () => {
       authListener.subscription.unsubscribe();
@@ -43,7 +50,7 @@ const App = () => {
   // Protected route component with better loading state
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     // If still checking auth, show minimal loader instead of full page loading state
-    if (isAuthenticated === null) {
+    if (!sessionChecked) {
       return (
         <div className="flex justify-center items-center h-screen bg-cream-light">
           <div className="flex items-center space-x-2">
