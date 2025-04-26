@@ -126,6 +126,10 @@ const JoinPage = () => {
               title: "Account Created",
               description: "Your account has been created and you've joined the loyalty program!"
             });
+            localStorage.setItem('loyaltyCardConfig', JSON.stringify({
+              ...loyaltyCardConfig,
+              businessId: businessData.id
+            }));
             navigate("/");
           }
         }
@@ -164,18 +168,20 @@ const JoinPage = () => {
 
             if (memberAddError) {
               console.error("Error adding member during login:", memberAddError);
-            } else {
-              toast({
-                title: "Login Successful",
-                description: "You've joined this business's loyalty program!"
-              });
             }
-          } else {
-            toast({
-              title: "Login Successful",
-              description: "You've logged into your account"
-            });
           }
+
+          // Store business context and redirect to home
+          localStorage.setItem('loyaltyCardConfig', JSON.stringify({
+            ...loyaltyCardConfig,
+            businessId: businessData.id
+          }));
+          
+          toast({
+            title: "Login Successful",
+            description: "Welcome to your loyalty card!"
+          });
+          
           navigate("/");
         }
       }

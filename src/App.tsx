@@ -17,12 +17,26 @@ const queryClient = new QueryClient();
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [sessionChecked, setSessionChecked] = useState<boolean>(false);
+  const [userType, setUserType] = useState<string | null>(null);
 
   useEffect(() => {
     // Set up auth state listener FIRST
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session ? "Has session" : "No session");
       setIsAuthenticated(!!session);
+      
+      if (session?.user) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('id', session.user.id)
+          .single();
+          
+        setUserType(profileData?.user_type || null);
+      } else {
+        setUserType(null);
+      }
+      
       setSessionChecked(true);
     });
 
@@ -32,9 +46,19 @@ const App = () => {
         const { data } = await supabase.auth.getSession();
         console.log("Initial auth check:", data.session ? "Has session" : "No session");
         setIsAuthenticated(!!data.session);
+        
+        if (data.session?.user) {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('user_type')
+            .eq('id', data.session.user.id)
+            .single();
+            
+          setUserType(profileData?.user_type || null);
+        }
       } catch (error) {
         console.error("Auth check error:", error);
-        setIsAuthenticated(false); // Fail safely
+        setIsAuthenticated(false);
       } finally {
         setSessionChecked(true);
       }
@@ -48,8 +72,10 @@ const App = () => {
   }, []);
 
   // Protected route component with better loading state
-  const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    // If still checking auth, show minimal loader instead of full page loading state
+  const ProtectedRoute = ({ children, allowedUserTypes = ['customer', 'business_owner', 'super_admin'] }: { 
+    children: React.ReactNode; 
+    allowedUserTypes?: string[];
+  }) => {
     if (!sessionChecked) {
       return (
         <div className="flex justify-center items-center h-screen bg-cream-light">
@@ -62,16 +88,17 @@ const App = () => {
       );
     }
     
-    // Redirect if not authenticated
     if (!isAuthenticated) {
       return <Navigate to="/auth" />;
     }
 
-    // Render children if authenticated
+    if (!allowedUserTypes.includes(userType || '')) {
+      return <Navigate to="/" />;
+    }
+
     return <>{children}</>;
   };
 
-  // Non-protected routes don't need to wait for auth check
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
@@ -79,12 +106,12 @@ const App = () => {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/admin" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedUserTypes={['business_owner']}>
               <AdminPage />
             </ProtectedRoute>
           } />
           <Route path="/super-admin" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedUserTypes={['super_admin']}>
               <SuperAdminPage />
             </ProtectedRoute>
           } />
