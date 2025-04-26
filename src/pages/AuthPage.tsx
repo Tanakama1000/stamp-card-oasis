@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
 
 const AuthPage = () => {
   const [email, setEmail] = useState('');
@@ -31,8 +30,6 @@ const AuthPage = () => {
     try {
       if (isSignup) {
         // Register new user
-        console.log("Signing up with:", { email, password, fullName, userType });
-        
         const { data, error } = await supabase.auth.signUp({ 
           email, 
           password,
@@ -45,65 +42,41 @@ const AuthPage = () => {
         });
 
         if (error) {
-          console.error("Signup error:", error);
           setAuthError(error.message);
           setIsLoading(false);
           return;
         }
 
-        console.log("Signup successful:", data);
-        
         toast({
           title: "Account Created",
           description: "Your account has been created successfully!",
         });
 
-        // After successful signup, navigate to appropriate page based on user type
-        if (userType === 'business_owner') {
-          navigate('/admin');
-        } else if (userType === 'super_admin') {
-          navigate('/super-admin');
-        } else {
-          navigate('/');
-        }
+        // After successful signup, navigate to admin page
+        navigate('/admin');
       } else {
         // Login existing user
-        console.log("Logging in with:", { email, password });
-        
         const { data, error } = await supabase.auth.signInWithPassword({ 
           email, 
           password 
         });
 
         if (error) {
-          console.error("Login error:", error);
           setAuthError(error.message);
           setIsLoading(false);
           return;
         }
 
-        console.log("Login successful:", data);
-        
         toast({
           title: "Login Successful",
           description: "You've been logged in successfully!",
         });
 
-        // Check user type and navigate accordingly
-        const userType = data.user?.user_metadata?.user_type;
-        
-        if (userType === 'super_admin') {
-          navigate('/super-admin');
-        } else if (userType === 'business_owner') {
-          navigate('/admin');
-        } else {
-          navigate('/');
-        }
+        navigate('/admin');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Authentication error:', error);
       setAuthError('An unexpected error occurred. Please try again.');
-    } finally {
       setIsLoading(false);
     }
   };
@@ -126,17 +99,13 @@ const AuthPage = () => {
           <form onSubmit={handleAuth} className="space-y-4">
             {isSignup && (
               <>
-                <div className="space-y-2">
-                  <Label htmlFor="full-name">Full Name</Label>
-                  <Input 
-                    id="full-name"
-                    type="text" 
-                    placeholder="Full Name" 
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    required
-                  />
-                </div>
+                <Input 
+                  type="text" 
+                  placeholder="Full Name" 
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
                 <div className="space-y-2">
                   <Label htmlFor="user-type">Account Type</Label>
                   <Select 
@@ -154,42 +123,26 @@ const AuthPage = () => {
                 </div>
               </>
             )}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email"
-                type="email" 
-                placeholder="Email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input 
-                id="password"
-                type="password" 
-                placeholder="Password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-              />
-            </div>
+            <Input 
+              type="email" 
+              placeholder="Email" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <Input 
+              type="password" 
+              placeholder="Password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
             <Button 
               type="submit" 
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isSignup ? 'Creating Account...' : 'Logging in...'}
-                </>
-              ) : (
-                isSignup ? 'Create Account' : 'Login'
-              )}
+              {isLoading ? 'Processing...' : (isSignup ? 'Create Account' : 'Login')}
             </Button>
             <div className="text-center mt-4">
               <Button 

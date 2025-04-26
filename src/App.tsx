@@ -10,61 +10,30 @@ import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import ScanPage from "./pages/ScanPage";
 import AuthPage from "./pages/AuthPage";
-import SuperAdminPage from "./pages/SuperAdminPage";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [sessionChecked, setSessionChecked] = useState<boolean>(false);
-  const [userType, setUserType] = useState<string | null>(null);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session ? "Has session" : "No session");
-      setIsAuthenticated(!!session);
-      
-      if (session?.user) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('user_type')
-          .eq('id', session.user.id)
-          .single();
-          
-        setUserType(profileData?.user_type || null);
-      } else {
-        setUserType(null);
-      }
-      
-      setSessionChecked(true);
-    });
-
-    // THEN check for existing session
+    // Check current auth status
     const checkAuth = async () => {
       try {
         const { data } = await supabase.auth.getSession();
-        console.log("Initial auth check:", data.session ? "Has session" : "No session");
         setIsAuthenticated(!!data.session);
-        
-        if (data.session?.user) {
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('user_type')
-            .eq('id', data.session.user.id)
-            .single();
-            
-          setUserType(profileData?.user_type || null);
-        }
       } catch (error) {
         console.error("Auth check error:", error);
-        setIsAuthenticated(false);
-      } finally {
-        setSessionChecked(true);
+        setIsAuthenticated(false); // Fail safely
       }
     };
     
     checkAuth();
+
+    // Listen for auth changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+    });
 
     return () => {
       authListener.subscription.unsubscribe();
@@ -72,11 +41,9 @@ const App = () => {
   }, []);
 
   // Protected route component with better loading state
-  const ProtectedRoute = ({ children, allowedUserTypes = ['customer', 'business_owner', 'super_admin'] }: { 
-    children: React.ReactNode; 
-    allowedUserTypes?: string[];
-  }) => {
-    if (!sessionChecked) {
+  const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+    // If still checking auth, show minimal loader instead of full page loading state
+    if (isAuthenticated === null) {
       return (
         <div className="flex justify-center items-center h-screen bg-cream-light">
           <div className="flex items-center space-x-2">
@@ -88,17 +55,16 @@ const App = () => {
       );
     }
     
+    // Redirect if not authenticated
     if (!isAuthenticated) {
       return <Navigate to="/auth" />;
     }
 
-    if (!allowedUserTypes.includes(userType || '')) {
-      return <Navigate to="/" />;
-    }
-
+    // Render children if authenticated
     return <>{children}</>;
   };
 
+  // Non-protected routes don't need to wait for auth check
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
@@ -106,13 +72,8 @@ const App = () => {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/admin" element={
-            <ProtectedRoute allowedUserTypes={['business_owner']}>
+            <ProtectedRoute>
               <AdminPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/super-admin" element={
-            <ProtectedRoute allowedUserTypes={['super_admin']}>
-              <SuperAdminPage />
             </ProtectedRoute>
           } />
           <Route path="/auth" element={<AuthPage />} />

@@ -1,3 +1,4 @@
+
 import React from "react";
 import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
@@ -43,7 +44,7 @@ const JoinForm: React.FC<JoinFormProps> = ({
               className="text-2xl font-bold"
               style={{ color: loyaltyCardConfig?.businessNameColor || "#2563EB" }}
             >
-              Join {businessName || "Business"}
+              Join {businessName}
             </h2>
             <p 
               className="text-coffee-light mt-1"
@@ -59,7 +60,7 @@ const JoinForm: React.FC<JoinFormProps> = ({
               customerName="Your Name"
               maxStamps={loyaltyCardConfig?.maxStamps || 10}
               currentStamps={0}
-              cardStyle={loyaltyCardConfig || {}}
+              cardStyle={loyaltyCardConfig}
               onStampCollected={() => {}}
               onReset={() => {}}
             />
