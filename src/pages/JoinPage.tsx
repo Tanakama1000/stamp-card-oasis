@@ -1,605 +1,115 @@
-
-import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import Layout from "@/components/Layout";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Loader2, Coffee, QrCode, UserPlus, LogIn } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import LoyaltyCard from "@/components/LoyaltyCard";
-import QRScannerDialog from "@/components/QRScannerDialog";
-import RewardsCard from "@/components/loyalty/RewardsCard";
-import JoinForm from "@/components/join/JoinForm";
-import MemberCard from "@/components/join/MemberCard";
-import LoginForm from "@/components/join/LoginForm";
-import LoadingState from "@/components/join/LoadingState";
 import ErrorState from "@/components/join/ErrorState";
+import LoadingState from "@/components/join/LoadingState";
+import LoginForm from "@/components/join/LoginForm";
+import JoinForm from "@/components/join/JoinForm";
 
 const JoinPage = () => {
-  const { businessSlug } = useParams();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const [businessName, setBusinessName] = useState<string>("");
-  const [customerName, setCustomerName] = useState<string>("");
+  const { businessSlug } = useParams<{ businessSlug: string }>();
+  const [businessData, setBusinessData] = useState<any>(null);
+  const [loyaltyCardConfig, setLoyaltyCardConfig] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [joined, setJoined] = useState<boolean>(false);
-  const [businessData, setBusinessData] = useState<any>(null);
-  const [customer, setCustomer] = useState<any>(null);
-  const [scannerOpen, setScannerOpen] = useState<boolean>(false);
-  const [stamps, setStamps] = useState<number>(0);
-  const [totalStampsCollected, setTotalStampsCollected] = useState<number>(0);
-  const [totalRewardsEarned, setTotalRewardsEarned] = useState<number>(0);
-  const [loyaltyCardConfig, setLoyaltyCardConfig] = useState<any>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [memberId, setMemberId] = useState<string | null>(null);
-  
+  const [customerName, setCustomerName] = useState<string>("");
+  const [isAuthMode, setIsAuthMode] = useState<boolean>(false);
+  const [isSignup, setIsSignup] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [isAuthMode, setIsAuthMode] = useState<boolean>(false);
-  const [isSignup, setIsSignup] = useState<boolean>(true);
   const [authLoading, setAuthLoading] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [businessActive, setBusinessActive] = useState<boolean>(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        setUserId(data.session.user.id);
-      } else {
-        setIsAuthMode(true);
-      }
-    };
-    
-    checkAuth();
-    
-    const fetchBusinessData = async () => {
+    const fetchBusiness = async () => {
       try {
-        const { data: businesses, error } = await supabase
-          .from("businesses")
-          .select("*")
-          .ilike("slug", businessSlug || '')
+        const { data, error } = await supabase
+          .from('businesses')
+          .select('*, loyalty_card_configs(*)')
+          .eq('slug', businessSlug)
           .single();
-        
+
         if (error) {
-          console.error("Error fetching business:", error);
-          const savedBusinesses = localStorage.getItem('businesses');
-          let foundBusiness = null;
-          
-          if (savedBusinesses) {
-            try {
-              const businesses = JSON.parse(savedBusinesses);
-              foundBusiness = businesses.find((b: any) => 
-                b.slug.toLowerCase() === (businessSlug || '').toLowerCase()
-              );
-            } catch (e) {
-              console.error("Error parsing businesses:", e);
-            }
-          }
-          
-          if (foundBusiness) {
-            setBusinessName(foundBusiness.name);
-            setBusinessData(foundBusiness);
-            await fetchLoyaltyCardConfig(foundBusiness.id);
-          } else if (businessSlug === "coffee-oasis") {
-            setBusinessName("Coffee Oasis");
-            const defaultBusinessData = {
-              name: "Coffee Oasis",
-              slug: "coffee-oasis",
-              id: "coffee-oasis-id"
-            };
-            setBusinessData(defaultBusinessData);
-            await fetchLoyaltyCardConfig(defaultBusinessData.id);
-          } else {
-            setError("Business not found");
-          }
-        } else if (businesses) {
-          setBusinessName(businesses.name);
-          setBusinessData(businesses);
-          await fetchLoyaltyCardConfig(businesses.id);
-          
-          if (userId) {
-            const { data: membership } = await supabase
-              .from("business_members")
-              .select("*")
-              .eq("business_id", businesses.id)
-              .eq("user_id", userId)
-              .eq("is_anonymous", false)
-              .single();
-              
-            if (membership) {
-              setJoined(true);
-              setMemberId(membership.id);
-              setCustomer({
-                id: userId,
-                name: membership.customer_name || "Member",
-                stamps: membership.stamps || 0
-              });
-              setStamps(membership.stamps || 0);
-            }
-          } else {
-            const savedMemberships = localStorage.getItem('memberships');
-            if (savedMemberships) {
-              try {
-                const memberships = JSON.parse(savedMemberships);
-                const membership = memberships.find((m: any) => 
-                  m.businessId === businesses.id
-                );
-                
-                if (membership) {
-                  setJoined(true);
-                  setMemberId(membership.id);
-                  setCustomer({
-                    id: membership.id,
-                    name: membership.customerName,
-                    stamps: membership.stamps || 0
-                  });
-                  setCustomerName(membership.customerName || "");
-                  setStamps(membership.stamps || 0);
-                }
-              } catch (e) {
-                console.error("Error parsing memberships:", e);
-              }
-            }
-          }
-        } else {
           setError("Business not found");
-        }
-        
-        setLoading(false);
-      } catch (e) {
-        console.error("Error in fetchBusinessData:", e);
-        setError("Failed to load business data");
-        setLoading(false);
-      }
-    };
-    
-    const fetchLoyaltyCardConfig = async (businessId: string) => {
-      try {
-        const { data: configData, error } = await supabase
-          .from("loyalty_card_configs")
-          .select("config")
-          .eq("business_id", businessId)
-          .single();
-          
-        if (!error && configData) {
-          setLoyaltyCardConfig(configData.config);
           return;
         }
-        
-        const savedCardConfig = localStorage.getItem(`loyaltyCardConfig_${businessId}`);
-        if (savedCardConfig) {
-          try {
-            const parsedConfig = JSON.parse(savedCardConfig);
-            setLoyaltyCardConfig(parsedConfig);
-          } catch (e) {
-            console.error("Error parsing card config:", e);
-            
-            setLoyaltyCardConfig({
-              businessName: businessName || "Business",
-              cardTitle: "Loyalty Card",
-              maxStamps: 10,
-              stampIcon: "Coffee",
-              cardBgColor: "#FFFFFF",
-              textColor: "#6F4E37",
-              businessNameColor: "#2563EB",
-              cardTitleColor: "#2563EB",
-              rewardTextColor: "#2563EB"
-            });
-          }
-        } else {
-          setLoyaltyCardConfig({
-            businessName: businessName || "Business",
-            cardTitle: "Loyalty Card",
-            maxStamps: 10,
-            stampIcon: "Coffee",
-            cardBgColor: "#FFFFFF",
-            textColor: "#6F4E37",
-            businessNameColor: "#2563EB",
-            cardTitleColor: "#2563EB",
-            rewardTextColor: "#2563EB"
-          });
+
+        if (!data.is_active) {
+          setBusinessActive(false);
+          return;
         }
-      } catch (e) {
-        console.error("Error fetching loyalty card config:", e);
+
+        setBusinessData(data);
+        setLoyaltyCardConfig(data.loyalty_card_configs?.config || {});
+      } catch (error) {
+        console.error('Error fetching business:', error);
+        setError("Failed to load business data");
+      } finally {
+        setLoading(false);
       }
     };
-    
-    fetchBusinessData();
-  }, [businessSlug, businessName, userId, customerName]);
+
+    if (businessSlug) {
+      fetchBusiness();
+    }
+  }, [businessSlug]);
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!customerName.trim()) {
-      toast({
-        title: "Name Required",
-        description: "Please enter your name to join.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (businessData) {
-      try {
-        let membershipId;
-        
-        if (businessData.id) {
-          const memberData = {
-            business_id: businessData.id,
-            stamps: 0,
-            customer_name: customerName,
-            is_anonymous: !userId,
-            total_stamps_collected: 0,
-            total_rewards_earned: 0
-          };
-          
-          if (userId) {
-            memberData['user_id'] = userId;
-          }
-          
-          const { data: membership, error } = await supabase
-            .from('business_members')
-            .insert(memberData)
-            .select('id')
-            .single();
-            
-          if (error) {
-            console.error("Error joining business:", error);
-            toast({
-              title: "Error",
-              description: "Could not join the loyalty program. Please try again.",
-              variant: "destructive"
-            });
-            return;
-          }
-          
-          membershipId = membership.id;
-          setMemberId(membershipId);
-        }
-        
-        if (!userId) {
-          try {
-            const membershipData = {
-              id: membershipId,
-              businessId: businessData.id,
-              businessSlug: businessSlug,
-              customerName: customerName,
-              joinedAt: new Date().toISOString(),
-              stamps: 0,
-              totalStampsCollected: 0,
-              totalRewardsEarned: 0
-            };
-            
-            const savedMemberships = localStorage.getItem('memberships') || '[]';
-            const memberships = JSON.parse(savedMemberships);
-            memberships.push(membershipData);
-            localStorage.setItem('memberships', JSON.stringify(memberships));
-          } catch (e) {
-            console.error("Error saving to localStorage:", e);
-          }
-        }
-        
-        toast({
-          title: "Welcome!",
-          description: `You've successfully joined ${businessName}'s loyalty program!`,
-        });
-        
-        setJoined(true);
-        setCustomer({
-          id: membershipId || 'temp-id',
-          name: customerName,
-          stamps: 0
-        });
-        setStamps(0);
-        setTotalStampsCollected(0);
-        setTotalRewardsEarned(0);
-      } catch (e) {
-        console.error("Error joining:", e);
-        toast({
-          title: "Error",
-          description: "Could not complete your request. Please try again.",
-          variant: "destructive"
-        });
-      }
-    }
-  };
-
-  const handleAuthSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthLoading(true);
     setAuthError(null);
-    
+    setAuthLoading(true);
+
     try {
       if (isSignup) {
-        const { data, error } = await supabase.auth.signUp({ 
-          email, 
-          password,
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: email,
+          password: password,
           options: {
             data: {
               full_name: customerName,
-              user_type: 'customer'
-            }
-          }
+            },
+          },
         });
-        
-        if (error) {
-          setAuthError(error.message);
-          setAuthLoading(false);
-          return;
+
+        if (signUpError) {
+          throw signUpError;
         }
-        
-        toast({
-          title: "Account Created",
-          description: "Your account has been created successfully!",
-        });
-        
-        if (data.user) {
-          setUserId(data.user.id);
-          
-          if (businessData && businessData.id) {
-            try {
-              const memberData = {
-                business_id: businessData.id,
-                stamps: 0,
-                customer_name: customerName,
-                user_id: data.user.id,
-                is_anonymous: false,
-                total_stamps_collected: 0,
-                total_rewards_earned: 0
-              };
-              
-              const { data: membership, error: membershipError } = await supabase
-                .from('business_members')
-                .insert(memberData)
-                .select('id')
-                .single();
-                
-              if (membershipError) {
-                console.error("Error joining business:", membershipError);
-              } else {
-                setMemberId(membership.id);
-                setJoined(true);
-                setCustomer({
-                  id: data.user.id,
-                  name: customerName,
-                  stamps: 0
-                });
-                setStamps(0);
-                setTotalStampsCollected(0);
-                setTotalRewardsEarned(0);
-              }
-            } catch (e) {
-              console.error("Error auto-joining loyalty program:", e);
-            }
+
+        // Optionally, update business_members table upon signup
+        if (businessData) {
+          const { error: memberError } = await supabase
+            .from('business_members')
+            .insert({
+              business_id: businessData.id,
+              user_id: signUpData.user?.id,
+              customer_name: customerName,
+              joined_at: new Date().toISOString(),
+            });
+
+          if (memberError) {
+            console.error("Error adding member:", memberError);
+            setAuthError("Account created, but failed to join the loyalty program.");
           }
-          
-          setIsAuthMode(false);
         }
+
+        setAuthError(null);
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({ 
-          email, 
-          password 
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password,
         });
-        
-        if (error) {
-          setAuthError(error.message);
-          setAuthLoading(false);
-          return;
+
+        if (signInError) {
+          throw signInError;
         }
-        
-        toast({
-          title: "Login Successful",
-          description: "You've been logged in successfully!",
-        });
-        
-        if (data.user) {
-          setUserId(data.user.id);
-          setIsAuthMode(false);
-          
-          if (businessData && businessData.id) {
-            const { data: membership, error: membershipError } = await supabase
-              .from('business_members')
-              .select('*')
-              .eq('business_id', businessData.id)
-              .eq('user_id', data.user.id)
-              .single();
-              
-            if (!membershipError && membership) {
-              setJoined(true);
-              setMemberId(membership.id);
-              setCustomerName(membership.customer_name || "");
-              setCustomer({
-                id: data.user.id,
-                name: membership.customer_name || "Member",
-                stamps: membership.stamps || 0
-              });
-              setStamps(membership.stamps || 0);
-              setTotalStampsCollected(membership.total_stamps_collected || 0);
-              setTotalRewardsEarned(membership.total_rewards_earned || 0);
-            } else {
-              try {
-                const memberData = {
-                  business_id: businessData.id,
-                  stamps: 0,
-                  customer_name: customerName || data.user.email?.split('@')[0] || "Member",
-                  user_id: data.user.id,
-                  is_anonymous: false,
-                  total_stamps_collected: 0,
-                  total_rewards_earned: 0
-                };
-                
-                const { data: newMembership, error: newMembershipError } = await supabase
-                  .from('business_members')
-                  .insert(memberData)
-                  .select('id')
-                  .single();
-                  
-                if (!newMembershipError) {
-                  setMemberId(newMembership.id);
-                  setJoined(true);
-                  setCustomer({
-                    id: data.user.id,
-                    name: memberData.customer_name,
-                    stamps: 0
-                  });
-                  setStamps(0);
-                  setTotalStampsCollected(0);
-                  setTotalRewardsEarned(0);
-                  
-                  toast({
-                    title: "Welcome!",
-                    description: `You've been automatically enrolled in ${businessName}'s loyalty program!`,
-                  });
-                }
-              } catch (e) {
-                console.error("Error auto-joining loyalty program:", e);
-              }
-            }
-          }
-        }
+        setAuthError(null);
       }
-      
+    } catch (error: any) {
+      console.error("Authentication error:", error);
+      setAuthError(error.message || "Authentication failed");
+    } finally {
       setAuthLoading(false);
-    } catch (error) {
-      console.error('Authentication error:', error);
-      setAuthError('An unexpected error occurred. Please try again.');
-      setAuthLoading(false);
-    }
-  };
-
-  const handleCollectStamp = () => {
-    setScannerOpen(true);
-  };
-
-  const handleSuccessfulScan = (businessId: string, timestamp: number, stampCount: number = 1) => {
-    setScannerOpen(false);
-    
-    if (businessData && businessData.id && businessId !== businessData.id) {
-      toast({
-        title: "Wrong Business QR Code",
-        description: "The QR code you scanned is for a different business.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    const newStamps = Math.min(stamps + stampCount, loyaltyCardConfig?.maxStamps || 10);
-    const newTotalStamps = totalStampsCollected + stampCount;
-    
-    const oldRewards = Math.floor(stamps / (loyaltyCardConfig?.maxStamps || 10));
-    const newRewards = Math.floor(newStamps / (loyaltyCardConfig?.maxStamps || 10));
-    const newEarnedRewards = totalRewardsEarned + (newRewards > oldRewards ? 1 : 0);
-    
-    setStamps(newStamps);
-    setTotalStampsCollected(newTotalStamps);
-    setTotalRewardsEarned(newEarnedRewards);
-    
-    setCustomer(prev => ({
-      ...prev,
-      stamps: newStamps
-    }));
-    
-    toast({
-      title: "Stamp Collected!",
-      description: `You've collected ${stampCount} stamp${stampCount > 1 ? 's' : ''}.`,
-    });
-    
-    if (businessData?.id && memberId) {
-      supabase
-        .from('business_members')
-        .update({ 
-          stamps: newStamps,
-          total_stamps_collected: newTotalStamps,
-          total_rewards_earned: newEarnedRewards
-        })
-        .eq('id', memberId)
-        .then(({ error }) => {
-          if (error) {
-            console.error("Error updating stamps:", error);
-          }
-        });
-        
-      if (!userId) {
-        try {
-          const savedMemberships = localStorage.getItem('memberships') || '[]';
-          const memberships = JSON.parse(savedMemberships);
-          const membershipIndex = memberships.findIndex((m: any) => m.id === memberId);
-          
-          if (membershipIndex !== -1) {
-            memberships[membershipIndex].stamps = newStamps;
-            memberships[membershipIndex].totalStampsCollected = newTotalStamps;
-            memberships[membershipIndex].totalRewardsEarned = newEarnedRewards;
-            localStorage.setItem('memberships', JSON.stringify(memberships));
-          }
-        } catch (e) {
-          console.error("Error updating localStorage:", e);
-        }
-      }
-    }
-  };
-
-  const toggleAuthMode = () => {
-    setIsAuthMode(!isAuthMode);
-  };
-  
-  const handleNewCard = async () => {
-    if (businessData?.id && memberId) {
-      try {
-        const wasRewardEarned = stamps >= (loyaltyCardConfig?.maxStamps || 10);
-        const newTotalRewards = wasRewardEarned ? totalRewardsEarned + 1 : totalRewardsEarned;
-        
-        const { error } = await supabase
-          .from('business_members')
-          .update({ 
-            stamps: 0,
-            total_rewards_earned: newTotalRewards
-          })
-          .eq('id', memberId);
-          
-        if (error) {
-          console.error("Error resetting stamps:", error);
-          toast({
-            title: "Error",
-            description: "Could not reset your card. Please try again.",
-            variant: "destructive"
-          });
-          return;
-        }
-        
-        setStamps(0);
-        setTotalRewardsEarned(newTotalRewards);
-        
-        if (!userId) {
-          try {
-            const savedMemberships = localStorage.getItem('memberships') || '[]';
-            const memberships = JSON.parse(savedMemberships);
-            const membershipIndex = memberships.findIndex((m: any) => m.id === memberId);
-            
-            if (membershipIndex !== -1) {
-              memberships[membershipIndex].stamps = 0;
-              memberships[membershipIndex].totalRewardsEarned = newTotalRewards;
-              localStorage.setItem('memberships', JSON.stringify(memberships));
-            }
-          } catch (e) {
-            console.error("Error updating localStorage:", e);
-          }
-        }
-        
-        toast({
-          title: "Card Reset",
-          description: "Your loyalty card has been reset. Your rewards history is maintained!"
-        });
-      } catch (e) {
-        console.error("Error resetting card:", e);
-        toast({
-          title: "Error",
-          description: "Could not reset your card. Please try again.",
-          variant: "destructive"
-        });
-      }
     }
   };
 
@@ -607,13 +117,13 @@ const JoinPage = () => {
     return <LoadingState />;
   }
 
-  if (error) {
-    return <ErrorState errorMessage={error} />;
+  if (error || !businessActive) {
+    return <ErrorState errorMessage={error} businessActive={businessActive} />;
   }
 
   if (isAuthMode) {
     return (
-      <LoginForm 
+      <LoginForm
         isSignup={isSignup}
         setIsSignup={setIsSignup}
         email={email}
@@ -622,40 +132,24 @@ const JoinPage = () => {
         setPassword={setPassword}
         customerName={customerName}
         setCustomerName={setCustomerName}
-        onSubmit={handleAuthSubmit}
+        onSubmit={handleJoin}
         authLoading={authLoading}
         authError={authError}
       />
     );
   }
 
-  if (joined && customer && businessData) {
-    return <MemberCard 
-      businessName={businessName}
-      businessData={businessData}
+  return (
+    <JoinForm
+      businessName={businessData?.name}
       loyaltyCardConfig={loyaltyCardConfig}
-      customerName={customerName || customer.name}
-      stamps={stamps}
-      totalStampsCollected={totalStampsCollected}
-      totalRewardsEarned={totalRewardsEarned}
-      userId={userId}
-      onCollectStamp={handleCollectStamp}
-      onResetCard={handleNewCard}
-      scannerOpen={scannerOpen}
-      onScannerClose={() => setScannerOpen(false)}
-      onSuccessfulScan={handleSuccessfulScan}
-    />;
-  }
-
-  return <JoinForm 
-    businessName={businessName}
-    loyaltyCardConfig={loyaltyCardConfig}
-    customerName={customerName}
-    setCustomerName={setCustomerName}
-    onJoin={handleJoin}
-    setIsAuthMode={setIsAuthMode}
-    setIsSignup={setIsSignup}
-  />;
+      customerName={customerName}
+      setCustomerName={setCustomerName}
+      onJoin={handleJoin}
+      setIsAuthMode={setIsAuthMode}
+      setIsSignup={setIsSignup}
+    />
+  );
 };
 
 export default JoinPage;
