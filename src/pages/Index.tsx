@@ -1,8 +1,6 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
-import RewardsCard from "@/components/loyalty/RewardsCard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,7 +111,6 @@ const Index = () => {
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
 
-      // Get current membership data
       const { data: membership, error: fetchError } = await supabase
         .from('business_members')
         .select('*')
@@ -127,7 +124,6 @@ const Index = () => {
       const newTotalStampsCollected = membership ? (membership.total_stamps_collected || 0) + 1 : 1;
       
       if (membership) {
-        // Update existing membership
         const { error: updateError } = await supabase
           .from('business_members')
           .update({
@@ -138,7 +134,6 @@ const Index = () => {
 
         if (updateError) throw updateError;
       } else {
-        // Create new membership if it doesn't exist (fallback)
         const { error: insertError } = await supabase
           .from('business_members')
           .insert({
@@ -302,16 +297,6 @@ const Index = () => {
             onStampCollected={handleStampCollected}
             onReset={handleCardReset}
             businessId={businessId}
-          />
-        </div>
-        
-        <div className="mb-8">
-          <RewardsCard 
-            rewardsCount={Math.floor(stamps / maxStamps)}
-            totalEarned={totalEarned}
-            totalStamps={stamps}
-            textColor={cardStyle?.businessNameColor || "#0066CC"}
-            accentColor={cardStyle?.stampBgColor || "#E5F0FF"}
           />
         </div>
       </div>

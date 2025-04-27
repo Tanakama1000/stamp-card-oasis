@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Image } from "lucide-react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Suspense } from "react";
+
 interface LayoutProps {
   children: React.ReactNode;
   isLoading?: boolean;
@@ -15,6 +16,7 @@ const LoadingFallback = () => <div className="flex justify-center items-center p
       <div className="w-3 h-3 bg-coffee-medium rounded-full animate-bounce [animation-delay:0.4s]" />
     </div>
   </div>;
+
 const Layout: React.FC<LayoutProps> = ({
   children,
   isLoading = false
@@ -26,7 +28,6 @@ const Layout: React.FC<LayoutProps> = ({
             <img src="/lovable-uploads/04523b06-63b5-485f-ac7d-8624e600ad0d.png" alt="InStamp Logo" className="h-8 w-8" />
             <span>InStamp</span>
           </Link>
-          
         </div>
       </header>
       <main className="container mx-auto py-8 px-4 bg-slate-50">
@@ -38,7 +39,7 @@ const Layout: React.FC<LayoutProps> = ({
       </main>
       <footer className="bg-coffee-dark text-white p-4 mt-auto">
         <div className="container mx-auto text-center text-sm">
-          &copy; {new Date().getFullYear()} Stamp Card Oasis. All rights reserved.
+          &copy; {new Date().getFullYear()} InStamp. All rights reserved.
         </div>
       </footer>
     </div>;
