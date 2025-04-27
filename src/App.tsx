@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -10,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import ScanPage from "./pages/ScanPage";
 import AuthPage from "./pages/AuthPage";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -17,20 +17,18 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Check current auth status
     const checkAuth = async () => {
       try {
         const { data } = await supabase.auth.getSession();
         setIsAuthenticated(!!data.session);
       } catch (error) {
         console.error("Auth check error:", error);
-        setIsAuthenticated(false); // Fail safely
+        setIsAuthenticated(false);
       }
     };
     
     checkAuth();
 
-    // Listen for auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       setIsAuthenticated(!!session);
     });
@@ -40,9 +38,7 @@ const App = () => {
     };
   }, []);
 
-  // Protected route component with better loading state
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    // If still checking auth, show minimal loader instead of full page loading state
     if (isAuthenticated === null) {
       return (
         <div className="flex justify-center items-center h-screen bg-cream-light">
@@ -55,16 +51,13 @@ const App = () => {
       );
     }
     
-    // Redirect if not authenticated
     if (!isAuthenticated) {
       return <Navigate to="/auth" />;
     }
 
-    // Render children if authenticated
     return <>{children}</>;
   };
 
-  // Non-protected routes don't need to wait for auth check
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
@@ -74,6 +67,11 @@ const App = () => {
           <Route path="/admin" element={
             <ProtectedRoute>
               <AdminPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute>
+              <AdminDashboard />
             </ProtectedRoute>
           } />
           <Route path="/auth" element={<AuthPage />} />
