@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
@@ -25,6 +24,7 @@ const JoinPage = () => {
   const [customerName, setCustomerName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [businessInactive, setBusinessInactive] = useState<boolean>(false);
   const [joined, setJoined] = useState<boolean>(false);
   const [businessData, setBusinessData] = useState<any>(null);
   const [customer, setCustomer] = useState<any>(null);
@@ -80,6 +80,12 @@ const JoinPage = () => {
           }
           
           if (foundBusiness) {
+            if (!foundBusiness.is_active) {
+              setBusinessInactive(true);
+              setError("This loyalty program is currently not available.");
+              setLoading(false);
+              return;
+            }
             setBusinessName(foundBusiness.name);
             setBusinessData(foundBusiness);
             await fetchLoyaltyCardConfig(foundBusiness.id);
@@ -88,7 +94,8 @@ const JoinPage = () => {
             const defaultBusinessData = {
               name: "Coffee Oasis",
               slug: "coffee-oasis",
-              id: "coffee-oasis-id"
+              id: "coffee-oasis-id",
+              is_active: true
             };
             setBusinessData(defaultBusinessData);
             await fetchLoyaltyCardConfig(defaultBusinessData.id);
@@ -96,6 +103,12 @@ const JoinPage = () => {
             setError("Business not found");
           }
         } else if (businesses) {
+          if (!businesses.is_active) {
+            setBusinessInactive(true);
+            setError("This loyalty program is currently not available.");
+            setLoading(false);
+            return;
+          }
           setBusinessName(businesses.name);
           setBusinessData(businesses);
           await fetchLoyaltyCardConfig(businesses.id);
@@ -609,6 +622,10 @@ const JoinPage = () => {
 
   if (error) {
     return <ErrorState errorMessage={error} />;
+  }
+
+  if (businessInactive) {
+    return <ErrorState errorMessage="This loyalty program is currently not available." />;
   }
 
   if (isAuthMode) {
