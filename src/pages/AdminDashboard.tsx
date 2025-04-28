@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
@@ -160,18 +159,18 @@ const AdminDashboard: React.FC = () => {
   const deleteBusiness = async (businessId: string) => {
     try {
       const { error } = await supabase
-        .from('businesses')
-        .delete()
-        .eq('id', businessId);
+        .rpc('delete_business_cascade', {
+          business_id_param: businessId
+        });
 
       if (error) throw error;
 
       // Update local state to remove the business
       setBusinesses(businesses.filter(business => business.id !== businessId));
-      toast.success("Business deleted successfully");
+      toast.success("Business and all associated data deleted successfully");
     } catch (error) {
       console.error('Error deleting business:', error);
-      toast.error('Failed to delete business');
+      toast.error('Failed to delete business and its data');
     }
   };
 
@@ -214,20 +213,23 @@ const AdminDashboard: React.FC = () => {
     }
 
     try {
-      const { error } = await supabase
-        .from('businesses')
-        .delete()
-        .in('id', selectedBusinesses);
-
-      if (error) throw error;
+      // Delete each selected business using the cascade function
+      for (const businessId of selectedBusinesses) {
+        const { error } = await supabase
+          .rpc('delete_business_cascade', {
+            business_id_param: businessId
+          });
+          
+        if (error) throw error;
+      }
 
       // Update local state
       setBusinesses(businesses.filter(business => !selectedBusinesses.includes(business.id)));
-      toast.success(`${selectedBusinesses.length} businesses deleted`);
+      toast.success(`${selectedBusinesses.length} businesses and their data deleted`);
       setSelectedBusinesses([]); // Clear selection after operation
     } catch (error) {
       console.error('Error deleting businesses:', error);
-      toast.error('Failed to delete businesses');
+      toast.error('Failed to delete businesses and their data');
     }
   };
 

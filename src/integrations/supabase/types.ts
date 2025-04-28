@@ -150,6 +150,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_business_cascade: {
+        Args: { business_id_param: string }
+        Returns: undefined
+      }
       generate_unique_slug: {
         Args: { business_name: string }
         Returns: string
