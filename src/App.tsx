@@ -1,9 +1,11 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import AdminPage from "./pages/AdminPage";
+import AdminLogin from "./pages/AdminLogin";
 import JoinPage from "./pages/JoinPage";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
@@ -38,7 +40,9 @@ const App = () => {
     };
   }, []);
 
-  const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const ProtectedRoute = ({ children, requiresAdmin = false }: { children: React.ReactNode, requiresAdmin?: boolean }) => {
+    const isAdmin = sessionStorage.getItem('is_admin') === 'true';
+    
     if (isAuthenticated === null) {
       return (
         <div className="flex justify-center items-center h-screen bg-cream-light">
@@ -55,6 +59,10 @@ const App = () => {
       return <Navigate to="/auth" />;
     }
 
+    if (requiresAdmin && !isAdmin) {
+      return <Navigate to="/admin" />;
+    }
+
     return <>{children}</>;
   };
 
@@ -64,13 +72,9 @@ const App = () => {
         <Toaster />
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/admin" element={
-            <ProtectedRoute>
-              <AdminPage />
-            </ProtectedRoute>
-          } />
+          <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={
-            <ProtectedRoute>
+            <ProtectedRoute requiresAdmin>
               <AdminDashboard />
             </ProtectedRoute>
           } />
