@@ -55,6 +55,7 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Changed from #FFFDD0 to pure white */
     --cream-light: #FFFFFF;
   }
 
@@ -105,10 +106,12 @@
 
 @layer base {
   body {
+    /* Changed background to light slate blue */
     background-color: #F8FAFC;
     @apply text-foreground;
   }
 
+  /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
