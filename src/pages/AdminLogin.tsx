@@ -29,17 +29,25 @@ const AdminLogin = () => {
     
     try {
       // Fetch admin password from Supabase
-      const { data, error } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('admin_settings')
         .select('setting_value')
-        .eq('setting_key', 'admin_dashboard_password')
-        .single();
+        .eq('setting_key', 'admin_dashboard_password');
       
-      if (error) {
-        throw error;
+      if (fetchError) {
+        throw fetchError;
       }
       
-      if (data?.setting_value === password) {
+      // Check if we got any results back
+      if (!data || data.length === 0) {
+        console.error('No admin password found in settings');
+        setError('Admin password not configured. Please contact the administrator.');
+        toast.error("Admin password configuration missing");
+        return;
+      }
+      
+      // Compare with the first row's setting_value
+      if (data[0].setting_value === password) {
         // Store admin token in session storage (not localStorage for security)
         sessionStorage.setItem('adminToken', 'true');
         toast.success("Admin login successful");
