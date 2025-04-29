@@ -6,12 +6,14 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import AdminPage from "./pages/AdminPage";
+import AdminLogin from "./pages/AdminLogin";
 import JoinPage from "./pages/JoinPage";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import ScanPage from "./pages/ScanPage";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminRoute from "./components/AdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -66,15 +68,12 @@ const App = () => {
         <Toaster />
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/admin" element={
-            <ProtectedRoute>
-              <AdminPage />
-            </ProtectedRoute>
-          } />
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={
-            <ProtectedRoute>
+            <AdminRoute>
               <AdminDashboard />
-            </ProtectedRoute>
+            </AdminRoute>
           } />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/join/:businessSlug" element={<JoinPage />} />
