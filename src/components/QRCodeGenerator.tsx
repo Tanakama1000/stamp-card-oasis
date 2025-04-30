@@ -86,8 +86,10 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
       return;
     }
     try {
-      const svg = qrCodeRef.current.querySelector('svg');
-      if (!svg) {
+      // Create a canvas element to draw all components
+      const canvas = document.createElement("canvas");
+      const qrCodeElement = qrCodeRef.current.querySelector('svg');
+      if (!qrCodeElement) {
         toast({
           title: "Download Failed",
           description: "Could not find the QR code. Please try again.",
@@ -95,43 +97,68 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
         });
         return;
       }
-      const canvas = document.createElement("canvas");
-      const box = svg.getBoundingClientRect();
-      canvas.width = box.width;
-      canvas.height = box.height;
-      const svgData = new XMLSerializer().serializeToString(svg);
+
+      // Get dimensions from the actual QR code element
+      const qrRect = qrCodeElement.getBoundingClientRect();
+      
+      // Canvas with padding and space for ID number
+      canvas.width = qrRect.width + 40; // Add padding
+      canvas.height = qrRect.height + 80; // Add space for ID at bottom
+      
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        toast({
+          title: "Download Failed",
+          description: "Could not process the QR code. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Fill canvas with white background
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Convert SVG to data URL for drawing on canvas
+      const svgData = new XMLSerializer().serializeToString(qrCodeElement);
       const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
-      const blobUrl = URL.createObjectURL(svgBlob);
+      const svgUrl = URL.createObjectURL(svgBlob);
+      
+      // Create an image from SVG
       const img = new Image();
       img.onload = () => {
-        const context = canvas.getContext("2d");
-        if (!context) {
-          toast({
-            title: "Download Failed",
-            description: "Could not process the QR code. Please try again.",
-            variant: "destructive",
-          });
-          URL.revokeObjectURL(blobUrl);
-          return;
-        }
-        context.fillStyle = "white";
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(img, 0, 0);
+        // Draw QR code centered with padding
+        ctx.drawImage(img, 20, 20, qrRect.width, qrRect.height);
+        
+        // Draw ID text below QR code
+        ctx.fillStyle = "#374151"; // Dark gray text
+        ctx.font = "bold 16px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(`Business ID: ${businessNumericId}`, canvas.width / 2, qrRect.height + 50);
+        
+        // Convert canvas to PNG
         const pngUrl = canvas.toDataURL("image/png");
+        
+        // Download the image
         const downloadLink = document.createElement("a");
         downloadLink.href = pngUrl;
         downloadLink.download = `business-qrcode-${businessNumericId}.png`;
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
-        URL.revokeObjectURL(blobUrl);
+        
+        // Clean up
+        URL.revokeObjectURL(svgUrl);
+        
         toast({
           title: "QR Code Downloaded",
-          description: "The QR code has been downloaded to your device.",
+          description: "The QR code with business ID has been downloaded to your device.",
         });
       };
-      img.src = blobUrl;
+      
+      img.src = svgUrl;
     } catch (error) {
+      console.error("QR code download error:", error);
       toast({
         title: "Download Failed",
         description: "Could not download the QR code. Please try again.",
@@ -142,8 +169,8 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
 
   return (
     <Card className="p-6 bg-white card-shadow">
-      <h3 className="text-xl font-semibold text-coffee-dark mb-4 flex items-center gap-2">
-        <QrCode size={24} className="text-orange" />
+      <h3 className="text-xl font-semibold text-[#0EA5E9] mb-4 flex items-center gap-2">
+        <QrCode size={24} className="text-[#0EA5E9]" />
         Business QR Code
       </h3>
 
@@ -178,6 +205,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ onGenerate, businessI
           variant="outline"
           className="w-full flex items-center justify-center gap-2"
           disabled={!!error}
+          style={{ borderColor: "#0EA5E9", color: "#0EA5E9" }}
         >
           <Download size={18} />
           Download QR Code

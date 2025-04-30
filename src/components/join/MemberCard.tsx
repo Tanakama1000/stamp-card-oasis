@@ -39,6 +39,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onScannerClose,
   onSuccessfulScan
 }) => {
+  const themeColor = loyaltyCardConfig?.businessNameColor || "#0EA5E9";
+  
   return (
     <Layout>
       <div className="max-w-md mx-auto mt-8 mb-12">
@@ -51,17 +53,15 @@ const MemberCard: React.FC<MemberCardProps> = ({
                 className="h-12 w-12 object-contain mx-auto mb-2"
               />
             ) : (
-              <Coffee size={40} className="mx-auto text-coffee-dark mb-2" />
+              <Coffee size={40} className="mx-auto mb-2" style={{ color: themeColor }} />
             )}
             <h2 
               className="text-2xl font-bold mb-1"
-              style={{ color: loyaltyCardConfig?.businessNameColor || "#2563EB" }}
+              style={{ color: themeColor }}
             >
               Welcome to {businessName}!
             </h2>
-            <p 
-              style={{ color: loyaltyCardConfig?.cardTitleColor || "#2563EB" }}
-            >
+            <p style={{ color: themeColor }}>
               Here's your loyalty card
             </p>
             
@@ -93,22 +93,20 @@ const MemberCard: React.FC<MemberCardProps> = ({
             <RewardsCard 
               rewardsCount={Math.floor(stamps / (loyaltyCardConfig?.maxStamps || 10))}
               totalStamps={totalStampsCollected}
-              textColor={loyaltyCardConfig?.businessNameColor || "#2563EB"}
+              textColor={themeColor}
               accentColor={loyaltyCardConfig?.stampBgColor || "#E5F0FF"}
             />
           </div>
 
           <div className="text-center space-y-4">
-            <p 
-              className="text-sm"
-              style={{ color: loyaltyCardConfig?.rewardTextColor || "#2563EB" }}
-            >
+            <p className="text-sm" style={{ color: themeColor }}>
               Show this card when you visit {businessName} to collect stamps
             </p>
             
             <Button
               onClick={onCollectStamp}
-              className="w-full flex items-center justify-center gap-2 bg-[#5271FF] hover:bg-[#3a5dff] text-white"
+              className="w-full flex items-center justify-center gap-2 text-white"
+              style={{ backgroundColor: themeColor, borderColor: themeColor }}
             >
               <QrCode size={20} />
               Scan QR Code to Collect Stamp

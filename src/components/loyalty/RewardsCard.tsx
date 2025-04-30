@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card } from "@/components/ui/card";
-import { Trophy } from "lucide-react";
+import { Trophy, Badge } from "lucide-react";
 
 interface RewardsCardProps {
   rewardsCount?: number;
@@ -15,11 +15,11 @@ const RewardsCard: React.FC<RewardsCardProps> = ({
   rewardsCount = 0,
   totalEarned = 0,
   totalStamps = 0,
-  textColor = "#5271FF",
+  textColor = "#0EA5E9",
   accentColor = "#EBF0FF"
 }) => {
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden shadow-md">
       <div 
         className="p-4 flex items-center gap-2"
         style={{ backgroundColor: accentColor }}
@@ -34,20 +34,26 @@ const RewardsCard: React.FC<RewardsCardProps> = ({
       </div>
 
       <div className="p-6 text-center">
-        <div className="text-5xl font-bold mb-2" style={{ color: textColor }}>
-          {rewardsCount}
+        <div 
+          className="text-6xl font-bold mb-4" 
+          style={{ color: textColor }}
+        >
+          {totalStamps}
         </div>
         
-        {rewardsCount === 0 ? (
-          <p className="text-gray-600 mb-4">You have no rewards available yet.</p>
-        ) : (
-          <p className="text-gray-600 mb-4">Active rewards available to use.</p>
-        )}
+        <div className="text-gray-600 mb-6 text-lg">
+          Total stamps collected
+        </div>
         
         <div className="border-t border-gray-100 pt-4">
-          <p className="text-sm text-gray-500">
-            Total stamps collected: <span className="font-medium">{totalStamps}</span>
-          </p>
+          {rewardsCount > 0 && (
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Badge className="text-white" size={16} style={{ color: textColor }} />
+              <p className="text-sm font-medium" style={{ color: textColor }}>
+                {rewardsCount} {rewardsCount === 1 ? 'reward' : 'rewards'} available
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </Card>
