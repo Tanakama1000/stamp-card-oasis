@@ -88,15 +88,6 @@ const MemberCard: React.FC<MemberCardProps> = ({
               businessId={businessData.id}
             />
           </div>
-          
-          <div className="mt-6 mb-6">
-            <RewardsCard 
-              rewardsCount={Math.floor(stamps / (loyaltyCardConfig?.maxStamps || 10))}
-              totalStamps={totalStampsCollected}
-              textColor={themeColor}
-              accentColor={loyaltyCardConfig?.stampBgColor || "#E5F0FF"}
-            />
-          </div>
 
           <div className="text-center space-y-4">
             <p className="text-sm" style={{ color: themeColor }}>
@@ -111,6 +102,15 @@ const MemberCard: React.FC<MemberCardProps> = ({
               <QrCode size={20} />
               Scan QR Code to Collect Stamp
             </Button>
+          </div>
+          
+          <div className="mt-6">
+            <RewardsCard 
+              rewardsCount={Math.floor(stamps / (loyaltyCardConfig?.maxStamps || 10))}
+              totalStamps={totalStampsCollected}
+              textColor={themeColor}
+              accentColor={loyaltyCardConfig?.stampBgColor || "#E5F0FF"}
+            />
           </div>
         </Card>
 
