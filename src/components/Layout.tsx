@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Image } from "lucide-react";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,7 +22,7 @@ const Layout: React.FC<LayoutProps> = ({
   children,
   isLoading = false
 }) => {
-  return <div className="min-h-screen bg-cream-light">
+  return <div className="min-h-screen bg-white">
       <header className="bg-coffee-dark text-white p-4 shadow-md">
         <div className="container mx-auto flex justify-between items-center">
           <Link to="/" className="text-xl font-bold flex items-center gap-2">
@@ -30,7 +31,7 @@ const Layout: React.FC<LayoutProps> = ({
           </Link>
         </div>
       </header>
-      <main className="container mx-auto py-8 px-4 bg-slate-50">
+      <main className="container mx-auto py-8 px-4 bg-white">
         <TooltipProvider>
           <Suspense fallback={<LoadingFallback />}>
             {isLoading ? <LoadingFallback /> : children}

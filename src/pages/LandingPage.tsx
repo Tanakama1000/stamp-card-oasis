@@ -1,14 +1,21 @@
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
-import { Image, Star, Gift, PieChart, ShieldCheck, Smartphone, Users, ChevronRight, Clock, Award, Mail, Phone } from "lucide-react";
+import { 
+  Star, Gift, PieChart, ShieldCheck, Smartphone, Users, 
+  ChevronRight, Clock, Award, Mail, Phone, Check, CreditCard,
+  QrCode, AreaChart
+} from "lucide-react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  return <div className="min-h-screen bg-white">
+  
+  return (
+    <div className="min-h-screen bg-white">
       {/* Header/Navigation */}
-      <header className="bg-coffee-dark text-white p-4 shadow-md">
+      <header className="bg-coffee-dark text-white p-4 shadow-md sticky top-0 z-50">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
             <img src="/lovable-uploads/04523b06-63b5-485f-ac7d-8624e600ad0d.png" alt="InStamp Logo" className="h-8 w-8" />
@@ -18,7 +25,7 @@ const LandingPage = () => {
             <Button variant="ghost" className="text-white hover:bg-white/10" onClick={() => navigate("/admin")}>
               Log In
             </Button>
-            <Button className="bg-white text-coffee-dark hover:bg-white/90" onClick={() => navigate("/admin")}>
+            <Button className="bg-white text-coffee-dark hover:bg-white/90 font-medium" onClick={() => navigate("/admin")}>
               Get Started
             </Button>
           </div>
@@ -26,386 +33,311 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto flex flex-col lg:flex-row items-center gap-12">
+      <section className="relative overflow-hidden bg-gradient-to-r from-coffee-dark to-[#7a8cf8] text-white py-20 px-4">
+        <div className="absolute inset-0 bg-[url('/lovable-uploads/9a9d4172-f54a-46e2-8496-052ae81557cd.png')] opacity-10 bg-cover bg-center"></div>
+        <div className="container mx-auto flex flex-col lg:flex-row items-center gap-12 relative z-10">
           <div className="lg:w-1/2 space-y-6">
-            <h1 className="text-5xl md:text-6xl font-bold leading-tight tracking-tighter text-black">
-              Go Digital With Your Loyalty Program — Instantly
+            <div className="inline-block bg-white/20 text-white px-4 py-1 rounded-full text-sm font-medium backdrop-blur-sm mb-2">
+              #1 Digital Loyalty Platform
+            </div>
+            <h1 className="text-5xl md:text-6xl font-bold leading-tight">
+              Transform Your Loyalty Program <span className="text-white">Digitally</span>
             </h1>
-            <p className="text-xl text-gray-600">
-              Increase customer retention and repeat business with our easy-to-use digital stamp card system.
+            <p className="text-xl text-white/90 max-w-lg">
+              Increase customer retention and drive repeat business with our easy-to-use digital stamp card system.
             </p>
-            <div className="pt-4">
-              <Button className="bg-[#4F46E5] hover:bg-[#4338CA] text-lg px-8 py-6 rounded-full" onClick={() => navigate("/admin")}>
-                Get Started
-              </Button>
-            </div>
-          </div>
-          <div className="lg:w-1/2">
-            <div className="relative">
-              <img alt="Loyalty Cards Preview" className="w-full transform rotate-[-5deg] hover:rotate-0 transition-transform duration-300" src="/lovable-uploads/ec60039d-0d09-4ec3-94ff-8e66e6c380a5.png" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Problem → Solution Section */}
-      <section className="py-24 px-4 bg-gradient-to-br from-slate-50 to-white">
-        <div className="container mx-auto text-center max-w-4xl">
-          <h2 className="text-4xl font-bold text-coffee-dark mb-4">
-            Say Goodbye to Paper Loyalty Cards
-          </h2>
-          <p className="text-xl text-coffee-light/80 mb-12 max-w-2xl mx-auto">
-            Join thousands of businesses revolutionizing their loyalty programs
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <Card className="p-8 text-left shadow-lg hover:shadow-xl transition-shadow border-coffee-light/10">
-              <h3 className="text-2xl font-semibold mb-6 text-coffee-dark">The Problems</h3>
-              <ul className="space-y-4">
-                <li className="flex items-start gap-3">
-                  <span className="text-red-500 bg-red-50 p-1 rounded-full mt-1">✗</span>
-                  <span className="text-gray-700">Customers always forget or lose paper cards</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-red-500 bg-red-50 p-1 rounded-full mt-1">✗</span>
-                  <span className="text-gray-700">No data insights on your loyalty program</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-red-500 bg-red-50 p-1 rounded-full mt-1">✗</span>
-                  <span className="text-gray-700">No way to message loyal customers</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-red-500 bg-red-50 p-1 rounded-full mt-1">✗</span>
-                  <span className="text-gray-700">Stamp fraud and forgery concerns</span>
-                </li>
-              </ul>
-            </Card>
-            
-            <Card className="p-8 text-left shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-white to-slate-50 border-coffee-light/10">
-              <h3 className="text-2xl font-semibold mb-6 text-coffee-dark">Our Solution</h3>
-              <ul className="space-y-4">
-                <li className="flex items-start gap-3">
-                  <span className="text-emerald-500 bg-emerald-50 p-1 rounded-full mt-1">✓</span>
-                  <span className="text-gray-700">Digital cards that customers can't lose</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-emerald-500 bg-emerald-50 p-1 rounded-full mt-1">✓</span>
-                  <span className="text-gray-700">Detailed analytics on your loyalty program</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-emerald-500 bg-emerald-50 p-1 rounded-full mt-1">✓</span>
-                  <span className="text-gray-700">Direct messaging to loyal customers</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-emerald-500 bg-emerald-50 p-1 rounded-full mt-1">✓</span>
-                  <span className="text-gray-700">Secure, tamper-proof digital stamps</span>
-                </li>
-              </ul>
-            </Card>
-          </div>
-          
-          <Button size="lg" className="bg-coffee-dark hover:bg-coffee-medium text-white text-lg px-12 py-6 rounded-full shadow-lg hover:shadow-xl transition-all" onClick={() => navigate("/admin")}>
-            Start Your Digital Loyalty Program
-          </Button>
-        </div>
-      </section>
-
-      {/* Key Features */}
-      <section className="py-24 px-4 bg-gradient-to-br from-white to-slate-50">
-        <div className="container mx-auto text-center">
-          <h2 className="text-4xl font-bold text-coffee-dark mb-4">Powerful Features for Your Business</h2>
-          <p className="text-xl text-coffee-light/80 mb-16 max-w-2xl mx-auto">
-            Everything you need to run an effective loyalty program that keeps customers coming back
-          </p>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="p-10 hover:shadow-xl transition-all duration-300 bg-white border-coffee-light/10 hover:-translate-y-1">
-              <div className="mb-6 text-coffee-dark bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto">
-                <Gift size={32} />
-              </div>
-              <h3 className="text-xl font-semibold mb-4 text-coffee-dark">Digital Stamp Cards</h3>
-              <p className="text-gray-600">
-                Fully customizable digital cards that match your brand and reward structure
-              </p>
-            </Card>
-            
-            <Card className="p-10 hover:shadow-xl transition-all duration-300 bg-white border-coffee-light/10 hover:-translate-y-1">
-              <div className="mb-6 text-coffee-dark bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto">
-                <PieChart size={32} />
-              </div>
-              <h3 className="text-xl font-semibold mb-4 text-coffee-dark">Analytics Dashboard</h3>
-              <p className="text-gray-600">
-                Track program performance with data on stamps, rewards and customer engagement
-              </p>
-            </Card>
-            
-            <Card className="p-10 hover:shadow-xl transition-all duration-300 bg-white border-coffee-light/10 hover:-translate-y-1">
-              <div className="mb-6 text-coffee-dark bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto">
-                <Smartphone size={32} />
-              </div>
-              <h3 className="text-xl font-semibold mb-4 text-coffee-dark">QR Code System</h3>
-              <p className="text-gray-600">
-                Simple scan-to-stamp system through QR codes - no app download required
-              </p>
-            </Card>
-            
-            <Card className="p-10 hover:shadow-xl transition-all duration-300 bg-white border-coffee-light/10 hover:-translate-y-1">
-              <div className="mb-6 text-coffee-dark bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto">
-                <Users size={32} />
-              </div>
-              <h3 className="text-xl font-semibold mb-4 text-coffee-dark">Customer Management</h3>
-              <p className="text-gray-600">
-                Build customer profiles and track their loyalty program engagement
-              </p>
-            </Card>
-            
-            <Card className="p-10 hover:shadow-xl transition-all duration-300 bg-white border-coffee-light/10 hover:-translate-y-1">
-              <div className="mb-6 text-coffee-dark bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto">
-                <Award size={32} />
-              </div>
-              <h3 className="text-xl font-semibold mb-4 text-coffee-dark">Flexible Rewards</h3>
-              <p className="text-gray-600">
-                Create milestone rewards, bonus stamps, and special promotions easily
-              </p>
-            </Card>
-            
-            <Card className="p-10 hover:shadow-xl transition-all duration-300 bg-white border-coffee-light/10 hover:-translate-y-1">
-              <div className="mb-6 text-coffee-dark bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto">
-                <ShieldCheck size={32} />
-              </div>
-              <h3 className="text-xl font-semibold mb-4 text-coffee-dark">Secure & Reliable</h3>
-              <p className="text-gray-600">
-                Fraud-proof stamp system with data backup and easy recovery
-              </p>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Screenshots/Demo */}
-      <section className="py-24 px-4 bg-gradient-to-br from-slate-50 to-white">
-        <div className="container mx-auto">
-          <h2 className="text-4xl font-bold text-center text-coffee-dark mb-4">See It In Action</h2>
-          <p className="text-xl text-coffee-light/80 text-center mb-16 max-w-2xl mx-auto">
-            Our intuitive interface makes managing your loyalty program simple
-          </p>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all group">
-              <div className="bg-coffee-dark text-white p-4 text-center font-semibold">
-                Business Dashboard
-              </div>
-              <div className="h-72 bg-slate-50 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
-                <PieChart size={48} className="text-coffee-medium opacity-50" />
-              </div>
-            </Card>
-            
-            <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all group">
-              <div className="bg-coffee-dark text-white p-4 text-center font-semibold">
-                Customer View
-              </div>
-              <div className="h-72 bg-slate-50 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
-                <Smartphone size={48} className="text-coffee-medium opacity-50" />
-              </div>
-            </Card>
-            
-            <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all group">
-              <div className="bg-coffee-dark text-white p-4 text-center font-semibold">
-                Mobile Experience
-              </div>
-              <div className="h-72 bg-slate-50 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
-                <Users size={48} className="text-coffee-medium opacity-50" />
-              </div>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-24 px-4 bg-coffee-dark text-white">
-        <div className="container mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-4">What Our Customers Say</h2>
-          <p className="text-xl opacity-80 mb-16 max-w-2xl mx-auto">
-            Businesses like yours are loving our digital loyalty solution
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="p-8 bg-white/5 backdrop-blur-sm border-white/10 text-left hover:bg-white/10 transition-colors">
-              <div className="flex items-center gap-1 mb-4 text-yellow-300">
-                <Star size={20} fill="currentColor" />
-                <Star size={20} fill="currentColor" />
-                <Star size={20} fill="currentColor" />
-                <Star size={20} fill="currentColor" />
-                <Star size={20} fill="currentColor" />
-              </div>
-              <p className="mb-6 text-lg">
-                "Our customers love the digital cards! We've seen a 30% increase in repeat visits since switching from paper cards."
-              </p>
-              <div>
-                <p className="font-semibold text-lg">Sarah Johnson</p>
-                <p className="text-sm opacity-80">Bloom Coffee House</p>
-              </div>
-            </Card>
-            
-            <Card className="p-8 bg-white/5 backdrop-blur-sm border-white/10 text-left hover:bg-white/10 transition-colors">
-              <div className="flex items-center gap-1 mb-4 text-yellow-300">
-                <Star size={20} fill="currentColor" />
-                <Star size={20} fill="currentColor" />
-                <Star size={20} fill="currentColor" />
-                <Star size={20} fill="currentColor" />
-                <Star size={20} fill="currentColor" />
-              </div>
-              <p className="mb-6 text-lg">
-                "The analytics alone made it worth switching. I finally understand which rewards drive the most business!"
-              </p>
-              <div>
-                <p className="font-semibold text-lg">Michael Chen</p>
-                <p className="text-sm opacity-80">Urban Bakery</p>
-              </div>
-            </Card>
-            
-            <Card className="p-8 bg-white/5 backdrop-blur-sm border-white/10 text-left hover:bg-white/10 transition-colors">
-              <div className="flex items-center gap-1 mb-4 text-yellow-300">
-                <Star size={20} fill="currentColor" />
-                <Star size={20} fill="currentColor" />
-                <Star size={20} fill="currentColor" />
-                <Star size={20} fill="currentColor" />
-                <Star size={20} />
-              </div>
-              <p className="mb-6 text-lg">
-                "Setup was incredibly easy and the customer support team was there to help every step of the way."
-              </p>
-              <div>
-                <p className="font-semibold text-lg">Jessica Williams</p>
-                <p className="text-sm opacity-80">Sunset Salon</p>
-              </div>
-            </Card>
-          </div>
-          
-          <div className="mt-12 inline-block border border-white/20 rounded-full px-8 py-3 bg-white/5 hover:bg-white/10 transition-colors">
-            Trusted by 500+ businesses worldwide
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section className="py-16 px-4 bg-white">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl font-bold text-coffee-dark mb-2">Simple, Transparent Pricing</h2>
-          <p className="text-coffee-light mb-12 max-w-2xl mx-auto">
-            Choose a plan that works for your business
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <Card className="p-6 border border-coffee-light/20 hover:shadow-lg transition-shadow bg-white">
-              <h3 className="text-xl font-bold text-coffee-dark mb-2">Starter</h3>
-              <div className="text-3xl font-bold mb-1">$19<span className="text-sm font-normal">/month</span></div>
-              <p className="text-coffee-light mb-6">Perfect for new businesses</p>
-              <Separator className="mb-6" />
-              <ul className="space-y-3 text-left mb-6">
-                <li className="flex items-start gap-2">
-                  <span className="text-coffee-dark mt-1">✓</span>
-                  <span>Up to 500 customers</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-coffee-dark mt-1">✓</span>
-                  <span>Basic analytics</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-coffee-dark mt-1">✓</span>
-                  <span>1 loyalty card template</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-coffee-dark mt-1">✓</span>
-                  <span>Email support</span>
-                </li>
-              </ul>
-              <Button className="w-full bg-coffee-dark hover:bg-coffee-medium" onClick={() => navigate("/admin")}>
+            <div className="pt-4 flex flex-col sm:flex-row gap-4">
+              <Button size="lg" className="bg-white text-coffee-dark hover:bg-white/90 px-8 py-6 rounded-full transition-all shadow-lg" onClick={() => navigate("/admin")}>
                 Start Free Trial
               </Button>
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-6 rounded-full transition-all" onClick={() => navigate("/admin/login")}>
+                Book a Demo
+              </Button>
+            </div>
+            <div className="flex items-center gap-2 pt-2">
+              <div className="flex -space-x-3">
+                <div className="w-8 h-8 rounded-full bg-blue-300 border-2 border-white"></div>
+                <div className="w-8 h-8 rounded-full bg-green-300 border-2 border-white"></div>
+                <div className="w-8 h-8 rounded-full bg-red-300 border-2 border-white"></div>
+                <div className="w-8 h-8 rounded-full bg-yellow-300 border-2 border-white flex items-center justify-center text-xs">+</div>
+              </div>
+              <p className="text-sm text-white/80">Join 5,000+ businesses already using InStamp</p>
+            </div>
+          </div>
+          <div className="lg:w-1/2 relative">
+            <div className="absolute -z-10 w-72 h-72 bg-white/10 rounded-full blur-3xl -top-10 -right-10"></div>
+            <img 
+              alt="Loyalty Cards Preview" 
+              className="w-full rounded-lg shadow-2xl border border-white/10 transform hover:scale-[1.02] transition-all duration-500" 
+              src="/lovable-uploads/ec60039d-0d09-4ec3-94ff-8e66e6c380a5.png" 
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 px-4 bg-white">
+        <div className="container mx-auto text-center">
+          <div className="max-w-xl mx-auto mb-16">
+            <h2 className="text-3xl font-bold mb-4 text-coffee-dark">Why Businesses Choose InStamp</h2>
+            <p className="text-gray-600">Powerful features designed to increase customer loyalty and streamline your rewards program.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="group p-8 rounded-xl bg-gray-50 hover:bg-coffee-dark hover:text-white transition-all duration-300">
+              <div className="bg-coffee-dark text-white group-hover:bg-white group-hover:text-coffee-dark w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-6 transition-all duration-300">
+                <QrCode size={24} />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Easy Scanning</h3>
+              <p className="text-gray-500 group-hover:text-white/80">Simple QR code scanning system that works on any smartphone without app downloads.</p>
+            </div>
+            
+            <div className="group p-8 rounded-xl bg-gray-50 hover:bg-coffee-dark hover:text-white transition-all duration-300">
+              <div className="bg-coffee-dark text-white group-hover:bg-white group-hover:text-coffee-dark w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-6 transition-all duration-300">
+                <CreditCard size={24} />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Custom Loyalty Cards</h3>
+              <p className="text-gray-500 group-hover:text-white/80">Create beautiful digital loyalty cards that match your brand and delight customers.</p>
+            </div>
+            
+            <div className="group p-8 rounded-xl bg-gray-50 hover:bg-coffee-dark hover:text-white transition-all duration-300">
+              <div className="bg-coffee-dark text-white group-hover:bg-white group-hover:text-coffee-dark w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-6 transition-all duration-300">
+                <AreaChart size={24} />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Powerful Analytics</h3>
+              <p className="text-gray-500 group-hover:text-white/80">Track customer engagement and program performance with actionable insights.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-20 px-4 bg-gradient-to-b from-white to-gray-50">
+        <div className="container mx-auto">
+          <div className="max-w-xl mx-auto text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4 text-coffee-dark">How InStamp Works</h2>
+            <p className="text-gray-600">Three simple steps to launch your digital loyalty program</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="relative">
+              <div className="bg-coffee-dark text-white w-12 h-12 rounded-full flex items-center justify-center mb-6">
+                1
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-coffee-dark">Create Your Account</h3>
+              <p className="text-gray-600">Sign up in minutes and customize your digital loyalty program to match your brand.</p>
+              <div className="absolute top-6 left-12 h-0.5 bg-coffee-light/30 w-full hidden md:block"></div>
+            </div>
+            
+            <div className="relative">
+              <div className="bg-coffee-dark text-white w-12 h-12 rounded-full flex items-center justify-center mb-6">
+                2
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-coffee-dark">Share Your Link</h3>
+              <p className="text-gray-600">Invite customers to join your loyalty program via a custom URL or QR code.</p>
+              <div className="absolute top-6 left-12 h-0.5 bg-coffee-light/30 w-full hidden md:block"></div>
+            </div>
+            
+            <div>
+              <div className="bg-coffee-dark text-white w-12 h-12 rounded-full flex items-center justify-center mb-6">
+                3
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-coffee-dark">Scan & Reward</h3>
+              <p className="text-gray-600">Use your business device to scan customer QR codes and add stamps with each purchase.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof Section */}
+      <section className="py-20 px-4 bg-coffee-dark text-white">
+        <div className="container mx-auto">
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Loved by Businesses & Customers</h2>
+            <p className="text-white/80">Join thousands of businesses that have increased customer retention with InStamp</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="bg-white/10 border-white/10 p-6 backdrop-blur-sm">
+              <div className="flex items-center gap-1 mb-4 text-yellow-300">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <Star key={i} size={18} fill="currentColor" />
+                ))}
+              </div>
+              <p className="mb-6 text-white/90">"We've seen a 35% increase in repeat customers since implementing InStamp. The digital cards are so much better than paper ones!"</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-300"></div>
+                <div>
+                  <p className="font-semibold">Sarah Johnson</p>
+                  <p className="text-xs text-white/70">Bloom Coffee Shop</p>
+                </div>
+              </div>
             </Card>
             
-            <Card className="p-6 border-2 border-coffee-light relative bg-white shadow-lg transform scale-105">
+            <Card className="bg-white/10 border-white/10 p-6 backdrop-blur-sm">
+              <div className="flex items-center gap-1 mb-4 text-yellow-300">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <Star key={i} size={18} fill="currentColor" />
+                ))}
+              </div>
+              <p className="mb-6 text-white/90">"The analytics alone made it worth switching. Now we understand which rewards drive customer loyalty and adjust accordingly."</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-green-300"></div>
+                <div>
+                  <p className="font-semibold">Michael Chen</p>
+                  <p className="text-xs text-white/70">Urban Bakery</p>
+                </div>
+              </div>
+            </Card>
+            
+            <Card className="bg-white/10 border-white/10 p-6 backdrop-blur-sm">
+              <div className="flex items-center gap-1 mb-4 text-yellow-300">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <Star key={i} size={i <= 4 ? 18 : 0} fill="currentColor" />
+                ))}
+              </div>
+              <p className="mb-6 text-white/90">"Our customers love that they don't have to download another app. The web-based system is so easy and convenient for everyone."</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-yellow-300"></div>
+                <div>
+                  <p className="font-semibold">Jessica Williams</p>
+                  <p className="text-xs text-white/70">Sunset Salon</p>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-20 px-4 bg-white">
+        <div className="container mx-auto">
+          <div className="max-w-xl mx-auto text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4 text-coffee-dark">Simple, Transparent Pricing</h2>
+            <p className="text-gray-600">Choose the plan that works best for your business</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <Card className="relative overflow-hidden border-gray-200">
+              <div className="p-6">
+                <h3 className="text-xl font-semibold mb-2 text-coffee-dark">Starter</h3>
+                <div className="text-3xl font-bold mb-1">$19<span className="text-sm font-normal text-gray-500">/month</span></div>
+                <p className="text-gray-500 mb-6">Perfect for new businesses</p>
+                
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-start gap-2">
+                    <Check size={18} className="text-green-500 mt-1 flex-shrink-0" />
+                    <span>Up to 500 customers</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={18} className="text-green-500 mt-1 flex-shrink-0" />
+                    <span>Basic analytics</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={18} className="text-green-500 mt-1 flex-shrink-0" />
+                    <span>1 loyalty card template</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={18} className="text-green-500 mt-1 flex-shrink-0" />
+                    <span>Email support</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="p-6 border-t border-gray-100">
+                <Button className="w-full bg-coffee-dark hover:bg-coffee-medium" onClick={() => navigate("/admin")}>
+                  Start Free Trial
+                </Button>
+              </div>
+            </Card>
+            
+            <Card className="relative overflow-hidden border-coffee-medium shadow-lg transform md:-translate-y-4 scale-105">
               <div className="absolute -top-4 left-0 right-0 mx-auto w-max bg-coffee-dark text-white px-4 py-1 rounded-full text-sm font-medium">
                 Most Popular
               </div>
-              <h3 className="text-xl font-bold text-coffee-dark mb-2">Growth</h3>
-              <div className="text-3xl font-bold mb-1">$49<span className="text-sm font-normal">/month</span></div>
-              <p className="text-coffee-light mb-6">For established businesses</p>
-              <Separator className="mb-6" />
-              <ul className="space-y-3 text-left mb-6">
-                <li className="flex items-start gap-2">
-                  <span className="text-coffee-dark mt-1">✓</span>
-                  <span>Unlimited customers</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-coffee-dark mt-1">✓</span>
-                  <span>Advanced analytics & reports</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-coffee-dark mt-1">✓</span>
-                  <span>3 custom card templates</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-coffee-dark mt-1">✓</span>
-                  <span>Priority email & chat support</span>
-                </li>
-              </ul>
-              <Button className="w-full bg-coffee-dark hover:bg-coffee-medium" onClick={() => navigate("/admin")}>
-                Start Free Trial
-              </Button>
+              <div className="p-6">
+                <h3 className="text-xl font-semibold mb-2 text-coffee-dark">Growth</h3>
+                <div className="text-3xl font-bold mb-1">$49<span className="text-sm font-normal text-gray-500">/month</span></div>
+                <p className="text-gray-500 mb-6">For established businesses</p>
+                
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-start gap-2">
+                    <Check size={18} className="text-green-500 mt-1 flex-shrink-0" />
+                    <span>Unlimited customers</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={18} className="text-green-500 mt-1 flex-shrink-0" />
+                    <span>Advanced analytics & reports</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={18} className="text-green-500 mt-1 flex-shrink-0" />
+                    <span>3 custom card templates</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={18} className="text-green-500 mt-1 flex-shrink-0" />
+                    <span>Priority email & chat support</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="p-6 border-t border-gray-100">
+                <Button className="w-full bg-coffee-dark hover:bg-coffee-medium" onClick={() => navigate("/admin")}>
+                  Start Free Trial
+                </Button>
+              </div>
             </Card>
             
-            <Card className="p-6 border border-coffee-light/20 hover:shadow-lg transition-shadow bg-white">
-              <h3 className="text-xl font-bold text-coffee-dark mb-2">Enterprise</h3>
-              <div className="text-3xl font-bold mb-1">$99<span className="text-sm font-normal">/month</span></div>
-              <p className="text-coffee-light mb-6">For multi-location businesses</p>
-              <Separator className="mb-6" />
-              <ul className="space-y-3 text-left mb-6">
-                <li className="flex items-start gap-2">
-                  <span className="text-coffee-dark mt-1">✓</span>
-                  <span>Unlimited customers</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-coffee-dark mt-1">✓</span>
-                  <span>Custom analytics & API access</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-coffee-dark mt-1">✓</span>
-                  <span>Unlimited custom templates</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-coffee-dark mt-1">✓</span>
-                  <span>24/7 priority support</span>
-                </li>
-              </ul>
-              <Button className="w-full bg-coffee-dark hover:bg-coffee-medium" onClick={() => navigate("/admin")}>
-                Contact Sales
-              </Button>
+            <Card className="relative overflow-hidden border-gray-200">
+              <div className="p-6">
+                <h3 className="text-xl font-semibold mb-2 text-coffee-dark">Enterprise</h3>
+                <div className="text-3xl font-bold mb-1">$99<span className="text-sm font-normal text-gray-500">/month</span></div>
+                <p className="text-gray-500 mb-6">For multi-location businesses</p>
+                
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-start gap-2">
+                    <Check size={18} className="text-green-500 mt-1 flex-shrink-0" />
+                    <span>Unlimited customers</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={18} className="text-green-500 mt-1 flex-shrink-0" />
+                    <span>Custom analytics & API access</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={18} className="text-green-500 mt-1 flex-shrink-0" />
+                    <span>Unlimited custom templates</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={18} className="text-green-500 mt-1 flex-shrink-0" />
+                    <span>24/7 priority support</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="p-6 border-t border-gray-100">
+                <Button className="w-full bg-coffee-dark hover:bg-coffee-medium" onClick={() => navigate("/admin")}>
+                  Contact Sales
+                </Button>
+              </div>
             </Card>
           </div>
           
-          <p className="mt-8 text-coffee-light">
+          <p className="text-center mt-6 text-gray-500">
             All plans include a 14-day free trial. No credit card required.
           </p>
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 px-4 bg-gradient-to-r from-coffee-light to-orange text-white text-center">
-        <div className="container mx-auto max-w-4xl">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Transform Your Loyalty Program?</h2>
-          <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
+      <section className="py-20 px-4 bg-gradient-to-r from-coffee-dark to-coffee-medium text-white">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h2 className="text-4xl font-bold mb-6">Ready to Transform Your Loyalty Program?</h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto text-white/90">
             Join thousands of businesses that have increased customer retention with our digital loyalty system.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button className="text-coffee-dark bg-white hover:bg-white/90 text-lg px-8 py-6" onClick={() => navigate("/admin")}>
+            <Button className="bg-white text-coffee-dark hover:bg-white/90 text-lg px-8 py-6 rounded-full shadow-lg" onClick={() => navigate("/admin")}>
               <span>Get Started Free</span>
               <ChevronRight />
             </Button>
-            <Button variant="outline" className="border-white text-white hover:bg-white/10 text-lg px-8 py-6">
-              <span>Book a Free Demo</span>
+            <Button variant="outline" className="border-white text-white hover:bg-white/10 text-lg px-8 py-6 rounded-full" onClick={() => navigate("/admin")}>
+              <span>Book a Demo</span>
               <Clock />
             </Button>
           </div>
@@ -446,20 +378,20 @@ const LandingPage = () => {
             <div>
               <h4 className="text-lg font-semibold mb-4">Company</h4>
               <ul className="space-y-2">
-                <li><Link to="/about" className="opacity-70 hover:opacity-100 transition-opacity">About Us</Link></li>
-                <li><Link to="/features" className="opacity-70 hover:opacity-100 transition-opacity">Features</Link></li>
-                <li><a href="#" className="opacity-70 hover:opacity-100 transition-opacity">Careers</a></li>
-                <li><a href="#" className="opacity-70 hover:opacity-100 transition-opacity">Blog</a></li>
+                <li><Link to="#" className="opacity-70 hover:opacity-100 transition-opacity">About Us</Link></li>
+                <li><Link to="#" className="opacity-70 hover:opacity-100 transition-opacity">Features</Link></li>
+                <li><Link to="#" className="opacity-70 hover:opacity-100 transition-opacity">Careers</Link></li>
+                <li><Link to="#" className="opacity-70 hover:opacity-100 transition-opacity">Blog</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="text-lg font-semibold mb-4">Resources</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="opacity-70 hover:opacity-100 transition-opacity">Help Center</a></li>
-                <li><a href="#" className="opacity-70 hover:opacity-100 transition-opacity">Documentation</a></li>
-                <li><a href="#" className="opacity-70 hover:opacity-100 transition-opacity">Pricing</a></li>
-                <li><Link to="/privacy" className="opacity-70 hover:opacity-100 transition-opacity">Privacy Policy</Link></li>
+                <li><Link to="#" className="opacity-70 hover:opacity-100 transition-opacity">Help Center</Link></li>
+                <li><Link to="#" className="opacity-70 hover:opacity-100 transition-opacity">Documentation</Link></li>
+                <li><Link to="#" className="opacity-70 hover:opacity-100 transition-opacity">Pricing</Link></li>
+                <li><Link to="#" className="opacity-70 hover:opacity-100 transition-opacity">Privacy Policy</Link></li>
               </ul>
             </div>
             
@@ -468,8 +400,8 @@ const LandingPage = () => {
               <ul className="space-y-3">
                 <li className="flex items-center gap-2">
                   <Mail size={18} className="flex-shrink-0 opacity-70" />
-                  <a href="mailto:support@stampcardoasis.com" className="hover:underline">
-                    support@stampcardoasis.com
+                  <a href="mailto:support@instamp.com" className="hover:underline">
+                    support@instamp.com
                   </a>
                 </li>
                 <li className="flex items-center gap-2">
@@ -477,15 +409,6 @@ const LandingPage = () => {
                   <a href="tel:+1234567890" className="hover:underline">
                     +1 (234) 567-890
                   </a>
-                </li>
-                <li>
-                  <Button className="w-full mt-2 bg-white text-coffee-dark hover:bg-white/90" onClick={() => window.location.href = "https://wa.me/1234567890"}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M3.9 12C3.9 10.29 4.5 8.6 5.64 7.25L4.2 4L7.5 5.25C8.76 4.5 10.26 4 11.9 4C16.74 4 20.65 7.95 20.65 12.79C20.65 17.63 16.74 21.58 11.9 21.58C7.06 21.58 3.5 17.63 3.5 12.79C3.5 12.5 3.5 12.26 3.54 12H3.9L3.9 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M9.06 14.32L10.15 14.87C11.5 15.34 12.96 15.03 13.99 14C15.01 12.97 15.32 11.5 14.85 10.14L14.29 8.87" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    Chat on WhatsApp
-                  </Button>
                 </li>
               </ul>
             </div>
@@ -498,6 +421,8 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default LandingPage;
