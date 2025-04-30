@@ -92,7 +92,6 @@ const MemberCard: React.FC<MemberCardProps> = ({
           <div className="mt-6 mb-6">
             <RewardsCard 
               rewardsCount={Math.floor(stamps / (loyaltyCardConfig?.maxStamps || 10))}
-              totalEarned={totalRewardsEarned}
               totalStamps={totalStampsCollected}
               textColor={loyaltyCardConfig?.businessNameColor || "#2563EB"}
               accentColor={loyaltyCardConfig?.stampBgColor || "#E5F0FF"}
@@ -109,7 +108,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
             
             <Button
               onClick={onCollectStamp}
-              className="w-full flex items-center justify-center gap-2 bg-[#5271ff] hover:bg-[#3a5dff] text-white"
+              className="w-full flex items-center justify-center gap-2 bg-[#5271FF] hover:bg-[#3a5dff] text-white"
             >
               <QrCode size={20} />
               Scan QR Code to Collect Stamp

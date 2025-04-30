@@ -44,10 +44,7 @@ const RewardsCard: React.FC<RewardsCardProps> = ({
           <p className="text-gray-600 mb-4">Active rewards available to use.</p>
         )}
         
-        <div className="border-t border-gray-100 pt-4 space-y-1">
-          <p className="text-sm text-gray-500">
-            Total rewards earned: <span className="font-medium">{totalEarned}</span>
-          </p>
+        <div className="border-t border-gray-100 pt-4">
           <p className="text-sm text-gray-500">
             Total stamps collected: <span className="font-medium">{totalStamps}</span>
           </p>

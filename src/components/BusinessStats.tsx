@@ -1,6 +1,6 @@
 
 import { Card } from "@/components/ui/card";
-import { Coffee } from "lucide-react";
+import { Users, Award, Coffee, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -20,8 +20,8 @@ const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon, description, 
   return (
     <Card className="p-6 flex flex-col bg-white shadow-sm border border-gray-100">
       <div className="flex justify-between items-start mb-3">
-        <div className="font-medium text-coffee-medium text-sm">{title}</div>
-        <div className="p-2 bg-blue-50 rounded-md text-coffee-dark">{icon}</div>
+        <div className="font-medium text-purple-500 text-sm">{title}</div>
+        <div className="p-2 bg-purple-50 rounded-md text-purple-500">{icon}</div>
       </div>
       <div className="text-3xl font-bold text-coffee-dark mb-2">
         {isLoading ? (
@@ -43,14 +43,17 @@ const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon, description, 
 };
 
 const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
+  const [totalCustomers, setTotalCustomers] = useState(0);
   const [totalStamps, setTotalStamps] = useState(0);
+  const [rewardsRedeemed, setRewardsRedeemed] = useState(0);
+  const [conversionRate, setConversionRate] = useState("0%");
   const [isLoading, setIsLoading] = useState(true);
   
-  const saveStatsToStorage = (stamps: number) => {
+  const saveStatsToStorage = (stats: any) => {
     if (!businessId) return;
     
     const allStats = JSON.parse(localStorage.getItem('businessStats') || '{}');
-    allStats[businessId] = { totalStamps: stamps, lastUpdated: new Date().toISOString() };
+    allStats[businessId] = { ...stats, lastUpdated: new Date().toISOString() };
     localStorage.setItem('businessStats', JSON.stringify(allStats));
   };
   
@@ -58,7 +61,7 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
     if (!businessId) return null;
     
     const allStats = JSON.parse(localStorage.getItem('businessStats') || '{}');
-    return allStats[businessId]?.totalStamps;
+    return allStats[businessId];
   };
   
   useEffect(() => {
@@ -67,35 +70,69 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
     const fetchStats = async () => {
       setIsLoading(true);
       
-      const savedStamps = loadStatsFromStorage();
-      if (savedStamps !== null && savedStamps !== undefined) {
-        setTotalStamps(savedStamps);
+      const savedStats = loadStatsFromStorage();
+      if (savedStats !== null && savedStats !== undefined) {
+        setTotalCustomers(savedStats.totalCustomers || 0);
+        setTotalStamps(savedStats.totalStamps || 0);
+        setRewardsRedeemed(savedStats.rewardsRedeemed || 0);
+        setConversionRate(savedStats.conversionRate || "0%");
         setIsLoading(false);
       }
       
-      await updateStampsFromSupabase();
+      await updateStatsFromSupabase();
     };
     
-    const updateStampsFromSupabase = async () => {
+    const updateStatsFromSupabase = async () => {
       try {
         const { data: membersData, error: membersError } = await supabase
           .from('business_members')
-          .select('stamps')
+          .select('*')
           .eq('business_id', businessId);
         
         if (membersError) throw membersError;
         
         if (membersData) {
+          // Calculate total customers
+          const customerCount = membersData.length;
+          
+          // Calculate total stamps
           const currentStamps = membersData.reduce((sum, member) => {
             const memberStamps = member.stamps !== null && member.stamps !== undefined ? member.stamps : 0;
             return sum + memberStamps;
           }, 0);
           
+          // Calculate total rewards redeemed
+          const totalRewardsRedeemed = membersData.reduce((sum, member) => {
+            const redeemed = member.redeemed_rewards !== null && member.redeemed_rewards !== undefined ? member.redeemed_rewards : 0;
+            return sum + redeemed;
+          }, 0);
+          
+          // Calculate active customers (those with at least one stamp)
+          const activeCustomers = membersData.filter(member => 
+            (member.stamps !== null && member.stamps !== undefined && member.stamps > 0)
+          ).length;
+          
+          // Calculate conversion rate
+          let conversionRateValue = "0%";
+          if (customerCount > 0) {
+            const rate = Math.round((activeCustomers / customerCount) * 100);
+            conversionRateValue = `${rate}%`;
+          }
+          
+          setTotalCustomers(customerCount);
           setTotalStamps(currentStamps);
-          saveStatsToStorage(currentStamps);
+          setRewardsRedeemed(totalRewardsRedeemed);
+          setConversionRate(conversionRateValue);
+          
+          saveStatsToStorage({
+            totalCustomers: customerCount,
+            totalStamps: currentStamps,
+            rewardsRedeemed: totalRewardsRedeemed,
+            conversionRate: conversionRateValue
+          });
         }
       } catch (error) {
-        console.error("Error fetching business stamps:", error);
+        console.error("Error fetching business stats:", error);
       } finally {
         setIsLoading(false);
       }
@@ -104,8 +141,8 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
     fetchStats();
     
     const intervalId = setInterval(() => {
-      updateStampsFromSupabase();
-    }, 5 * 60 * 1000);
+      updateStatsFromSupabase();
+    }, 5 * 60 * 1000); // Update every 5 minutes
     
     return () => {
       clearInterval(intervalId);
@@ -113,12 +150,36 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({ businessId }) => {
   }, [businessId]);
   
   return (
-    <div className="mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       <StatsCard
-        title="Customer Stamps"
+        title="Total Customers"
+        value={totalCustomers}
+        icon={<Users size={20} />}
+        description="Based on program joins"
+        isLoading={isLoading}
+      />
+      
+      <StatsCard
+        title="Rewards Redeemed"
+        value={rewardsRedeemed}
+        icon={<Award size={20} />}
+        description="Total rewards claimed"
+        isLoading={isLoading}
+      />
+      
+      <StatsCard
+        title="Total Stamps"
         value={totalStamps}
         icon={<Coffee size={20} />}
-        description="Total stamps collected by customers"
+        description="Current stamps collected"
+        isLoading={isLoading}
+      />
+      
+      <StatsCard
+        title="Conversion Rate"
+        value={conversionRate}
+        icon={<TrendingUp size={20} />}
+        description="Active customers"
         isLoading={isLoading}
       />
     </div>
