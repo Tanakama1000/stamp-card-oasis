@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,17 +26,17 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
     businessName: "Coffee Shop",
     cardTitle: "Loyalty Card",
     maxStamps: 10,
-    cardBgColor: "#FFFFFF",
-    stampBgColor: "#F5F5DC",
-    stampActiveColor: "#8B4513",
-    textColor: "#6F4E37",
-    businessNameColor: "#6F4E37",
-    cardTitleColor: "#8B4513",
-    rewardTextColor: "#6F4E37",
-    stampIcon: "Gift",
+    cardBgColor: '#EFF6FF',
+    textColor: '#1E40AF',
+    businessNameColor: '#1E3A8A',
+    cardTitleColor: '#2563EB',
+    stampBgColor: '#BFDBFE',
+    stampActiveColor: '#3B82F6',
+    rewardTextColor: '#1E40AF',
+    lastStampBorderColor: '#2563EB',
+    stampIcon: "Heart", // Changed default icon to Heart
     lastStampText: "FREE",
     lastStampTextColor: "#FFFFFF",
-    lastStampBorderColor: "#F97316",
     rewardText: "Collect 10 stamps for a free item",
     rewards: []
   });
@@ -142,17 +143,17 @@ export default function CardCustomization({ onSave, initialConfig }: CardCustomi
       businessName: "Coffee Shop",
       cardTitle: "Loyalty Card",
       maxStamps: 10,
-      cardBgColor: "#FFFFFF",
-      stampBgColor: "#F5F5DC",
-      stampActiveColor: "#8B4513",
-      textColor: "#6F4E37",
-      businessNameColor: "#6F4E37",
-      cardTitleColor: "#8B4513",
-      rewardTextColor: "#6F4E37",
-      stampIcon: "Gift",
+      cardBgColor: '#EFF6FF',
+      textColor: '#1E40AF',
+      businessNameColor: '#1E3A8A',
+      cardTitleColor: '#2563EB',
+      stampBgColor: '#BFDBFE',
+      stampActiveColor: '#3B82F6',
+      rewardTextColor: '#1E40AF',
+      lastStampBorderColor: '#2563EB',
+      stampIcon: "Heart", // Changed default icon to Heart
       lastStampText: "FREE",
       lastStampTextColor: "#FFFFFF",
-      lastStampBorderColor: "#F97316",
       rewardText: "Collect 10 stamps for a free item",
       rewards: []
     };
