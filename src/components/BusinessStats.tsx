@@ -22,7 +22,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
   return <Card className="p-6 flex flex-col bg-white shadow-sm border border-gray-100">
       <div className="flex justify-between items-start mb-3">
         <div className="font-medium text-blue-500 text-sm">{title}</div>
-        <div className="p-2 rounded-md text-purple-500 bg-blue">{icon}</div>
+        <div className="p-2 rounded-md text-blue-500 bg-blue">{icon}</div>
       </div>
       <div className="text-3xl font-bold text-coffee-dark mb-2">
         {isLoading ? <div className="h-8 bg-gray-200 animate-pulse rounded w-16"></div> : value}
