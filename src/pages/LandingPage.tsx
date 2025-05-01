@@ -32,47 +32,99 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-coffee-dark to-[#7a8cf8] text-white py-20 px-4">
-        <div className="absolute inset-0 bg-[url('/lovable-uploads/9a9d4172-f54a-46e2-8496-052ae81557cd.png')] opacity-10 bg-cover bg-center"></div>
-        <div className="container mx-auto flex flex-col lg:flex-row items-center gap-12 relative z-10">
-          <div className="lg:w-1/2 space-y-6">
-            <div className="inline-block bg-white/20 text-white px-4 py-1 rounded-full text-sm font-medium backdrop-blur-sm mb-2">
-              #1 Digital Loyalty Platform
-            </div>
-            <h1 className="text-5xl md:text-6xl font-bold leading-tight">
-              Transform Your Loyalty Program <span className="text-white">Digitally</span>
-            </h1>
-            <p className="text-xl text-white/90 max-w-lg">
-              Increase customer retention and drive repeat business with our easy-to-use digital stamp card system.
-            </p>
-            <div className="pt-4 flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-white text-coffee-dark hover:bg-white/90 px-8 py-6 rounded-full transition-all shadow-lg" onClick={() => navigate("/admin")}>
-                Start Free Trial
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-6 rounded-full transition-all" onClick={() => navigate("/admin/login")}>
-                Book a Demo
-              </Button>
-            </div>
-            <div className="flex items-center gap-2 pt-2">
-              <div className="flex -space-x-3">
-                <div className="w-8 h-8 rounded-full bg-blue-300 border-2 border-white"></div>
-                <div className="w-8 h-8 rounded-full bg-green-300 border-2 border-white"></div>
-                <div className="w-8 h-8 rounded-full bg-red-300 border-2 border-white"></div>
-                <div className="w-8 h-8 rounded-full bg-yellow-300 border-2 border-white flex items-center justify-center text-xs">+</div>
+      {/* Hero Section - Updated to match the reference image */}
+      <section className="py-16 px-4 overflow-hidden relative bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="relative z-10">
+              <div className="mb-4">
+                <span className="text-pink-500 font-medium uppercase tracking-wider text-sm">SIMPLE LOYALTY MANAGEMENT TOOL</span>
               </div>
-              <p className="text-sm text-white/80">Join 5,000+ businesses already using InStamp</p>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-800 leading-tight mb-6">
+                The <span className="relative inline-block px-2">
+                  <span className="relative z-10">Easiest</span>
+                  <span className="absolute inset-0 -rotate-1 border-2 rounded-full border-green-400 z-0"></span>
+                </span> Way To Manage Your Loyalty
+              </h1>
+              <p className="text-lg text-slate-600 mb-8 max-w-lg">
+                Powerful digital stamp cards that increase customer retention and drive repeat business for businesses of all sizes.
+              </p>
+              
+              <div className="flex flex-wrap gap-4 mb-8">
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6" onClick={() => navigate("/admin")}>
+                  Start Free Trial
+                </Button>
+                <Button size="lg" variant="outline" className="border-slate-300 hover:bg-slate-100 text-slate-700 px-6" onClick={() => navigate("/admin/login")}>
+                  Get a Live Demo
+                </Button>
+              </div>
+              
+              <div className="flex flex-wrap gap-8">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                    <Check size={12} className="text-green-600" />
+                  </div>
+                  <span className="text-slate-600 text-sm">No credit card required</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                    <Check size={12} className="text-green-600" />
+                  </div>
+                  <span className="text-slate-600 text-sm">No need previous knowledge</span>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="lg:w-1/2 relative">
-            <div className="absolute -z-10 w-72 h-72 bg-white/10 rounded-full blur-3xl -top-10 -right-10"></div>
-            <img 
-              alt="Loyalty Cards Preview" 
-              className="w-full rounded-lg shadow-2xl border border-white/10 transform hover:scale-[1.02] transition-all duration-500" 
-              src="/lovable-uploads/ec60039d-0d09-4ec3-94ff-8e66e6c380a5.png" 
-            />
+            
+            <div className="relative">
+              {/* Decorative elements */}
+              <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-yellow-200 opacity-60"></div>
+              <div className="absolute bottom-10 -left-10 w-20 h-20 rounded-full bg-blue-200 opacity-60"></div>
+              <div className="absolute top-1/3 -left-5 w-10 h-10 rounded-full bg-pink-200 opacity-60"></div>
+              
+              <div className="relative z-10 bg-white p-1 rounded-2xl shadow-xl">
+                <img 
+                  src="/lovable-uploads/ec60039d-0d09-4ec3-94ff-8e66e6c380a5.png"
+                  alt="Loyalty Cards Preview" 
+                  className="w-full rounded-xl shadow-sm"
+                />
+                
+                {/* Stats cards positioning */}
+                <div className="absolute -right-10 -top-16 transform rotate-6">
+                  <Card className="bg-white p-4 shadow-lg rounded-xl w-56">
+                    <div className="mb-1 text-sm font-medium text-slate-500">Total Customers</div>
+                    <div className="text-2xl font-bold text-slate-800">38</div>
+                    <div className="mt-2 text-xs text-blue-500">↗ Growing rapidly</div>
+                  </Card>
+                </div>
+                
+                <div className="absolute -right-16 bottom-10 transform -rotate-3">
+                  <Card className="bg-white p-4 shadow-lg rounded-xl w-64">
+                    <div className="mb-1 text-sm font-medium text-slate-500">Customer Growth</div>
+                    <div className="h-24 flex items-end justify-between gap-1">
+                      {[30, 45, 25, 55, 40, 60, 70, 55, 65, 75].map((h, i) => (
+                        <div key={i} className="w-2 bg-blue-500 rounded-t-sm" style={{ height: `${h}%` }}></div>
+                      ))}
+                    </div>
+                  </Card>
+                </div>
+                
+                <div className="absolute -left-16 top-1/4 transform -rotate-6">
+                  <div className="bg-white p-2 shadow-lg rounded-lg flex items-center gap-1">
+                    <div className="flex text-yellow-400">
+                      {[1,2,3,4,5].map(i => <Star key={i} size={16} fill="currentColor" />)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+        
+        {/* Decorative dots and shapes */}
+        <div className="absolute top-1/4 right-12 w-3 h-3 rounded-full bg-blue-500 opacity-60"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-2 h-2 rounded-full bg-green-500 opacity-60"></div>
+        <div className="absolute top-1/2 left-1/4 w-4 h-4 rounded-full bg-yellow-500 opacity-60"></div>
+        <div className="absolute bottom-1/4 left-12 w-3 h-3 rounded-full bg-pink-500 opacity-60"></div>
       </section>
 
       {/* Features Section */}
