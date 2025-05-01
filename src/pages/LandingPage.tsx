@@ -50,12 +50,21 @@ const LandingPage = () => {
                 Powerful digital stamp cards that increase customer retention and drive repeat business for businesses of all sizes.
               </p>
               
-              <div className="flex flex-wrap gap-4 mb-8">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6" onClick={() => navigate("/admin")}>
-                  Start Free Trial
-                </Button>
-                <Button size="lg" variant="outline" className="border-slate-300 hover:bg-slate-100 text-slate-700 px-6" onClick={() => navigate("/admin/login")}>
-                  Get a Live Demo
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                <div className="flex-1">
+                  <div className="bg-white border border-gray-300 rounded-xl overflow-hidden">
+                    <div className="p-3">
+                      <span className="text-gray-500 text-sm">instamp.app/</span>
+                      <span className="font-medium">your-business</span>
+                    </div>
+                  </div>
+                </div>
+                <Button 
+                  size="lg" 
+                  className="bg-purple-400 hover:bg-purple-500 text-slate-800 px-6 rounded-full"
+                  onClick={() => navigate("/admin")}
+                >
+                  Claim your link
                 </Button>
               </div>
               
