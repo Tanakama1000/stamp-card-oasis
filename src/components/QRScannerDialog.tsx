@@ -1,8 +1,6 @@
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Camera, QrCode } from "lucide-react";
 import QRScanner from "@/components/QRScanner";
 
 interface QRScannerDialogProps {
@@ -12,19 +10,8 @@ interface QRScannerDialogProps {
 }
 
 const QRScannerDialog = ({ isOpen, onClose, onSuccessfulScan }: QRScannerDialogProps) => {
-  const [showScanner, setShowScanner] = useState<boolean>(false);
-  
-  const handleScan = (businessId: string, timestamp: number, stamps?: number) => {
-    onSuccessfulScan(businessId, timestamp, stamps);
-    // After successful scanning, close dialog after a brief delay
-    setTimeout(() => {
-      setShowScanner(false);
-      onClose();
-    }, 2000);
-  };
-  
+  // When dialog closes, make sure we handle cleanup
   const handleClose = () => {
-    setShowScanner(false);
     onClose();
   };
 
@@ -38,27 +25,9 @@ const QRScannerDialog = ({ isOpen, onClose, onSuccessfulScan }: QRScannerDialogP
         </DialogHeader>
         
         <div className="flex flex-col items-center justify-center p-4">
-          {!showScanner ? (
-            <div className="text-center">
-              <div className="w-48 h-48 mx-auto bg-cream-light rounded-lg flex items-center justify-center mb-6">
-                <QrCode className="h-24 w-24 text-coffee-dark opacity-60" />
-              </div>
-              <p className="text-coffee-medium mb-6">
-                Scan a business QR code to collect a stamp
-              </p>
-              <Button 
-                onClick={() => setShowScanner(true)} 
-                className="bg-orange hover:bg-orange-light text-white"
-              >
-                <Camera className="mr-2" size={18} />
-                Start Camera
-              </Button>
-            </div>
-          ) : (
-            <div className="w-full">
-              <QRScanner onSuccessfulScan={handleScan} />
-            </div>
-          )}
+          <div className="w-full">
+            <QRScanner onSuccessfulScan={onSuccessfulScan} />
+          </div>
         </div>
       </DialogContent>
     </Dialog>

@@ -3,7 +3,7 @@ import React from "react";
 import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Coffee, QrCode } from "lucide-react";
+import { Coffee, ScanQrCode } from "lucide-react";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import QRScannerDialog from "@/components/QRScannerDialog";
 import RewardsCard from "@/components/loyalty/RewardsCard";
@@ -99,7 +99,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
               className="w-full flex items-center justify-center gap-2 text-white"
               style={{ backgroundColor: themeColor, borderColor: themeColor }}
             >
-              <QrCode size={20} />
+              <ScanQrCode size={20} />
               Scan QR Code to Collect Stamp
             </Button>
           </div>
