@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -92,8 +91,8 @@ const LandingPage = () => {
               
               <div className="relative z-10 bg-white p-1 rounded-2xl shadow-xl">
                 <img 
-                  src="/lovable-uploads/ec60039d-0d09-4ec3-94ff-8e66e6c380a5.png"
-                  alt="Loyalty Cards Preview" 
+                  src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80" 
+                  alt="Person using loyalty app" 
                   className="w-full rounded-xl shadow-sm"
                 />
                 
