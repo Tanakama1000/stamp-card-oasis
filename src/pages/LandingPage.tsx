@@ -2,17 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
-import { 
-  Star, Gift, PieChart, ShieldCheck, Smartphone, Users, 
-  ChevronRight, Clock, Award, Mail, Phone, Check, CreditCard,
-  QrCode, AreaChart, TrendingUp, BadgeCheck, Zap
-} from "lucide-react";
-
+import { Star, Gift, PieChart, ShieldCheck, Smartphone, Users, ChevronRight, Clock, Award, Mail, Phone, Check, CreditCard, QrCode, AreaChart, TrendingUp, BadgeCheck, Zap } from "lucide-react";
 const LandingPage = () => {
   const navigate = useNavigate();
-  
-  return (
-    <div className="min-h-screen bg-white">
+  return <div className="min-h-screen bg-white">
       {/* Header/Navigation */}
       <header className="bg-coffee-dark text-white p-4 shadow-md sticky top-0 z-50">
         <div className="container mx-auto flex justify-between items-center">
@@ -58,11 +51,7 @@ const LandingPage = () => {
                     </div>
                   </div>
                 </div>
-                <Button 
-                  size="lg" 
-                  className="bg-purple-400 hover:bg-purple-500 text-slate-800 px-6 rounded-full"
-                  onClick={() => navigate("/admin")}
-                >
+                <Button size="lg" className="bg-purple-400 hover:bg-purple-500 text-slate-800 px-6 rounded-full" onClick={() => navigate("/admin")}>
                   Claim your link
                 </Button>
               </div>
@@ -89,12 +78,8 @@ const LandingPage = () => {
               <div className="absolute bottom-10 -left-10 w-20 h-20 rounded-full bg-blue-200 opacity-60"></div>
               <div className="absolute top-1/3 -left-5 w-10 h-10 rounded-full bg-pink-200 opacity-60"></div>
               
-              <div className="relative z-10 bg-white p-1 rounded-2xl shadow-xl">
-                <img 
-                  src="/lovable-uploads/e96cc08e-37f2-4ba1-bdf4-b00665a89d2d.png" 
-                  alt="Happy customer using loyalty app" 
-                  className="w-full rounded-xl shadow-sm"
-                />
+              <div className="">
+                <img src="/lovable-uploads/e96cc08e-37f2-4ba1-bdf4-b00665a89d2d.png" alt="Happy customer using loyalty app" className="w-full rounded-xl shadow-sm" />
                 
                 {/* Enhanced floating stat cards */}
                 <div className="absolute -right-12 -top-20 transform rotate-6">
@@ -108,9 +93,9 @@ const LandingPage = () => {
                     <div className="mt-2 text-2xl font-bold text-slate-800">+42%</div>
                     <div className="mt-1 text-xs text-blue-600">↗ Last 30 days</div>
                     <div className="h-16 mt-2 flex items-end justify-between gap-1">
-                      {[30, 45, 25, 55, 40, 60, 70, 55, 65, 75].map((h, i) => (
-                        <div key={i} className="w-2 bg-blue-500 rounded-t-sm" style={{ height: `${h}%` }}></div>
-                      ))}
+                      {[30, 45, 25, 55, 40, 60, 70, 55, 65, 75].map((h, i) => <div key={i} className="w-2 bg-blue-500 rounded-t-sm" style={{
+                      height: `${h}%`
+                    }}></div>)}
                     </div>
                   </Card>
                 </div>
@@ -122,7 +107,7 @@ const LandingPage = () => {
                       <span className="text-green-700 font-medium text-sm">Customer Reviews</span>
                     </div>
                     <div className="flex text-yellow-400 mt-2">
-                      {[1,2,3,4,5].map(i => <Star key={i} size={16} fill="currentColor" />)}
+                      {[1, 2, 3, 4, 5].map(i => <Star key={i} size={16} fill="currentColor" />)}
                     </div>
                     <div className="text-xs text-green-600 mt-1">98% satisfaction rate</div>
                   </Card>
@@ -251,9 +236,7 @@ const LandingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="bg-white/10 border-white/10 p-6 backdrop-blur-sm">
               <div className="flex items-center gap-1 mb-4 text-yellow-300">
-                {[1, 2, 3, 4, 5].map(i => (
-                  <Star key={i} size={18} fill="currentColor" />
-                ))}
+                {[1, 2, 3, 4, 5].map(i => <Star key={i} size={18} fill="currentColor" />)}
               </div>
               <p className="mb-6 text-white/90">"We've seen a 35% increase in repeat customers since implementing InStamp. The digital cards are so much better than paper ones!"</p>
               <div className="flex items-center gap-3">
@@ -267,9 +250,7 @@ const LandingPage = () => {
             
             <Card className="bg-white/10 border-white/10 p-6 backdrop-blur-sm">
               <div className="flex items-center gap-1 mb-4 text-yellow-300">
-                {[1, 2, 3, 4, 5].map(i => (
-                  <Star key={i} size={18} fill="currentColor" />
-                ))}
+                {[1, 2, 3, 4, 5].map(i => <Star key={i} size={18} fill="currentColor" />)}
               </div>
               <p className="mb-6 text-white/90">"The analytics alone made it worth switching. Now we understand which rewards drive customer loyalty and adjust accordingly."</p>
               <div className="flex items-center gap-3">
@@ -283,9 +264,7 @@ const LandingPage = () => {
             
             <Card className="bg-white/10 border-white/10 p-6 backdrop-blur-sm">
               <div className="flex items-center gap-1 mb-4 text-yellow-300">
-                {[1, 2, 3, 4, 5].map(i => (
-                  <Star key={i} size={i <= 4 ? 18 : 0} fill="currentColor" />
-                ))}
+                {[1, 2, 3, 4, 5].map(i => <Star key={i} size={i <= 4 ? 18 : 0} fill="currentColor" />)}
               </div>
               <p className="mb-6 text-white/90">"Our customers love that they don't have to download another app. The web-based system is so easy and convenient for everyone."</p>
               <div className="flex items-center gap-3">
@@ -512,8 +491,6 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default LandingPage;
