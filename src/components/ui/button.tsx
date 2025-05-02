@@ -20,6 +20,7 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         purple: "bg-purple-400 text-white hover:bg-purple-500",
+        neonblue: "bg-ocean-DEFAULT text-white hover:bg-ocean-dark shadow-md",
       },
       size: {
         default: "h-10 px-4 py-2",

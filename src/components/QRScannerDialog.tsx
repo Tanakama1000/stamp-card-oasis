@@ -1,5 +1,4 @@
 
-import { useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import QRScanner from "@/components/QRScanner";
 
@@ -19,7 +18,7 @@ const QRScannerDialog = ({ isOpen, onClose, onSuccessfulScan }: QRScannerDialogP
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-center text-xl text-coffee-dark font-bold">
+          <DialogTitle className="text-center text-xl text-ocean-dark font-bold">
             Scan Business QR Code
           </DialogTitle>
         </DialogHeader>
