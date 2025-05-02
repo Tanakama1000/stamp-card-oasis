@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
 import { Star, Gift, PieChart, ShieldCheck, Smartphone, Users, ChevronRight, Clock, Award, Mail, Phone, Check, CreditCard, QrCode, AreaChart, TrendingUp, BadgeCheck, Zap } from "lucide-react";
+
 const LandingPage = () => {
   const navigate = useNavigate();
   return <div className="min-h-screen bg-white">
@@ -24,24 +25,48 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* Hero Section - Updated to match the reference image */}
+      {/* Updated Hero Section - Based on the reference image */}
       <section className="py-16 px-4 overflow-hidden relative bg-white">
+        {/* Decorative dot patterns like in the reference image */}
+        <div className="absolute bottom-0 left-0 w-32 h-32 opacity-10">
+          <div className="grid grid-cols-8 gap-1">
+            {Array(64).fill(0).map((_, i) => (
+              <div key={i} className="w-1 h-1 rounded-full bg-blue-400"></div>
+            ))}
+          </div>
+        </div>
+        
+        <div className="absolute top-20 right-20 w-24 h-24 opacity-10">
+          <div className="grid grid-cols-6 gap-1">
+            {Array(36).fill(0).map((_, i) => (
+              <div key={i} className="w-1 h-1 rounded-full bg-purple-400"></div>
+            ))}
+          </div>
+        </div>
+        
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="relative z-10">
-              <div className="mb-4">
-                <span className="text-pink-500 font-medium uppercase tracking-wider text-sm">SIMPLE LOYALTY MANAGEMENT TOOL</span>
+              {/* Decorative element - pink icon like in reference */}
+              <div className="mb-6 relative">
+                <div className="w-16 h-16 bg-pink-500 rounded-lg rotate-12 relative">
+                  <div className="absolute inset-0 flex items-center justify-center -rotate-12">
+                    <img src="/lovable-uploads/04523b06-63b5-485f-ac7d-8624e600ad0d.png" alt="InStamp Logo" className="w-10 h-10 object-contain" />
+                  </div>
+                </div>
               </div>
+              
+              {/* Two-line heading with color contrast like reference */}
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-800 leading-tight mb-6">
-                The <span className="relative inline-block px-2">
-                  <span className="relative z-10">Easiest</span>
-                  <span className="absolute inset-0 -rotate-1 border-2 rounded-full border-green-400 z-0"></span>
-                </span> Way To Manage Your Loyalty
+                Committed To Loyalty<br/>
+                Committed To <span className="text-purple-500">The Future</span>
               </h1>
+              
               <p className="text-lg text-slate-600 mb-8 max-w-lg">
                 Powerful digital stamp cards that increase customer retention and drive repeat business for businesses of all sizes.
               </p>
               
+              {/* Keep the existing input/button element as requested */}
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <div className="flex-1">
                   <div className="bg-white border border-gray-300 rounded-xl overflow-hidden">
@@ -56,6 +81,7 @@ const LandingPage = () => {
                 </Button>
               </div>
               
+              {/* Keep existing check items */}
               <div className="flex flex-wrap gap-8">
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
@@ -72,86 +98,83 @@ const LandingPage = () => {
               </div>
             </div>
             
+            {/* Right side with floating stat cards */}
             <div className="relative">
-              {/* Decorative elements */}
-              <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-yellow-200 opacity-60"></div>
-              <div className="absolute bottom-10 -left-10 w-20 h-20 rounded-full bg-blue-200 opacity-60"></div>
-              <div className="absolute top-1/3 -left-5 w-10 h-10 rounded-full bg-pink-200 opacity-60"></div>
+              {/* Background decorative elements */}
+              <div className="absolute -right-20 top-10 w-40 h-40 rounded-full bg-yellow-100 opacity-60 blur-lg"></div>
+              <div className="absolute -left-10 bottom-10 w-32 h-32 rounded-full bg-purple-100 opacity-60 blur-lg"></div>
               
-              <div className="">
-                
-                
-                {/* Enhanced floating stat cards */}
-                <div className="absolute -right-12 -top-20 transform rotate-6">
-                  <Card className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 shadow-lg rounded-xl w-64 border-blue-200">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 bg-blue-500 rounded-lg">
-                        <TrendingUp size={16} className="text-white" />
-                      </div>
-                      <div className="text-sm font-medium text-blue-700">Customer Growth</div>
-                    </div>
-                    <div className="mt-2 text-2xl font-bold text-slate-800">+42%</div>
-                    <div className="mt-1 text-xs text-blue-600">↗ Last 30 days</div>
-                    <div className="h-16 mt-2 flex items-end justify-between gap-1">
-                      {[30, 45, 25, 55, 40, 60, 70, 55, 65, 75].map((h, i) => <div key={i} className="w-2 bg-blue-500 rounded-t-sm" style={{
-                      height: `${h}%`
-                    }}></div>)}
-                    </div>
-                  </Card>
+              {/* Main graph card - similar to reference image */}
+              <div className="relative z-10 bg-white rounded-2xl shadow-lg border border-gray-100 p-5 mb-28">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-medium text-gray-800">Followers Stats</h3>
                 </div>
                 
-                <div className="absolute -left-16 top-1/4 transform -rotate-6">
-                  <Card className="bg-gradient-to-br from-green-50 to-green-100 p-3 shadow-lg rounded-lg border-green-200">
-                    <div className="flex items-center gap-2">
-                      <BadgeCheck size={18} className="text-green-600" />
-                      <span className="text-green-700 font-medium text-sm">Customer Reviews</span>
-                    </div>
-                    <div className="flex text-yellow-400 mt-2">
-                      {[1, 2, 3, 4, 5].map(i => <Star key={i} size={16} fill="currentColor" />)}
-                    </div>
-                    <div className="text-xs text-green-600 mt-1">98% satisfaction rate</div>
-                  </Card>
+                <div className="h-40 flex items-end justify-between gap-3 mb-4">
+                  {[35, 48, 30, 25, 35, 22, 40, 50].map((h, i) => (
+                    <div key={i} className="w-8 rounded-t-md bg-purple-500" style={{height: `${h}%`}}></div>
+                  ))}
                 </div>
                 
-                <div className="absolute -right-16 bottom-16 transform -rotate-3">
-                  <Card className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 shadow-lg rounded-xl w-64 border-purple-200">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 bg-purple-500 rounded-lg">
-                        <Gift size={16} className="text-white" />
-                      </div>
-                      <div className="text-sm font-medium text-purple-700">Rewards Redeemed</div>
-                    </div>
-                    <div className="mt-2 text-2xl font-bold text-slate-800">1,248</div>
-                    <div className="mt-1 flex justify-between items-center">
-                      <span className="text-xs text-purple-600">↗ Growing rapidly</span>
-                      <span className="text-xs px-2 py-1 bg-purple-200 text-purple-700 rounded-full">+18% MoM</span>
-                    </div>
-                  </Card>
+                <div className="flex justify-between text-xs text-gray-400">
+                  <span>16/10</span>
+                  <span>18/10</span>
+                  <span>20/10</span>
+                  <span>22/10</span>
                 </div>
-                
-                <div className="absolute -left-10 bottom-10 transform rotate-6">
-                  <Card className="bg-gradient-to-br from-orange-50 to-orange-100 p-3 shadow-lg rounded-lg border-orange-200">
-                    <div className="flex items-center gap-2">
-                      <Zap size={16} className="text-orange-500" />
-                      <span className="text-orange-700 font-medium text-sm">Average Retention</span>
+              </div>
+              
+              {/* Floating stat cards */}
+              <div className="absolute -right-6 -top-16">
+                <Card className="bg-white p-4 shadow-lg rounded-2xl w-56">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="p-1.5 bg-red-100 rounded-full">
+                      <Star size={14} className="text-red-500" />
                     </div>
-                    <div className="text-xl font-bold text-slate-800 mt-1">+27%</div>
-                    <div className="text-xs text-orange-600">higher with loyalty program</div>
-                  </Card>
-                </div>
+                    <span className="text-xs font-medium text-gray-500">Likes</span>
+                  </div>
+                  <div className="text-3xl font-bold">15.9k</div>
+                  <div className="flex items-center mt-1 text-xs text-green-500">
+                    <span className="text-xs">▲ 2.1% vs last 7 days</span>
+                  </div>
+                </Card>
+              </div>
+              
+              <div className="absolute -right-10 bottom-20">
+                <Card className="bg-white p-4 shadow-lg rounded-2xl w-56">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="p-1.5 bg-orange-100 rounded-full">
+                      <Zap size={14} className="text-orange-500" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-500">Reach</span>
+                  </div>
+                  <div className="text-3xl font-bold">256.18k</div>
+                  <div className="flex items-center mt-1 text-xs text-green-500">
+                    <span>▲ 2.1% vs last 7 days</span>
+                  </div>
+                </Card>
+              </div>
+              
+              <div className="absolute -left-8 top-40">
+                <Card className="bg-white p-4 shadow-lg rounded-2xl w-56">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="p-1.5 bg-green-100 rounded-full">
+                      <TrendingUp size={14} className="text-green-500" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-500">Followers gained</span>
+                  </div>
+                  <div className="text-3xl font-bold">2,938</div>
+                  <div className="flex items-center mt-1 text-xs text-gray-500">
+                    <span>Followers gained after this post</span>
+                  </div>
+                </Card>
               </div>
             </div>
           </div>
         </div>
-        
-        {/* Decorative dots and shapes */}
-        <div className="absolute top-1/4 right-12 w-3 h-3 rounded-full bg-blue-500 opacity-60"></div>
-        <div className="absolute bottom-1/3 right-1/4 w-2 h-2 rounded-full bg-green-500 opacity-60"></div>
-        <div className="absolute top-1/2 left-1/4 w-4 h-4 rounded-full bg-yellow-500 opacity-60"></div>
-        <div className="absolute bottom-1/4 left-12 w-3 h-3 rounded-full bg-pink-500 opacity-60"></div>
       </section>
-
-      {/* Features Section */}
+      
+      {/* Keep existing Features Section */}
       <section className="py-20 px-4 bg-white">
         <div className="container mx-auto text-center">
           <div className="max-w-xl mx-auto mb-16">
@@ -187,7 +210,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* How It Works Section */}
+      {/* Keep existing How It Works Section */}
       <section className="py-20 px-4 bg-gradient-to-b from-white to-gray-50">
         <div className="container mx-auto">
           <div className="max-w-xl mx-auto text-center mb-16">
@@ -225,7 +248,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Social Proof Section */}
+      {/* Keep existing Social Proof Section */}
       <section className="py-20 px-4 bg-coffee-dark text-white">
         <div className="container mx-auto">
           <div className="max-w-3xl mx-auto text-center mb-12">
@@ -279,7 +302,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
+      {/* Keep existing Pricing Section */}
       <section className="py-20 px-4 bg-white">
         <div className="container mx-auto">
           <div className="max-w-xl mx-auto text-center mb-16">
@@ -394,7 +417,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Final CTA */}
+      {/* Keep existing Final CTA */}
       <section className="py-20 px-4 bg-gradient-to-r from-coffee-dark to-coffee-medium text-white">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Transform Your Loyalty Program?</h2>
@@ -414,7 +437,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Keep existing Footer */}
       <footer className="bg-coffee-dark text-white pt-12 pb-6 px-4">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
