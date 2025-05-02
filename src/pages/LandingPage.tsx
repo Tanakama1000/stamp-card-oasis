@@ -49,7 +49,7 @@ const LandingPage = () => {
             <div className="relative z-10">
               {/* Decorative element - pink icon like in reference */}
               <div className="mb-6 relative">
-                <div className="w-16 h-16 bg-pink-500 rounded-lg rotate-12 relative">
+                <div className="w-16 h-16 bg-purple-500 rounded-lg rotate-12 relative">
                   <div className="absolute inset-0 flex items-center justify-center -rotate-12">
                     <img src="/lovable-uploads/04523b06-63b5-485f-ac7d-8624e600ad0d.png" alt="InStamp Logo" className="w-10 h-10 object-contain" />
                   </div>
@@ -76,7 +76,7 @@ const LandingPage = () => {
                     </div>
                   </div>
                 </div>
-                <Button size="lg" className="bg-purple-400 hover:bg-purple-500 text-slate-800 px-6 rounded-full" onClick={() => navigate("/admin")}>
+                <Button size="lg" className="bg-purple-500 hover:bg-purple-600 text-white px-6 rounded-full" onClick={() => navigate("/admin")}>
                   Claim your link
                 </Button>
               </div>
@@ -98,74 +98,101 @@ const LandingPage = () => {
               </div>
             </div>
             
-            {/* Right side with floating stat cards */}
-            <div className="relative">
+            {/* Right side with improved floating stat cards */}
+            <div className="relative h-[500px]">
               {/* Background decorative elements */}
-              <div className="absolute -right-20 top-10 w-40 h-40 rounded-full bg-yellow-100 opacity-60 blur-lg"></div>
-              <div className="absolute -left-10 bottom-10 w-32 h-32 rounded-full bg-purple-100 opacity-60 blur-lg"></div>
+              <div className="absolute -right-20 top-10 w-40 h-40 rounded-full bg-purple-100 opacity-60 blur-lg"></div>
+              <div className="absolute -left-10 bottom-10 w-32 h-32 rounded-full bg-blue-100 opacity-60 blur-lg"></div>
               
-              {/* Main graph card - similar to reference image */}
-              <div className="relative z-10 bg-white rounded-2xl shadow-lg border border-gray-100 p-5 mb-28">
+              {/* Main graph card - redesigned with app theme */}
+              <div className="relative z-10 bg-white rounded-2xl shadow-lg p-5 border border-gray-100 transform translate-y-6">
                 <div className="flex justify-between items-center mb-3">
-                  <h3 className="font-medium text-gray-800">Followers Stats</h3>
+                  <h3 className="font-medium text-gray-800">Customer Growth</h3>
                 </div>
                 
                 <div className="h-40 flex items-end justify-between gap-3 mb-4">
                   {[35, 48, 30, 25, 35, 22, 40, 50].map((h, i) => (
-                    <div key={i} className="w-8 rounded-t-md bg-purple-500" style={{height: `${h}%`}}></div>
+                    <div key={i} className="w-8 rounded-t-md bg-gradient-to-t from-purple-500 to-purple-300" style={{height: `${h}%`}}></div>
                   ))}
                 </div>
                 
                 <div className="flex justify-between text-xs text-gray-400">
-                  <span>16/10</span>
-                  <span>18/10</span>
-                  <span>20/10</span>
-                  <span>22/10</span>
+                  <span>April</span>
+                  <span>May</span>
+                  <span>June</span>
+                  <span>July</span>
                 </div>
               </div>
               
-              {/* Floating stat cards */}
-              <div className="absolute -right-6 -top-16">
-                <Card className="bg-white p-4 shadow-lg rounded-2xl w-56">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="p-1.5 bg-red-100 rounded-full">
-                      <Star size={14} className="text-red-500" />
+              {/* Floating stat cards - redesigned with better styling */}
+              <div className="absolute -right-6 -top-10 animate-fade-in">
+                <Card className="bg-white p-5 shadow-xl rounded-2xl w-60 border-0 overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-b from-purple-100 to-transparent rounded-full -mr-10 -mt-10 opacity-60"></div>
+                  <div className="relative">
+                    <div className="flex items-center gap-3 mb-1">
+                      <div className="p-2 bg-purple-100 rounded-xl">
+                        <Star size={16} className="text-purple-500" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-500">Customer Satisfaction</span>
                     </div>
-                    <span className="text-xs font-medium text-gray-500">Likes</span>
-                  </div>
-                  <div className="text-3xl font-bold">15.9k</div>
-                  <div className="flex items-center mt-1 text-xs text-green-500">
-                    <span className="text-xs">▲ 2.1% vs last 7 days</span>
+                    <div className="text-3xl font-bold mb-1">98%</div>
+                    <div className="flex items-center mt-1 text-xs text-green-500">
+                      <span className="text-xs">▲ 3.2% from last month</span>
+                    </div>
                   </div>
                 </Card>
               </div>
               
-              <div className="absolute -right-10 bottom-20">
-                <Card className="bg-white p-4 shadow-lg rounded-2xl w-56">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="p-1.5 bg-orange-100 rounded-full">
-                      <Zap size={14} className="text-orange-500" />
+              <div className="absolute -right-10 top-48 translate-y-20 animate-fade-in" style={{animationDelay: "0.2s"}}>
+                <Card className="bg-white p-5 shadow-xl rounded-2xl w-64 border-0 overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-b from-blue-100 to-transparent rounded-full -mr-10 -mt-10 opacity-60"></div>
+                  <div className="relative">
+                    <div className="flex items-center gap-3 mb-1">
+                      <div className="p-2 bg-blue-100 rounded-xl">
+                        <BadgeCheck size={16} className="text-blue-500" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-500">Stamps Collected</span>
                     </div>
-                    <span className="text-xs font-medium text-gray-500">Reach</span>
-                  </div>
-                  <div className="text-3xl font-bold">256.18k</div>
-                  <div className="flex items-center mt-1 text-xs text-green-500">
-                    <span>▲ 2.1% vs last 7 days</span>
+                    <div className="text-3xl font-bold mb-1">256.3k</div>
+                    <div className="flex items-center mt-1 text-xs text-green-500">
+                      <span>▲ 5.7% this week</span>
+                    </div>
                   </div>
                 </Card>
               </div>
               
-              <div className="absolute -left-8 top-40">
-                <Card className="bg-white p-4 shadow-lg rounded-2xl w-56">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="p-1.5 bg-green-100 rounded-full">
-                      <TrendingUp size={14} className="text-green-500" />
+              <div className="absolute -left-8 top-20 animate-fade-in" style={{animationDelay: "0.4s"}}>
+                <Card className="bg-white p-5 shadow-xl rounded-2xl w-60 border-0 overflow-hidden">
+                  <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-b from-green-100 to-transparent rounded-full -ml-10 -mt-10 opacity-60"></div>
+                  <div className="relative">
+                    <div className="flex items-center gap-3 mb-1">
+                      <div className="p-2 bg-green-100 rounded-xl">
+                        <Gift size={16} className="text-green-500" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-500">Rewards Redeemed</span>
                     </div>
-                    <span className="text-xs font-medium text-gray-500">Followers gained</span>
+                    <div className="text-3xl font-bold mb-1">12,569</div>
+                    <div className="flex items-center mt-1 text-xs text-green-500">
+                      <span>+15% vs previous month</span>
+                    </div>
                   </div>
-                  <div className="text-3xl font-bold">2,938</div>
-                  <div className="flex items-center mt-1 text-xs text-gray-500">
-                    <span>Followers gained after this post</span>
+                </Card>
+              </div>
+              
+              <div className="absolute left-10 top-64 translate-y-16 animate-fade-in" style={{animationDelay: "0.6s"}}>
+                <Card className="bg-white p-5 shadow-xl rounded-2xl w-60 border-0 overflow-hidden">
+                  <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-b from-purple-100 to-transparent rounded-full -ml-10 -mt-10 opacity-60"></div>
+                  <div className="relative">
+                    <div className="flex items-center gap-3 mb-1">
+                      <div className="p-2 bg-purple-100 rounded-xl">
+                        <Users size={16} className="text-purple-500" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-500">Retention Rate</span>
+                    </div>
+                    <div className="text-3xl font-bold mb-1">78.3%</div>
+                    <div className="flex items-center mt-1 text-xs text-green-500">
+                      <span>▲ 4.5% increase</span>
+                    </div>
                   </div>
                 </Card>
               </div>
