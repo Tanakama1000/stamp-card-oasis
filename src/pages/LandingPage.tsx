@@ -79,7 +79,7 @@ const LandingPage = () => {
               <div className="absolute top-1/3 -left-5 w-10 h-10 rounded-full bg-pink-200 opacity-60"></div>
               
               <div className="">
-                <img src="/lovable-uploads/e96cc08e-37f2-4ba1-bdf4-b00665a89d2d.png" alt="Happy customer using loyalty app" className="w-full rounded-xl shadow-sm" />
+                
                 
                 {/* Enhanced floating stat cards */}
                 <div className="absolute -right-12 -top-20 transform rotate-6">
