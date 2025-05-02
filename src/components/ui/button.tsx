@@ -20,7 +20,7 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         purple: "bg-purple-400 text-white hover:bg-purple-500",
-        neonblue: "bg-ocean-DEFAULT text-white hover:bg-ocean-dark shadow-md",
+        neonblue: "bg-gradient-to-r from-ocean-DEFAULT to-ocean-dark text-white hover:from-ocean-dark hover:to-ocean-DEFAULT shadow-md hover:shadow-lg transition-all duration-300",
       },
       size: {
         default: "h-10 px-4 py-2",

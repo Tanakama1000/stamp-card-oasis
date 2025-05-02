@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -29,62 +28,76 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* Updated Hero Section with better card organization and neon blue theme */}
-      <section className="py-16 px-4 overflow-hidden relative bg-white">
-        {/* Decorative dot patterns */}
-        <div className="absolute bottom-0 left-0 w-32 h-32 opacity-10">
-          <div className="grid grid-cols-8 gap-1">
-            {Array(64).fill(0).map((_, i) => (
-              <div key={i} className="w-1 h-1 rounded-full bg-ocean-light"></div>
-            ))}
+      {/* Enhanced Hero Section with more vibrant colors and gradients */}
+      <section className="relative py-16 px-4 overflow-hidden bg-gradient-to-r from-ocean-light/10 via-white to-ocean-DEFAULT/10">
+        {/* New decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+          <div className="absolute -top-40 -left-40 w-80 h-80 rounded-full bg-ocean-DEFAULT/10 blur-3xl"></div>
+          <div className="absolute top-60 -right-20 w-60 h-60 rounded-full bg-purple-400/10 blur-3xl"></div>
+          <div className="absolute -bottom-40 left-1/4 w-80 h-80 rounded-full bg-ocean-DEFAULT/10 blur-3xl"></div>
+          
+          {/* Decorative patterns */}
+          <div className="absolute top-20 left-10 opacity-20">
+            <div className="grid grid-cols-3 gap-10">
+              {Array(9).fill(0).map((_, i) => (
+                <div key={i} className="w-2 h-2 rounded-full bg-ocean-DEFAULT"></div>
+              ))}
+            </div>
           </div>
+          
+          <div className="absolute bottom-20 right-10 opacity-20">
+            <div className="grid grid-cols-3 gap-10">
+              {Array(9).fill(0).map((_, i) => (
+                <div key={i} className="w-2 h-2 rounded-full bg-ocean-DEFAULT"></div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Wavy line decoration */}
+          <svg className="absolute bottom-10 left-0 w-full opacity-10" height="30" viewBox="0 0 1920 30">
+            <path d="M0,0 C320,30 420,30 640,15 C880,0 980,30 1200,15 C1440,0 1540,30 1760,15 C1980,0 1920,30 1920,30 L1920,30 L0,30 Z" fill="#0EA5E9"></path>
+          </svg>
         </div>
         
-        <div className="absolute top-20 right-20 w-24 h-24 opacity-10">
-          <div className="grid grid-cols-6 gap-1">
-            {Array(36).fill(0).map((_, i) => (
-              <div key={i} className="w-1 h-1 rounded-full bg-ocean-DEFAULT"></div>
-            ))}
-          </div>
-        </div>
-        
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="relative z-10">
-              {/* Decorative element - icon */}
+              {/* Decorative element with enhanced styling */}
               <div className="mb-6 relative">
-                <div className="w-16 h-16 bg-ocean-DEFAULT rounded-lg rotate-12 relative">
+                <div className="w-16 h-16 bg-gradient-to-br from-ocean-DEFAULT to-ocean-dark rounded-lg rotate-12 relative shadow-lg">
                   <div className="absolute inset-0 flex items-center justify-center -rotate-12">
                     <img src="/lovable-uploads/04523b06-63b5-485f-ac7d-8624e600ad0d.png" alt="InStamp Logo" className="w-10 h-10 object-contain" />
                   </div>
                 </div>
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-orange-300 rounded-full opacity-20 blur-md"></div>
               </div>
               
-              {/* Two-line heading with color contrast like reference */}
+              {/* Enhanced heading with text shadow */}
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-800 leading-tight mb-6">
-                Committed To Loyalty<br/>
-                Committed To <span className="text-ocean-DEFAULT">The Future</span>
+                Committed To <span className="text-gradient-primary">Loyalty</span><br/>
+                Committed To <span className="text-ocean-DEFAULT drop-shadow-sm">The Future</span>
               </h1>
               
               <p className="text-lg text-slate-600 mb-8 max-w-lg">
                 Powerful digital stamp cards that increase customer retention and drive repeat business for businesses of all sizes.
               </p>
               
-              {/* Updated slug checker component */}
-              <div className="mb-8">
+              {/* Updated slug checker component with shadow */}
+              <div className="mb-8 relative">
+                <div className="absolute -top-10 -left-10 w-20 h-20 bg-ocean-light opacity-20 rounded-full blur-xl"></div>
                 <SlugChecker />
               </div>
               
-              {/* Keep existing check items */}
+              {/* Enhanced check items with better icons */}
               <div className="flex flex-wrap gap-8">
                 <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center shadow-sm">
                     <Check size={12} className="text-green-600" />
                   </div>
                   <span className="text-slate-600 text-sm">No credit card required</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center shadow-sm">
                     <Check size={12} className="text-green-600" />
                   </div>
                   <span className="text-slate-600 text-sm">No need previous knowledge</span>
@@ -92,24 +105,27 @@ const LandingPage = () => {
               </div>
             </div>
             
-            {/* Right side with redesigned floating stat cards that are mobile responsive */}
+            {/* Right side with redesigned floating stat cards with enhanced shadows and gradients */}
             <div className="relative h-[550px] md:h-[550px] sm:h-[650px]">
-              {/* Background decorative elements */}
-              <div className="absolute -right-20 top-10 w-60 h-60 rounded-full bg-ocean-light opacity-60 blur-xl"></div>
-              <div className="absolute -left-10 bottom-10 w-40 h-40 rounded-full bg-blue-100 opacity-60 blur-xl"></div>
-              <div className="absolute right-40 bottom-20 w-32 h-32 rounded-full bg-yellow-100 opacity-50 blur-lg"></div>
+              {/* Background decorative elements with gradients */}
+              <div className="absolute -right-20 top-10 w-60 h-60 rounded-full bg-gradient-to-br from-ocean-light to-ocean-light/20 opacity-60 blur-xl"></div>
+              <div className="absolute -left-10 bottom-10 w-40 h-40 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 opacity-60 blur-xl"></div>
+              <div className="absolute right-40 bottom-20 w-32 h-32 rounded-full bg-gradient-to-br from-yellow-100 to-yellow-50 opacity-50 blur-lg"></div>
               
-              {/* Decorative curved line */}
+              {/* Decorative curved line with gradient */}
               <div className="absolute left-20 top-40 w-[200px] h-[180px] border-4 border-ocean-light border-dashed rounded-full opacity-20 -z-10" 
                    style={{clipPath: "polygon(0 0, 100% 0, 100% 50%, 0 50%)"}}></div>
               
-              {/* Card with graph - positioned strategically for mobile and desktop */}
+              {/* Enhanced Card with graph - positioned strategically for mobile and desktop */}
               <div className={`${isMobile ? "absolute left-1/2 transform -translate-x-1/2 top-0" : "absolute left-5 top-1/2 transform -translate-y-1/2"} max-w-[280px] animate-fade-in z-10`}>
-                <Card className="bg-white p-5 shadow-xl rounded-2xl border-0 overflow-hidden hover-scale">
+                <Card className="bg-white p-5 shadow-xl rounded-2xl border-0 overflow-hidden hover-scale bg-gradient-to-br from-white to-ocean-light/5">
                   <h3 className="font-semibold text-gray-700 mb-2">Customer Growth</h3>
-                  <div className="h-40 flex items-end justify-between gap-2 mb-4">
+                  <div className="h-40 flex items-end justify-between gap-2 mb-4 relative">
+                    {/* Enhanced graph with gradient bars */}
                     {[35, 48, 30, 25, 35, 22, 40, 50].map((h, i) => (
-                      <div key={i} className="w-6 rounded-t-md bg-gradient-to-t from-ocean-DEFAULT to-ocean-light" style={{height: `${h}%`}}></div>
+                      <div key={i} className="w-6 rounded-t-md bg-gradient-to-t from-ocean-DEFAULT to-ocean-light shadow-inner" style={{height: `${h}%`}}>
+                        <div className="absolute top-0 left-0 w-full h-full bg-white/20 opacity-20"></div>
+                      </div>
                     ))}
                   </div>
                   <div className="flex justify-between text-xs text-gray-400">
@@ -121,11 +137,11 @@ const LandingPage = () => {
                 </Card>
               </div>
               
-              {/* Top-right card - repositioned for mobile */}
+              {/* Enhanced Top-right card with gradient - repositioned for mobile */}
               <div className={`${isMobile ? "absolute left-1/2 transform -translate-x-1/2 top-[220px]" : "absolute right-0 top-10"} max-w-[280px] animate-fade-in`} style={{animationDelay: "0.3s"}}>
-                <Card className="bg-white p-5 shadow-xl rounded-2xl w-64 border-0 overflow-hidden hover-scale">
+                <Card className="bg-gradient-to-br from-white to-ocean-light/5 p-5 shadow-xl rounded-2xl w-64 border-0 overflow-hidden hover-scale">
                   <div className="flex items-start gap-3">
-                    <div className="p-2 bg-green-100 rounded-full">
+                    <div className="p-2 bg-gradient-to-br from-green-100 to-green-50 rounded-full shadow-sm">
                       <TrendingUp className="w-5 h-5 text-green-500" />
                     </div>
                     <div className="flex-1">
@@ -139,11 +155,11 @@ const LandingPage = () => {
                 </Card>
               </div>
               
-              {/* Top card - repositioned for mobile */}
+              {/* Enhanced Top card with gradient - repositioned for mobile */}
               <div className={`${isMobile ? "absolute left-1/2 transform -translate-x-1/2 top-[340px]" : "absolute right-1/2 transform translate-x-1/2 top-0"} max-w-[200px] animate-fade-in`} style={{animationDelay: "0.2s"}}>
-                <Card className="bg-white p-5 shadow-xl rounded-2xl border-0 overflow-hidden hover-scale">
+                <Card className="bg-gradient-to-br from-white to-ocean-light/5 p-5 shadow-xl rounded-2xl border-0 overflow-hidden hover-scale">
                   <div className="flex items-start gap-3">
-                    <div className="p-2 bg-red-100 rounded-full">
+                    <div className="p-2 bg-gradient-to-br from-red-100 to-red-50 rounded-full shadow-sm">
                       <Heart className="w-5 h-5 text-red-500" fill="currentColor" />
                     </div>
                     <div className="flex-1">
@@ -157,11 +173,11 @@ const LandingPage = () => {
                 </Card>
               </div>
               
-              {/* Bottom-right card - repositioned for mobile */}
+              {/* Enhanced Bottom-right card with gradient - repositioned for mobile */}
               <div className={`${isMobile ? "absolute left-1/2 transform -translate-x-1/2 top-[460px]" : "absolute right-10 bottom-20"} max-w-[280px] animate-fade-in`} style={{animationDelay: "0.4s"}}>
-                <Card className="bg-white p-5 shadow-xl rounded-2xl border-0 overflow-hidden hover-scale">
+                <Card className="bg-gradient-to-br from-white to-ocean-light/5 p-5 shadow-xl rounded-2xl border-0 overflow-hidden hover-scale">
                   <div className="flex items-start gap-3">
-                    <div className="p-2 bg-orange-100 rounded-full">
+                    <div className="p-2 bg-gradient-to-br from-orange-100 to-orange-50 rounded-full shadow-sm">
                       <Gift className="w-5 h-5 text-orange-500" />
                     </div>
                     <div className="flex-1">
@@ -175,11 +191,11 @@ const LandingPage = () => {
                 </Card>
               </div>
               
-              {/* Decorative dots */}
+              {/* Enhanced decorative dots with animation */}
               <div className="absolute bottom-0 left-10 opacity-30">
                 <div className="grid grid-cols-6 gap-2">
                   {Array(18).fill(0).map((_, i) => (
-                    <div key={i} className="w-2 h-2 rounded-full bg-ocean-DEFAULT"></div>
+                    <div key={i} className="w-2 h-2 rounded-full bg-ocean-DEFAULT animate-pulse" style={{animationDelay: `${i * 0.1}s`}}></div>
                   ))}
                 </div>
               </div>
@@ -472,7 +488,7 @@ const LandingPage = () => {
                 </a>
                 <a href="#" className="hover:text-coffee-light transition-colors" aria-label="Instagram">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z" />
+                    <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z" />
                   </svg>
                 </a>
               </div>
