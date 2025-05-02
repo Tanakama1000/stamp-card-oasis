@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
-import { Star, Gift, PieChart, ShieldCheck, Smartphone, Users, ChevronRight, Clock, Award, Mail, Phone, Check, CreditCard, QrCode, AreaChart, TrendingUp, BadgeCheck, Zap } from "lucide-react";
+import { Star, Gift, PieChart, ShieldCheck, Smartphone, Users, ChevronRight, Clock, Award, Mail, Phone, Check, CreditCard, QrCode, AreaChart, TrendingUp, BadgeCheck, Zap, Heart } from "lucide-react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -25,9 +25,9 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* Updated Hero Section - Based on the reference image */}
+      {/* Updated Hero Section with better card organization */}
       <section className="py-16 px-4 overflow-hidden relative bg-white">
-        {/* Decorative dot patterns like in the reference image */}
+        {/* Decorative dot patterns */}
         <div className="absolute bottom-0 left-0 w-32 h-32 opacity-10">
           <div className="grid grid-cols-8 gap-1">
             {Array(64).fill(0).map((_, i) => (
@@ -98,103 +98,96 @@ const LandingPage = () => {
               </div>
             </div>
             
-            {/* Right side with improved floating stat cards */}
-            <div className="relative h-[500px]">
+            {/* Right side with reimagined floating stat cards */}
+            <div className="relative h-[550px]">
               {/* Background decorative elements */}
-              <div className="absolute -right-20 top-10 w-40 h-40 rounded-full bg-purple-100 opacity-60 blur-lg"></div>
-              <div className="absolute -left-10 bottom-10 w-32 h-32 rounded-full bg-blue-100 opacity-60 blur-lg"></div>
+              <div className="absolute -right-20 top-10 w-60 h-60 rounded-full bg-purple-100 opacity-60 blur-xl"></div>
+              <div className="absolute -left-10 bottom-10 w-40 h-40 rounded-full bg-blue-100 opacity-60 blur-xl"></div>
+              <div className="absolute right-40 bottom-20 w-32 h-32 rounded-full bg-yellow-100 opacity-50 blur-lg"></div>
               
-              {/* Main graph card - redesigned with app theme */}
-              <div className="relative z-10 bg-white rounded-2xl shadow-lg p-5 border border-gray-100 transform translate-y-6">
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="font-medium text-gray-800">Customer Growth</h3>
-                </div>
-                
-                <div className="h-40 flex items-end justify-between gap-3 mb-4">
-                  {[35, 48, 30, 25, 35, 22, 40, 50].map((h, i) => (
-                    <div key={i} className="w-8 rounded-t-md bg-gradient-to-t from-purple-500 to-purple-300" style={{height: `${h}%`}}></div>
+              {/* Decorative curved line similar to reference image */}
+              <div className="absolute left-20 top-40 w-[200px] h-[180px] border-4 border-yellow-400 border-dashed rounded-full opacity-20 -z-10" 
+                   style={{clipPath: "polygon(0 0, 100% 0, 100% 50%, 0 50%)"}}></div>
+              
+              {/* Card with graph - positioned like the Followers Stats in reference */}
+              <div className="absolute left-5 top-1/2 transform -translate-y-1/2 max-w-[280px] animate-fade-in z-10">
+                <Card className="bg-white p-5 shadow-xl rounded-2xl border-0 overflow-hidden hover-scale">
+                  <h3 className="font-semibold text-gray-700 mb-2">Customer Growth</h3>
+                  <div className="h-40 flex items-end justify-between gap-2 mb-4">
+                    {[35, 48, 30, 25, 35, 22, 40, 50].map((h, i) => (
+                      <div key={i} className="w-6 rounded-t-md bg-gradient-to-t from-purple-500 to-purple-300" style={{height: `${h}%`}}></div>
+                    ))}
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-400">
+                    <span>Apr</span>
+                    <span>May</span>
+                    <span>Jun</span>
+                    <span>Jul</span>
+                  </div>
+                </Card>
+              </div>
+              
+              {/* Top-right card - like the Followers Gained in reference */}
+              <div className="absolute right-0 top-10 max-w-[280px] animate-fade-in" style={{animationDelay: "0.3s"}}>
+                <Card className="bg-white p-5 shadow-xl rounded-2xl w-64 border-0 overflow-hidden hover-scale">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-green-100 rounded-full">
+                      <TrendingUp className="w-5 h-5 text-green-500" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-gray-500 text-sm mb-1">New Customers</p>
+                      <h3 className="text-3xl font-bold mb-1">2,938</h3>
+                      <p className="text-green-500 text-xs flex items-center gap-1">
+                        <span>▲</span> 4.3% vs last month
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+              
+              {/* Top card - like the Likes card in reference */}
+              <div className="absolute right-1/2 transform translate-x-1/2 top-0 max-w-[200px] animate-fade-in" style={{animationDelay: "0.2s"}}>
+                <Card className="bg-white p-5 shadow-xl rounded-2xl border-0 overflow-hidden hover-scale">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-red-100 rounded-full">
+                      <Heart className="w-5 h-5 text-red-500" fill="currentColor" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-gray-500 text-sm mb-1">Loyalty Rate</p>
+                      <h3 className="text-3xl font-bold mb-1">15.9k</h3>
+                      <p className="text-green-500 text-xs flex items-center gap-1">
+                        <span>▲</span> 2.1% vs last 7 days
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+              
+              {/* Bottom-right card - like the Reach card in reference */}
+              <div className="absolute right-10 bottom-20 max-w-[280px] animate-fade-in" style={{animationDelay: "0.4s"}}>
+                <Card className="bg-white p-5 shadow-xl rounded-2xl border-0 overflow-hidden hover-scale">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-orange-100 rounded-full">
+                      <Gift className="w-5 h-5 text-orange-500" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-gray-500 text-sm mb-1">Stamps Collected</p>
+                      <h3 className="text-3xl font-bold mb-1">256.18k</h3>
+                      <p className="text-green-500 text-xs flex items-center gap-1">
+                        <span>▲</span> 2.1% vs last week
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+              
+              {/* Decorative dots similar to reference image */}
+              <div className="absolute bottom-0 left-10 opacity-30">
+                <div className="grid grid-cols-6 gap-2">
+                  {Array(18).fill(0).map((_, i) => (
+                    <div key={i} className="w-2 h-2 rounded-full bg-purple-500"></div>
                   ))}
                 </div>
-                
-                <div className="flex justify-between text-xs text-gray-400">
-                  <span>April</span>
-                  <span>May</span>
-                  <span>June</span>
-                  <span>July</span>
-                </div>
-              </div>
-              
-              {/* Floating stat cards - redesigned with better styling */}
-              <div className="absolute -right-6 -top-10 animate-fade-in">
-                <Card className="bg-white p-5 shadow-xl rounded-2xl w-60 border-0 overflow-hidden">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-b from-purple-100 to-transparent rounded-full -mr-10 -mt-10 opacity-60"></div>
-                  <div className="relative">
-                    <div className="flex items-center gap-3 mb-1">
-                      <div className="p-2 bg-purple-100 rounded-xl">
-                        <Star size={16} className="text-purple-500" />
-                      </div>
-                      <span className="text-sm font-medium text-gray-500">Customer Satisfaction</span>
-                    </div>
-                    <div className="text-3xl font-bold mb-1">98%</div>
-                    <div className="flex items-center mt-1 text-xs text-green-500">
-                      <span className="text-xs">▲ 3.2% from last month</span>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-              
-              <div className="absolute -right-10 top-48 translate-y-20 animate-fade-in" style={{animationDelay: "0.2s"}}>
-                <Card className="bg-white p-5 shadow-xl rounded-2xl w-64 border-0 overflow-hidden">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-b from-blue-100 to-transparent rounded-full -mr-10 -mt-10 opacity-60"></div>
-                  <div className="relative">
-                    <div className="flex items-center gap-3 mb-1">
-                      <div className="p-2 bg-blue-100 rounded-xl">
-                        <BadgeCheck size={16} className="text-blue-500" />
-                      </div>
-                      <span className="text-sm font-medium text-gray-500">Stamps Collected</span>
-                    </div>
-                    <div className="text-3xl font-bold mb-1">256.3k</div>
-                    <div className="flex items-center mt-1 text-xs text-green-500">
-                      <span>▲ 5.7% this week</span>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-              
-              <div className="absolute -left-8 top-20 animate-fade-in" style={{animationDelay: "0.4s"}}>
-                <Card className="bg-white p-5 shadow-xl rounded-2xl w-60 border-0 overflow-hidden">
-                  <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-b from-green-100 to-transparent rounded-full -ml-10 -mt-10 opacity-60"></div>
-                  <div className="relative">
-                    <div className="flex items-center gap-3 mb-1">
-                      <div className="p-2 bg-green-100 rounded-xl">
-                        <Gift size={16} className="text-green-500" />
-                      </div>
-                      <span className="text-sm font-medium text-gray-500">Rewards Redeemed</span>
-                    </div>
-                    <div className="text-3xl font-bold mb-1">12,569</div>
-                    <div className="flex items-center mt-1 text-xs text-green-500">
-                      <span>+15% vs previous month</span>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-              
-              <div className="absolute left-10 top-64 translate-y-16 animate-fade-in" style={{animationDelay: "0.6s"}}>
-                <Card className="bg-white p-5 shadow-xl rounded-2xl w-60 border-0 overflow-hidden">
-                  <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-b from-purple-100 to-transparent rounded-full -ml-10 -mt-10 opacity-60"></div>
-                  <div className="relative">
-                    <div className="flex items-center gap-3 mb-1">
-                      <div className="p-2 bg-purple-100 rounded-xl">
-                        <Users size={16} className="text-purple-500" />
-                      </div>
-                      <span className="text-sm font-medium text-gray-500">Retention Rate</span>
-                    </div>
-                    <div className="text-3xl font-bold mb-1">78.3%</div>
-                    <div className="flex items-center mt-1 text-xs text-green-500">
-                      <span>▲ 4.5% increase</span>
-                    </div>
-                  </div>
-                </Card>
               </div>
             </div>
           </div>
