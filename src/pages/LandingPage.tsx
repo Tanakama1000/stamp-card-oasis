@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -6,19 +5,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { Award, Check, ChevronRight, Coffee, CreditCard, Gift, Heart, Mail, Phone, QrCode, Shield, Smartphone, Star, TrendingUp, Users } from "lucide-react";
 import SlugChecker from "@/components/SlugChecker";
 import useWindowSize from "@/hooks/useWindowSize";
-
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { width } = useWindowSize();
+  const {
+    width
+  } = useWindowSize();
   const isMobile = width < 768;
-  
-  return (
-    <div className="min-h-screen bg-white font-[Poppins]">
+  return <div className="min-h-screen bg-white font-[Poppins]">
       {/* Header/Navigation */}
       <header className="bg-white text-slate-800 p-4 shadow-sm sticky top-0 z-50 border-b border-gray-100">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <img src="/lovable-uploads/09d9d85d-a5be-4ff5-8719-cc0a75ecc273.png" alt="InStamp Logo" className="h-10 w-auto" />
+            <img alt="InStamp Logo" className="h-10 w-auto" src="/lovable-uploads/101a2884-0ac9-46b2-81e7-c566dea60886.png" />
             <span className="text-xl font-bold bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent">InStamp</span>
           </div>
           <div className="flex items-center gap-2">
@@ -49,7 +47,7 @@ const LandingPage = () => {
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight mb-6">
-                Build Customer <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">Loyalty</span><br/>
+                Build Customer <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">Loyalty</span><br />
                 Drive <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">Repeat Business</span>
               </h1>
               
@@ -87,11 +85,7 @@ const LandingPage = () => {
             {/* Hero image/illustration section */}
             <div className="relative">
               <div className="w-full h-full flex items-center justify-center">
-                <img 
-                  src="/lovable-uploads/03bd2d95-1cd4-4fba-8e3a-d6e467234380.png" 
-                  alt="InStamp App Demo" 
-                  className="max-w-full rounded-lg shadow-xl relative z-10"
-                />
+                <img src="/lovable-uploads/03bd2d95-1cd4-4fba-8e3a-d6e467234380.png" alt="InStamp App Demo" className="max-w-full rounded-lg shadow-xl relative z-10" />
                 
                 {/* Floating cards elements */}
                 <div className="absolute -top-12 -right-6 bg-white p-4 rounded-lg shadow-lg w-48 transform rotate-6 z-20">
@@ -472,20 +466,11 @@ const LandingPage = () => {
             Join thousands of businesses that have increased customer retention and revenue with our digital loyalty platform.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button 
-              className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg text-lg rounded-full" 
-              size="xxl"
-              onClick={() => navigate("/admin")}
-            >
+            <Button className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg text-lg rounded-full" size="xxl" onClick={() => navigate("/admin")}>
               Get Started Free
               <ChevronRight size={20} />
             </Button>
-            <Button 
-              variant="outline" 
-              className="border-white text-white hover:bg-white/10 text-lg rounded-full" 
-              size="xxl"
-              onClick={() => navigate("/admin")}
-            >
+            <Button variant="outline" className="border-white text-white hover:bg-white/10 text-lg rounded-full" size="xxl" onClick={() => navigate("/admin")}>
               Schedule a Demo
             </Button>
           </div>
@@ -561,8 +546,6 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default LandingPage;
