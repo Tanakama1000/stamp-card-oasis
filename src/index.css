@@ -146,7 +146,7 @@
   }
   
   .text-gradient-primary {
-    @apply bg-gradient-to-br from-ocean-DEFAULT via-ocean-light to-ocean-DEFAULT bg-clip-text text-transparent;
+    @apply bg-gradient-to-br from-ocean-light via-ocean-DEFAULT to-ocean-dark bg-clip-text text-transparent;
   }
 }
 
