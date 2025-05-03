@@ -1,36 +1,67 @@
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
-import { Award, Check, ChevronRight, Coffee, CreditCard, Gift, Heart, Mail, Phone, QrCode, Shield, Smartphone, Star, TrendingUp, Users } from "lucide-react";
+import { 
+  Award, 
+  Check, 
+  ChevronRight, 
+  Coffee, 
+  CreditCard, 
+  Gift, 
+  Heart, 
+  Mail, 
+  Phone, 
+  QrCode, 
+  Shield, 
+  Smartphone, 
+  Star, 
+  TrendingUp, 
+  Users 
+} from "lucide-react";
 import SlugChecker from "@/components/SlugChecker";
 import useWindowSize from "@/hooks/useWindowSize";
+import RewardsCard from "@/components/loyalty/RewardsCard";
+
 const LandingPage = () => {
   const navigate = useNavigate();
-  const {
-    width
-  } = useWindowSize();
+  const { width } = useWindowSize();
   const isMobile = width < 768;
-  return <div className="min-h-screen bg-white font-[Poppins]">
+
+  return (
+    <div className="min-h-screen bg-white font-[Poppins] overflow-x-hidden">
       {/* Header/Navigation */}
-      <header className="bg-white text-slate-800 p-4 shadow-sm sticky top-0 z-50 border-b border-gray-100">
+      <header className="bg-white text-slate-800 p-4 sticky top-0 z-50 border-b border-slate-100 shadow-sm">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <img alt="InStamp Logo" className="h-10 w-auto" src="/lovable-uploads/101a2884-0ac9-46b2-81e7-c566dea60886.png" />
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent">InStamp</span>
+            <img 
+              alt="InStamp Logo" 
+              className="h-10 w-auto" 
+              src="/lovable-uploads/101a2884-0ac9-46b2-81e7-c566dea60886.png" 
+            />
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">InStamp</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" className="hidden md:flex" onClick={() => navigate("/admin")}>
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="outline" 
+              className="hidden md:flex border-slate-200 hover:bg-slate-50 hover:border-slate-300" 
+              onClick={() => navigate("/admin")}
+            >
               Log In
             </Button>
-            <Button variant="heroGradient" onClick={() => navigate("/admin")}>
+            <Button 
+              variant="accent"
+              className="px-5" 
+              onClick={() => navigate("/admin")}
+            >
               Get Started
             </Button>
           </div>
         </div>
       </header>
 
-      {/* Enhanced Hero Section */}
+      {/* Hero Section */}
       <section className="relative py-16 md:py-24 overflow-hidden">
         {/* Background decorations */}
         <div className="absolute inset-0 overflow-hidden z-0">
@@ -41,14 +72,15 @@ const LandingPage = () => {
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
+            <div className="animate-fade-in">
               <div className="flex items-center mb-4 bg-blue-50 w-max px-3 py-1.5 rounded-full text-blue-600 text-sm font-medium">
-                <span className="animate-pulse mr-2">●</span> Digital Stamp Cards Made Simple
+                <span className="animate-pulse mr-2">●</span> 
+                Digital Stamp Cards Made Simple
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight mb-6">
-                Build Customer <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">Loyalty</span><br />
-                Drive <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">Repeat Business</span>
+                Build Customer <span className="bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Loyalty</span><br />
+                Drive <span className="bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Repeat Business</span>
               </h1>
               
               <p className="text-lg text-slate-600 mb-8 max-w-lg">
@@ -57,7 +89,7 @@ const LandingPage = () => {
               </p>
               
               <div className="mb-8">
-                <SlugChecker />
+                <SlugChecker className="shadow-lg rounded-lg overflow-hidden" />
               </div>
               
               <div className="flex flex-wrap gap-6 mb-8">
@@ -82,43 +114,110 @@ const LandingPage = () => {
               </div>
             </div>
             
-            {/* Hero image/illustration section */}
-            <div className="relative">
-              <div className="w-full h-full flex items-center justify-center">
-                <img src="/lovable-uploads/03bd2d95-1cd4-4fba-8e3a-d6e467234380.png" alt="InStamp App Demo" className="max-w-full rounded-lg shadow-xl relative z-10" />
+            {/* Hero image/illustration section with animated cards */}
+            <div className="relative animate-fade-in">
+              <div className="w-full h-full flex items-center justify-center perspective-1000">
+                {/* Main device mockup */}
+                <div className="relative z-20 shadow-2xl rounded-xl rotate-1 transform transition-transform duration-500 hover:rotate-3 hover:scale-105">
+                  <img 
+                    src="/lovable-uploads/03bd2d95-1cd4-4fba-8e3a-d6e467234380.png" 
+                    alt="InStamp App Demo" 
+                    className="max-w-full rounded-xl border border-slate-200"
+                  />
+                </div>
                 
-                {/* Floating cards elements */}
-                <div className="absolute -top-12 -right-6 bg-white p-4 rounded-lg shadow-lg w-48 transform rotate-6 z-20">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
-                      <Star size={14} />
+                {/* Floating stamp card */}
+                <div className="absolute -top-12 -right-6 bg-white p-4 rounded-lg shadow-xl w-48 transform rotate-6 z-20 animate-float">
+                  <div className="flex flex-col h-full justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                        <Coffee size={14} />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Collect</p>
+                        <p className="text-sm font-medium">10 Stamps</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Program</p>
-                      <p className="text-sm font-medium">Reward Ready!</p>
+                    <div className="h-2 bg-blue-50 rounded-full">
+                      <div className="h-2 bg-blue-600 rounded-full w-8/12"></div>
                     </div>
-                  </div>
-                  <div className="h-2 bg-blue-50 rounded-full mt-3">
-                    <div className="h-2 bg-blue-500 rounded-full w-full"></div>
+                    <div className="grid grid-cols-5 gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <div key={`stamp-${i}`} className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+                          <Check size={10} className="text-blue-600" />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 
-                <div className="absolute -bottom-10 -left-6 bg-white p-4 rounded-lg shadow-lg z-20">
+                {/* Stats card */}
+                <div className="absolute -bottom-8 -left-4 bg-white p-4 rounded-lg shadow-xl z-20 animate-float" style={{animationDelay: "0.5s"}}>
                   <div className="flex items-center gap-2">
-                    <Coffee size={20} className="text-blue-500" />
+                    <Star size={20} className="text-blue-600" />
                     <div>
-                      <p className="text-sm font-medium">+324 Stamps Today</p>
+                      <p className="text-sm font-medium">324 Stamps Today</p>
                       <p className="text-xs text-green-500">↑ 12% from yesterday</p>
                     </div>
                   </div>
                 </div>
+
+                {/* Background decoration */}
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-3xl transform rotate-3 scale-105 -z-10"></div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section with gradient background */}
+      {/* Feature preview section */}
+      <section className="py-20 bg-slate-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-3">
+              LOYALTY MADE EASY
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-slate-800">
+              Digital Loyalty Cards That Drive Results
+            </h2>
+            <p className="text-lg text-slate-600">
+              Attract new customers and keep them coming back with beautiful digital stamp cards
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="animate-slide-in-left" style={{ animationDelay: "0.1s" }}>
+              <RewardsCard 
+                rewardsCount={2}
+                totalEarned={36}
+                totalStamps={124}
+                textColor="#3B82F6"
+                accentColor="#EBF5FF"
+              />
+            </div>
+            <div className="animate-slide-in-left" style={{ animationDelay: "0.3s" }}>
+              <RewardsCard 
+                rewardsCount={4}
+                totalEarned={52}
+                totalStamps={205}
+                textColor="#8B5CF6" 
+                accentColor="#F3EEFF"
+              />
+            </div>
+            <div className="animate-slide-in-left" style={{ animationDelay: "0.5s" }}>
+              <RewardsCard 
+                rewardsCount={3}
+                totalEarned={29}
+                totalStamps={98}
+                textColor="#EC4899"
+                accentColor="#FCE7F3"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
       <section className="py-16 bg-gradient-to-b from-white to-blue-50">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-12">
@@ -128,19 +227,19 @@ const LandingPage = () => {
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">2.5M+</div>
+              <div className="text-4xl font-bold text-blue-600 mb-2 animate-count">2.5M+</div>
               <div className="text-slate-600">Stamps Collected</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">15k+</div>
+              <div className="text-4xl font-bold text-blue-600 mb-2 animate-count">15k+</div>
               <div className="text-slate-600">Business Users</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">98%</div>
+              <div className="text-4xl font-bold text-blue-600 mb-2 animate-count">98%</div>
               <div className="text-slate-600">Customer Satisfaction</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">35%</div>
+              <div className="text-4xl font-bold text-blue-600 mb-2 animate-count">35%</div>
               <div className="text-slate-600">Avg. Revenue Boost</div>
             </div>
           </div>
@@ -148,7 +247,7 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4 bg-white">
         <div className="container mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-3">POWERFUL FEATURES</span>
@@ -158,14 +257,14 @@ const LandingPage = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <Card className="bg-white border-0 shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
+            <Card className="bg-white border-0 shadow-lg rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300">
               <div className="p-6">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-5">
                   <QrCode size={24} className="text-blue-600" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-slate-800">Digital Stamp Cards</h3>
                 <p className="text-slate-600 mb-4">Create beautiful digital loyalty cards that work on any device without app downloads.</p>
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   <li className="flex items-start gap-2">
                     <Check size={18} className="text-blue-500 mt-0.5 flex-shrink-0" />
                     <span className="text-slate-600">Customizable design</span>
@@ -174,19 +273,23 @@ const LandingPage = () => {
                     <Check size={18} className="text-blue-500 mt-0.5 flex-shrink-0" />
                     <span className="text-slate-600">Works on all devices</span>
                   </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={18} className="text-blue-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-slate-600">Easy to setup and share</span>
+                  </li>
                 </ul>
               </div>
             </Card>
             
             {/* Feature 2 */}
-            <Card className="bg-white border-0 shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
+            <Card className="bg-white border-0 shadow-lg rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300">
               <div className="p-6">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-5">
                   <TrendingUp size={24} className="text-blue-600" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-slate-800">Analytics Dashboard</h3>
                 <p className="text-slate-600 mb-4">Track customer engagement and program performance with real-time analytics.</p>
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   <li className="flex items-start gap-2">
                     <Check size={18} className="text-blue-500 mt-0.5 flex-shrink-0" />
                     <span className="text-slate-600">Customer insights</span>
@@ -195,19 +298,23 @@ const LandingPage = () => {
                     <Check size={18} className="text-blue-500 mt-0.5 flex-shrink-0" />
                     <span className="text-slate-600">Revenue tracking</span>
                   </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={18} className="text-blue-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-slate-600">Performance metrics</span>
+                  </li>
                 </ul>
               </div>
             </Card>
             
             {/* Feature 3 */}
-            <Card className="bg-white border-0 shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
+            <Card className="bg-white border-0 shadow-lg rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300">
               <div className="p-6">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-5">
                   <Gift size={24} className="text-blue-600" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-slate-800">Reward Management</h3>
                 <p className="text-slate-600 mb-4">Create and manage rewards that keep customers coming back again and again.</p>
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   <li className="flex items-start gap-2">
                     <Check size={18} className="text-blue-500 mt-0.5 flex-shrink-0" />
                     <span className="text-slate-600">Flexible reward options</span>
@@ -215,6 +322,10 @@ const LandingPage = () => {
                   <li className="flex items-start gap-2">
                     <Check size={18} className="text-blue-500 mt-0.5 flex-shrink-0" />
                     <span className="text-slate-600">Automatic redemption</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={18} className="text-blue-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-slate-600">Custom milestones</span>
                   </li>
                 </ul>
               </div>
@@ -224,44 +335,56 @@ const LandingPage = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 px-4 bg-slate-50">
-        <div className="container mx-auto">
+      <section className="py-20 px-4 bg-slate-50 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-blue-50/50 rounded-l-full -translate-y-1/4 transform rotate-12 opacity-70"></div>
+        
+        <div className="container mx-auto relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-3">GETTING STARTED</span>
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-slate-800">How InStamp Works</h2>
             <p className="text-lg text-slate-600">Three simple steps to launch your digital loyalty program</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-16 max-w-5xl mx-auto">
-            <div className="text-center relative">
-              <div className="w-16 h-16 bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto relative">
+            {/* Connecting lines (desktop only) */}
+            <div className="hidden md:block absolute top-16 left-[25%] right-[25%] h-0.5 bg-blue-200"></div>
+            
+            <div className="relative text-center">
+              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6 shadow-lg relative z-10">
                 1
               </div>
               <h3 className="text-xl font-semibold mb-3 text-slate-800">Create Your Account</h3>
               <p className="text-slate-600">Sign up in minutes and customize your digital stamp card to match your brand.</p>
-              
-              {/* Connector line (only show on desktop) */}
-              <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-blue-200 -ml-4 transform translate-x-2"></div>
             </div>
             
-            <div className="text-center relative">
-              <div className="w-16 h-16 bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+            <div className="relative text-center">
+              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6 shadow-lg relative z-10">
                 2
               </div>
               <h3 className="text-xl font-semibold mb-3 text-slate-800">Share Your Link</h3>
               <p className="text-slate-600">Invite customers to join your loyalty program via QR code or personalized link.</p>
-              
-              {/* Connector line (only show on desktop) */}
-              <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-blue-200 -ml-4 transform translate-x-2"></div>
             </div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+            <div className="relative text-center">
+              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6 shadow-lg relative z-10">
                 3
               </div>
               <h3 className="text-xl font-semibold mb-3 text-slate-800">Reward Customers</h3>
               <p className="text-slate-600">Scan customer QR codes to add stamps and watch your customer loyalty grow.</p>
             </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <Button 
+              variant="accent" 
+              size="lg" 
+              onClick={() => navigate("/admin")} 
+              className="px-8"
+            >
+              Get Started Now
+              <ChevronRight size={18} />
+            </Button>
           </div>
         </div>
       </section>
@@ -276,10 +399,10 @@ const LandingPage = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Testimonial 1 */}
-            <Card className="bg-white border border-gray-100 shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+            {/* Testimonial cards */}
+            <Card className="bg-white border border-slate-100 shadow-md p-6 hover:shadow-lg transition-shadow duration-300 rounded-xl">
               <div className="flex items-center gap-1 mb-4 text-yellow-400">
-                {[1, 2, 3, 4, 5].map(i => <Star key={i} size={16} fill="currentColor" />)}
+                {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
               </div>
               <p className="mb-6 text-slate-700">"Since implementing InStamp, we've seen a 35% increase in repeat customers. The digital loyalty cards are so much better than the paper ones we used to use!"</p>
               <div className="flex items-center gap-3">
@@ -294,9 +417,9 @@ const LandingPage = () => {
             </Card>
             
             {/* Testimonial 2 */}
-            <Card className="bg-white border border-gray-100 shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+            <Card className="bg-white border border-slate-100 shadow-md p-6 hover:shadow-lg transition-shadow duration-300 rounded-xl">
               <div className="flex items-center gap-1 mb-4 text-yellow-400">
-                {[1, 2, 3, 4, 5].map(i => <Star key={i} size={16} fill="currentColor" />)}
+                {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
               </div>
               <p className="mb-6 text-slate-700">"The analytics alone made it worth switching to InStamp. We can now track which rewards drive customer loyalty and adjust our offerings accordingly."</p>
               <div className="flex items-center gap-3">
@@ -311,9 +434,9 @@ const LandingPage = () => {
             </Card>
             
             {/* Testimonial 3 */}
-            <Card className="bg-white border border-gray-100 shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+            <Card className="bg-white border border-slate-100 shadow-md p-6 hover:shadow-lg transition-shadow duration-300 rounded-xl">
               <div className="flex items-center gap-1 mb-4 text-yellow-400">
-                {[1, 2, 3, 4, 5].map(i => <Star key={i} size={16} fill="currentColor" />)}
+                {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
               </div>
               <p className="mb-6 text-slate-700">"Our customers love the convenience of digital stamp cards. No more lost paper cards, and they can check their progress anytime. It's a game-changer!"</p>
               <div className="flex items-center gap-3">
@@ -330,147 +453,34 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-20 px-4 bg-slate-50">
-        <div className="container mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-3">PRICING</span>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-slate-800">Simple, Transparent Pricing</h2>
-            <p className="text-lg text-slate-600">Choose the plan that works best for your business</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Starter Plan */}
-            <Card className="bg-white border border-gray-100 overflow-hidden shadow-lg">
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2 text-slate-800">Starter</h3>
-                <div className="flex items-baseline mb-5">
-                  <span className="text-3xl font-bold">$19</span>
-                  <span className="text-slate-500 ml-1">/month</span>
-                </div>
-                <p className="text-slate-600 mb-6">Perfect for new businesses</p>
-                
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-start gap-2">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-slate-600">Up to 500 customers</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-slate-600">Basic analytics</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-slate-600">1 loyalty card template</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-slate-600">Email support</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="p-6 border-t border-gray-100">
-                <Button className="w-full" variant="heroGradient" onClick={() => navigate("/admin")}>
-                  Get Started
-                </Button>
-              </div>
-            </Card>
-            
-            {/* Growth Plan - Featured */}
-            <Card className="bg-white border-2 border-blue-500 overflow-hidden shadow-2xl relative transform scale-105 z-10">
-              <div className="absolute top-0 left-0 right-0 bg-blue-500 text-white text-center text-sm py-1 font-medium">
-                MOST POPULAR
-              </div>
-              <div className="p-6 pt-10">
-                <h3 className="text-xl font-semibold mb-2 text-slate-800">Growth</h3>
-                <div className="flex items-baseline mb-5">
-                  <span className="text-3xl font-bold">$49</span>
-                  <span className="text-slate-500 ml-1">/month</span>
-                </div>
-                <p className="text-slate-600 mb-6">For established businesses</p>
-                
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-start gap-2">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-slate-600">Unlimited customers</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-slate-600">Advanced analytics & reports</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-slate-600">3 custom card templates</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-slate-600">Priority email & chat support</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="p-6 border-t border-gray-100">
-                <Button className="w-full" variant="heroGradient" size="lg" onClick={() => navigate("/admin")}>
-                  Get Started
-                </Button>
-              </div>
-            </Card>
-            
-            {/* Enterprise Plan */}
-            <Card className="bg-white border border-gray-100 overflow-hidden shadow-lg">
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2 text-slate-800">Enterprise</h3>
-                <div className="flex items-baseline mb-5">
-                  <span className="text-3xl font-bold">$99</span>
-                  <span className="text-slate-500 ml-1">/month</span>
-                </div>
-                <p className="text-slate-600 mb-6">For multi-location businesses</p>
-                
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-start gap-2">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-slate-600">Unlimited customers</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-slate-600">Custom analytics & API access</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-slate-600">Unlimited custom templates</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-slate-600">24/7 priority support</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="p-6 border-t border-gray-100">
-                <Button className="w-full" variant="heroGradient" onClick={() => navigate("/admin")}>
-                  Contact Sales
-                </Button>
-              </div>
-            </Card>
-          </div>
-          
-          <div className="text-center mt-8">
-            <p className="text-slate-500">All plans include a 14-day free trial. No credit card required.</p>
-          </div>
-        </div>
-      </section>
-
       {/* Call-to-Action Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-        <div className="container mx-auto max-w-4xl text-center">
+      <section className="py-20 px-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white relative overflow-hidden">
+        {/* Background decorations */}
+        <div className="absolute inset-0 overflow-hidden opacity-10">
+          <div className="absolute top-0 left-0 w-1/3 h-1/3 bg-white rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-white rounded-full blur-3xl transform translate-x-1/3 translate-y-1/3"></div>
+        </div>
+        
+        <div className="container mx-auto max-w-4xl text-center relative z-10">
           <h2 className="text-4xl font-bold mb-6">Ready to Transform Your Loyalty Program?</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
             Join thousands of businesses that have increased customer retention and revenue with our digital loyalty platform.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg text-lg rounded-full" size="xxl" onClick={() => navigate("/admin")}>
+            <Button 
+              className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg text-lg rounded-full" 
+              size="xxl" 
+              onClick={() => navigate("/admin")}
+            >
               Get Started Free
               <ChevronRight size={20} />
             </Button>
-            <Button variant="outline" className="border-white text-white hover:bg-white/10 text-lg rounded-full" size="xxl" onClick={() => navigate("/admin")}>
+            <Button 
+              variant="outline" 
+              className="border-white text-white hover:bg-white/10 text-lg rounded-full" 
+              size="xxl" 
+              onClick={() => navigate("/admin")}
+            >
               Schedule a Demo
             </Button>
           </div>
@@ -546,6 +556,8 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default LandingPage;

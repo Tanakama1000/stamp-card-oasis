@@ -22,6 +22,7 @@ const buttonVariants = cva(
         purple: "bg-purple-400 text-white hover:bg-purple-500",
         neonblue: "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md hover:shadow-lg transition-all duration-300",
         heroGradient: "bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl transform transition-all duration-300 hover:translate-y-[-2px]",
+        accent: "bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg transition-all duration-300",
       },
       size: {
         default: "h-10 px-4 py-2",

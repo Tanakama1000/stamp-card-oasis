@@ -56,7 +56,6 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
-    /* Changed from #FFFDD0 to pure white */
     --cream-light: #FFFFFF;
   }
 
@@ -107,7 +106,6 @@
 
 @layer base {
   body {
-    /* Changed background to light slate blue */
     background-color: #F8FAFC;
     @apply text-foreground;
   }
@@ -147,6 +145,10 @@
   
   .text-gradient-primary {
     @apply bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent;
+  }
+  
+  .perspective-1000 {
+    perspective: 1000px;
   }
 }
 
@@ -239,4 +241,35 @@
 
 .animate-slide-in-right {
   animation: slideInRight 0.5s ease-out forwards;
+}
+
+/* New enhanced animations */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-count {
+  opacity: 0;
+  animation: countUp 0.8s ease-out forwards;
+  animation-delay: calc(var(--animation-order, 0) * 0.1s);
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+}
+
+.animate-glow {
+  animation: glow 2s infinite;
 }
