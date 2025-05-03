@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Check, X } from "lucide-react";
+import { Check, X, Link as LinkIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
@@ -73,18 +73,15 @@ const SlugChecker: React.FC<SlugCheckerProps> = ({ className }) => {
     }
   };
 
-  const getButtonText = () => {
-    if (isChecking) return "Checking...";
-    if (isAvailable && wasChecked) return "Claim your link";
-    return "Claim your link";
-  };
-
   return (
     <form onSubmit={handleSubmit} className={`flex flex-col sm:flex-row gap-4 ${className}`}>
       <div className="flex-1 relative">
-        <div className="bg-white border border-gray-300 rounded-xl overflow-hidden flex items-center pr-3">
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden flex items-center pr-3 shadow-md focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-opacity-50 transition-all">
+          <div className="bg-slate-50 p-3 border-r border-gray-200">
+            <LinkIcon size={20} className="text-blue-500" />
+          </div>
           <div className="p-3 flex-grow">
-            <span className="text-gray-500 text-sm">instamp.app/</span>
+            <span className="text-slate-500 text-sm">instamp.app/</span>
             <Input 
               value={slug}
               onChange={handleSlugChange}
@@ -103,19 +100,28 @@ const SlugChecker: React.FC<SlugCheckerProps> = ({ className }) => {
           )}
         </div>
         {wasChecked && (
-          <div className={`text-sm mt-1 ${isAvailable ? 'text-green-600' : 'text-red-600'}`}>
-            {isAvailable ? 'This link is available!' : 'This link is already taken.'}
+          <div className={`text-sm mt-2 ${isAvailable ? 'text-green-600' : 'text-red-600'} flex items-center`}>
+            {isAvailable ? 
+              <>
+                <Check className="h-4 w-4 mr-1" />
+                This link is available!
+              </> : 
+              <>
+                <X className="h-4 w-4 mr-1" />
+                This link is already taken.
+              </>
+            }
           </div>
         )}
       </div>
       <Button 
         type="submit"
         size="lg" 
-        variant="neonblue"
-        className="px-6 rounded-full"
+        variant="heroGradient"
+        className="px-6 sm:whitespace-nowrap"
         disabled={!isAvailable || isChecking || !slug}
       >
-        {getButtonText()}
+        {isChecking ? "Checking..." : isAvailable && wasChecked ? "Claim Your Link" : "Claim Your Link"}
       </Button>
     </form>
   );

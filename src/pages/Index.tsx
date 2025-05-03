@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -69,7 +70,8 @@ const Index = () => {
                 user_id: userId,
                 is_anonymous: !userId,
                 stamps: 0,
-                total_rewards_earned: 0
+                total_rewards_earned: 0,
+                total_stamps_collected: 0
               });
 
             if (insertError) {
@@ -121,14 +123,15 @@ const Index = () => {
       if (fetchError) throw fetchError;
 
       const newStamps = stamps + 1;
+      // Increment both current stamps and total stamps collected (permanent stat)
       const newTotalStampsCollected = membership ? (membership.total_stamps_collected || 0) + 1 : 1;
       
       if (membership) {
         const { error: updateError } = await supabase
           .from('business_members')
           .update({
-            stamps: newStamps,
-            total_stamps_collected: newTotalStampsCollected
+            stamps: newStamps, // Card-cycle data
+            total_stamps_collected: newTotalStampsCollected // Permanent stat
           })
           .eq('id', membership.id);
 

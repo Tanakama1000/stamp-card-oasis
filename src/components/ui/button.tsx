@@ -20,7 +20,8 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         purple: "bg-purple-400 text-white hover:bg-purple-500",
-        neonblue: "bg-gradient-to-r from-ocean-DEFAULT to-ocean-dark text-white hover:from-ocean-dark hover:to-ocean-DEFAULT shadow-md hover:shadow-lg transition-all duration-300",
+        neonblue: "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md hover:shadow-lg transition-all duration-300",
+        heroGradient: "bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl transform transition-all duration-300 hover:translate-y-[-2px]",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -28,6 +29,7 @@ const buttonVariants = cva(
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
         xl: "h-12 px-8 py-3 text-base",
+        xxl: "h-14 px-10 py-4 text-lg rounded-xl",
       },
     },
     defaultVariants: {

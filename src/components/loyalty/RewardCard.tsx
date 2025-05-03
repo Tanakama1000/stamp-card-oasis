@@ -47,7 +47,8 @@ const RewardCard: React.FC<RewardCardProps> = ({
         if (fetchError) throw fetchError;
 
         if (existingMembership) {
-          // Update existing membership
+          // Update existing membership - increment total_rewards_earned
+          // This is a permanent stat that accumulates over time
           const { error: updateError } = await supabase
             .from('business_members')
             .update({
@@ -101,15 +102,15 @@ const RewardCard: React.FC<RewardCardProps> = ({
       if (fetchError) throw fetchError;
 
       if (membership) {
-        // Manually increment the redeemed_rewards counter
+        // Increment redeemed_rewards counter (permanent stat)
         const newRedeemedRewards = (membership.redeemed_rewards || 0) + 1;
         
         // Update redeemed rewards count in database
         const { error: updateError } = await supabase
           .from('business_members')
           .update({
-            stamps: 0,
-            redeemed_rewards: newRedeemedRewards
+            stamps: 0, // Reset card-cycle data
+            redeemed_rewards: newRedeemedRewards // Increment permanent stat
           })
           .eq('id', membership.id);
 

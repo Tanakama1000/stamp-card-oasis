@@ -27,8 +27,12 @@ const RewardsCard: React.FC<RewardsCardProps> = ({
           {totalStamps}
         </div>
         
-        <div className="text-gray-600 mb-6 text-lg">
+        <div className="text-gray-600 mb-2 text-lg">
           Total stamps collected
+        </div>
+        
+        <div className="text-sm text-gray-500">
+          All-time program participation
         </div>
       </div>
     </Card>
