@@ -4,6 +4,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -108,6 +109,7 @@
   body {
     background-color: #F8FAFC;
     @apply text-foreground;
+    font-family: 'Inter', sans-serif;
   }
 
   /* Custom scrollbar */
@@ -149,6 +151,23 @@
   
   .perspective-1000 {
     perspective: 1000px;
+  }
+  
+  /* Modern design utilities */
+  .glass-effect {
+    @apply backdrop-blur-lg bg-white/70 border border-white/20 shadow-lg;
+  }
+  
+  .feature-card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+  
+  .hero-gradient {
+    background: linear-gradient(to right, #2563eb, #4f46e5);
+  }
+  
+  .blob-shape {
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
   }
 }
 
@@ -272,4 +291,34 @@
 
 .animate-glow {
   animation: glow 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-effect {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite;
+}
+
+.gradient-border {
+  position: relative;
+  border-radius: 0.5rem;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: 0.6rem;
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  opacity: 0.7;
 }
