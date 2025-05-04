@@ -70,7 +70,7 @@ const SlugChecker: React.FC<SlugCheckerProps> = ({
             <LinkIcon size={20} className="text-blue-500" />
           </div>
           <div className="p-3 flex-grow">
-            <span className="text-slate-500 text-sm">instamp.digital/</span>
+            <span className="text-slate-500 text-sm font-bold">instamp.digital/</span>
             <Input value={slug} onChange={handleSlugChange} className="inline-block border-none p-0 h-auto w-auto focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent" placeholder="your-business" aria-label="Business slug" />
           </div>
           {wasChecked && <div className={`flex items-center justify-center h-6 w-6 rounded-full ${isAvailable ? 'bg-green-100' : 'bg-red-100'}`}>
