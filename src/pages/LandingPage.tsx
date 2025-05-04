@@ -451,7 +451,7 @@ const LandingPage = () => {
               Schedule a Demo
             </Button>
           </div>
-          <p className="text-sm mt-4 opacity-80">No credit card required • Free 14-day trial • Setup in minutes</p>
+          <p className="text-sm mt-4 opacity-80">No credit card required • Free 30-day trial • Setup in minutes</p>
         </div>
       </section>
 
