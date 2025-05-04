@@ -3,10 +3,31 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
-import { Award, Check, ChevronRight, Coffee, CreditCard, Gift, Globe, Mail, Menu, Phone, QrCode, Shield, Star, TrendingUp, Users, X } from "lucide-react";
+import { 
+  Award, 
+  Check, 
+  ChevronRight, 
+  Coffee, 
+  CreditCard, 
+  Gift, 
+  Globe, 
+  Mail, 
+  Menu, 
+  Phone, 
+  QrCode, 
+  Shield, 
+  Star, 
+  TrendingUp, 
+  Users, 
+  X,
+  PlusCircle,
+  MinusCircle
+} from "lucide-react";
 import SlugChecker from "@/components/SlugChecker";
 import useWindowSize from "@/hooks/useWindowSize";
 import RewardsCard from "@/components/loyalty/RewardsCard";
+import CookieConsent from "@/components/CookieConsent";
+
 const LandingPage = () => {
   const navigate = useNavigate();
   const {
@@ -17,11 +38,18 @@ const LandingPage = () => {
   const [isIntersecting, setIsIntersecting] = useState<{
     [key: string]: boolean;
   }>({});
+  const [openFaqItem, setOpenFaqItem] = useState<number | null>(null);
+
+  const toggleFaqItem = (index: number) => {
+    setOpenFaqItem(openFaqItem === index ? null : index);
+  };
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
+
   useEffect(() => {
-    const sections = ['features', 'how-it-works', 'benefits', 'testimonials'];
+    const sections = ['features', 'how-it-works', 'benefits', 'testimonials', 'faq'];
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
       entries.forEach(entry => {
         setIsIntersecting(prev => ({
@@ -41,6 +69,34 @@ const LandingPage = () => {
     });
     return () => observer.disconnect();
   }, []);
+
+  const faqItems = [
+    {
+      question: "How does InStamp's loyalty program work?",
+      answer: "InStamp provides digital loyalty cards that customers can access on their mobile devices. Business owners can set up custom rewards, track customer visits, and add stamps digitally. No physical cards or app downloads are required - just a simple QR code scan or link access."
+    },
+    {
+      question: "Do my customers need to download an app?",
+      answer: "No! That's one of the main benefits of InStamp. Your customers can access their loyalty cards directly through a link or QR code scan in their mobile browser. No app downloads required, making it incredibly convenient."
+    },
+    {
+      question: "How much does InStamp cost?",
+      answer: "InStamp offers a 30-day free trial with full access to all features. After that, we have affordable monthly plans starting at $29/month for small businesses. Custom enterprise plans are available for larger businesses with multiple locations."
+    },
+    {
+      question: "Can I customize the loyalty cards to match my brand?",
+      answer: "Absolutely! InStamp allows you to customize your loyalty cards with your logo, brand colors, custom rewards, and personalized messaging. Make your loyalty program an extension of your brand identity."
+    },
+    {
+      question: "How do I track analytics and customer data?",
+      answer: "InStamp provides a comprehensive dashboard where you can track customer visits, reward redemptions, customer activity, and program performance. Gain valuable insights to optimize your loyalty program and business operations."
+    },
+    {
+      question: "Is my data secure with InStamp?",
+      answer: "Yes, security is our priority. InStamp uses industry-standard encryption and security practices to protect your business and customer data. We're compliant with privacy regulations and never share your data with third parties without consent."
+    }
+  ];
+
   return <div className="min-h-screen bg-white font-['Inter'] overflow-x-hidden">
       {/* Header/Navigation */}
       <header className="bg-white text-slate-800 px-4 py-4 sticky top-0 z-50 border-b border-slate-100 shadow-sm">
@@ -281,7 +337,7 @@ const LandingPage = () => {
             description: "Build stronger relationships through personalized loyalty experiences"
           }].map((feature, index) => <Card key={index} className={`border-0 shadow-lg rounded-xl overflow-hidden staggered-fade-in staggered-delay-${index + 1} hover:shadow-xl transition-all duration-300 h-full`}>
                 <div className="p-6 flex flex-col h-full">
-                  <div className={`feature-icon-container from-${feature.bgColor.split(' ')[0]} to-${feature.bgColor.split(' ')[1]}`}>
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 shadow-md bg-gradient-to-br ${feature.bgColor}`}>
                     {feature.icon}
                   </div>
                   <h3 className="text-xl font-semibold mb-3 text-gray-800">{feature.title}</h3>
@@ -424,6 +480,47 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section id="faq" className="section-padding bg-blue-50/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-3">
+              FREQUENTLY ASKED QUESTIONS
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-800">Got Questions?</h2>
+            <p className="text-lg text-gray-600">Everything you need to know about InStamp's digital loyalty solution</p>
+          </div>
+          
+          <div className="max-w-3xl mx-auto">
+            {faqItems.map((item, index) => (
+              <div 
+                key={index} 
+                className={`mb-4 border border-blue-100 rounded-xl overflow-hidden bg-white shadow-sm transition-all duration-300 ${openFaqItem === index ? 'shadow-md' : ''}`}
+              >
+                <button 
+                  className="w-full px-6 py-4 flex justify-between items-center text-left"
+                  onClick={() => toggleFaqItem(index)}
+                >
+                  <h3 className="text-lg font-medium text-gray-800">{item.question}</h3>
+                  {openFaqItem === index ? 
+                    <MinusCircle className="flex-shrink-0 text-blue-600" size={20} /> : 
+                    <PlusCircle className="flex-shrink-0 text-blue-600" size={20} />
+                  }
+                </button>
+                
+                <div className={`overflow-hidden transition-all duration-300 ${
+                  openFaqItem === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                }`}>
+                  <div className="px-6 pb-4 text-gray-600">
+                    {item.answer}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Call-to-Action Section */}
       <section className="py-20 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white relative overflow-hidden">
         {/* Background decorations */}
@@ -485,7 +582,7 @@ const LandingPage = () => {
                 <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
                 <li><a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a></li>
                 <li><a href="#testimonials" className="hover:text-white transition-colors">Testimonials</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+                <li><a href="#faq" className="hover:text-white transition-colors">FAQ</a></li>
               </ul>
             </div>
             
@@ -516,8 +613,8 @@ const LandingPage = () => {
             <div>
               <h4 className="font-semibold text-lg mb-4">Legal</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
+                <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
                 <li><a href="#" className="hover:text-white transition-colors">Cookies</a></li>
               </ul>
             </div>
@@ -530,6 +627,9 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
+
+      {/* Cookie Consent */}
+      <CookieConsent />
     </div>;
 };
 export default LandingPage;

@@ -14,6 +14,8 @@ import ScanPage from "./pages/ScanPage";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminRoute from "./components/AdminRoute";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -78,6 +80,8 @@ const App = () => {
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/join/:businessSlug" element={<JoinPage />} />
           <Route path="/scan" element={<ScanPage />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
