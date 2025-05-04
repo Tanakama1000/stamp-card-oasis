@@ -147,7 +147,7 @@ const LandingPage = () => {
                   <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center">
                     <Check size={14} className="text-blue-600" />
                   </div>
-                  <span className="text-gray-600">Works on any device</span>
+                  <span className="text-gray-600">Free 30-day trial</span>
                 </div>
               </div>
               
