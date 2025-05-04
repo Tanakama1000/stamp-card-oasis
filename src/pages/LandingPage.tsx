@@ -492,9 +492,7 @@ const LandingPage = () => {
               Get Started Free
               <ChevronRight size={20} />
             </Button>
-            <Button variant="outline" size="xxl" onClick={() => navigate("/admin")} className="border-white text-white text-lg rounded-full bg-white/0">
-              Schedule a Demo
-            </Button>
+            
           </div>
           <p className="text-sm mt-4 opacity-80">No credit card required • Free 30-day trial • Setup in minutes</p>
         </div>
