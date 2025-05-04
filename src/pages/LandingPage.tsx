@@ -3,42 +3,25 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Award,
-  Check,
-  ChevronRight,
-  Coffee,
-  CreditCard,
-  Gift,
-  Globe,
-  Mail,
-  Menu,
-  Phone,
-  QrCode,
-  Shield,
-  Star,
-  TrendingUp,
-  Users,
-  X
-} from "lucide-react";
+import { Award, Check, ChevronRight, Coffee, CreditCard, Gift, Globe, Mail, Menu, Phone, QrCode, Shield, Star, TrendingUp, Users, X } from "lucide-react";
 import SlugChecker from "@/components/SlugChecker";
 import useWindowSize from "@/hooks/useWindowSize";
 import RewardsCard from "@/components/loyalty/RewardsCard";
-
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { width } = useWindowSize();
+  const {
+    width
+  } = useWindowSize();
   const isMobile = width < 768;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isIntersecting, setIsIntersecting] = useState<{[key: string]: boolean}>({});
-
+  const [isIntersecting, setIsIntersecting] = useState<{
+    [key: string]: boolean;
+  }>({});
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
-  
   useEffect(() => {
     const sections = ['features', 'how-it-works', 'benefits', 'testimonials'];
-    
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
       entries.forEach(entry => {
         setIsIntersecting(prev => ({
@@ -47,32 +30,23 @@ const LandingPage = () => {
         }));
       });
     };
-    
     const observer = new IntersectionObserver(observerCallback, {
       root: null,
       rootMargin: '0px',
       threshold: 0.1
     });
-    
     sections.forEach(section => {
       const element = document.getElementById(section);
       if (element) observer.observe(element);
     });
-    
     return () => observer.disconnect();
   }, []);
-
-  return (
-    <div className="min-h-screen bg-white font-['Inter'] overflow-x-hidden">
+  return <div className="min-h-screen bg-white font-['Inter'] overflow-x-hidden">
       {/* Header/Navigation */}
       <header className="bg-white text-slate-800 px-4 py-4 sticky top-0 z-50 border-b border-slate-100 shadow-sm">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <img 
-              alt="InStamp Logo" 
-              className="h-10 w-auto" 
-              src="/lovable-uploads/101a2884-0ac9-46b2-81e7-c566dea60886.png" 
-            />
+            <img alt="InStamp Logo" className="h-10 w-auto" src="/lovable-uploads/101a2884-0ac9-46b2-81e7-c566dea60886.png" />
             <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">InStamp</span>
           </div>
           
@@ -87,18 +61,10 @@ const LandingPage = () => {
               </ul>
             </nav>
             <div className="flex items-center gap-3">
-              <Button 
-                variant="outlineModern" 
-                size="pill"
-                onClick={() => navigate("/admin")}
-              >
+              <Button variant="outlineModern" size="pill" onClick={() => navigate("/admin")}>
                 Log In
               </Button>
-              <Button 
-                variant="vibrant"
-                size="pill"
-                onClick={() => navigate("/admin")}
-              >
+              <Button variant="vibrant" size="pill" onClick={() => navigate("/admin")}>
                 Get Started
               </Button>
             </div>
@@ -113,8 +79,7 @@ const LandingPage = () => {
         </div>
         
         {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg animate-fade-in z-50">
+        {mobileMenuOpen && <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg animate-fade-in z-50">
             <nav className="container mx-auto py-4 px-6">
               <ul className="space-y-4 mb-6">
                 <li><a href="#features" onClick={toggleMobileMenu} className="text-gray-600 block py-2">Features</a></li>
@@ -123,24 +88,15 @@ const LandingPage = () => {
                 <li><a href="#testimonials" onClick={toggleMobileMenu} className="text-gray-600 block py-2">Testimonials</a></li>
               </ul>
               <div className="space-y-3">
-                <Button 
-                  variant="outlineModern" 
-                  onClick={() => navigate("/admin")}
-                  className="w-full justify-center"
-                >
+                <Button variant="outlineModern" onClick={() => navigate("/admin")} className="w-full justify-center">
                   Log In
                 </Button>
-                <Button 
-                  variant="vibrant"
-                  onClick={() => navigate("/admin")}
-                  className="w-full justify-center"
-                >
+                <Button variant="vibrant" onClick={() => navigate("/admin")} className="w-full justify-center">
                   Get Started
                 </Button>
               </div>
             </nav>
-          </div>
-        )}
+          </div>}
       </header>
 
       {/* Hero Section */}
@@ -196,20 +152,11 @@ const LandingPage = () => {
               </div>
               
               <div className="flex flex-wrap gap-4">
-                <Button 
-                  variant="cta"
-                  size="pillLg"
-                  onClick={() => navigate("/admin")}
-                  className="group"
-                >
+                <Button variant="cta" size="pillLg" onClick={() => navigate("/admin")} className="group">
                   Get Started Free
                   <ChevronRight className="group-hover:translate-x-1 transition-transform" size={20} />
                 </Button>
-                <Button 
-                  variant="outlineModern"
-                  size="pillLg"
-                  onClick={() => navigate("/")}
-                >
+                <Button variant="outlineModern" size="pillLg" onClick={() => navigate("/")}>
                   See It In Action
                 </Button>
               </div>
@@ -221,11 +168,7 @@ const LandingPage = () => {
                 {/* Main device mockup */}
                 <div className="relative z-20 shadow-2xl rounded-xl transform transition-all duration-500 hover:rotate-1 hover:scale-105">
                   <div className="relative overflow-hidden rounded-xl border-8 border-gray-800 shadow-lg">
-                    <img 
-                      src="/lovable-uploads/03bd2d95-1cd4-4fba-8e3a-d6e467234380.png" 
-                      alt="InStamp App Demo" 
-                      className="w-full h-auto"
-                    />
+                    <img src="/lovable-uploads/03bd2d95-1cd4-4fba-8e3a-d6e467234380.png" alt="InStamp App Demo" className="w-full h-auto" />
                     <div className="absolute bottom-0 left-0 right-0 h-6 bg-gray-800"></div>
                     <div className="absolute top-0 left-0 right-0 h-6 bg-gray-800 flex justify-center items-center">
                       <div className="w-16 h-1 bg-gray-600 rounded-full"></div>
@@ -248,16 +191,16 @@ const LandingPage = () => {
                     <div className="h-2 bg-blue-600 rounded-full w-8/12"></div>
                   </div>
                   <div className="grid grid-cols-5 gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <div key={`stamp-${i}`} className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+                    {[...Array(5)].map((_, i) => <div key={`stamp-${i}`} className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
                         <Check size={10} className="text-blue-600" />
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </div>
                 
                 {/* Stats card */}
-                <div className="absolute -bottom-8 -left-4 bg-white p-4 rounded-lg shadow-xl z-20 animate-float" style={{animationDelay: "0.5s"}}>
+                <div className="absolute -bottom-8 -left-4 bg-white p-4 rounded-lg shadow-xl z-20 animate-float" style={{
+                animationDelay: "0.5s"
+              }}>
                   <div className="flex items-center gap-2">
                     <Star size={20} className="text-amber-500" />
                     <div>
@@ -321,33 +264,27 @@ const LandingPage = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                icon: <QrCode size={24} className="text-white" />,
-                bgColor: "from-blue-500 to-blue-600",
-                title: "Digital Loyalty Cards",
-                description: "Create beautiful digital stamp cards that your customers can access on any device"
-              },
-              {
-                icon: <Gift size={24} className="text-white" />,
-                bgColor: "from-purple-500 to-indigo-600",
-                title: "Custom Rewards",
-                description: "Set milestones and create custom rewards that keep your customers coming back"
-              },
-              {
-                icon: <TrendingUp size={24} className="text-white" />,
-                bgColor: "from-pink-500 to-rose-600",
-                title: "Analytics Dashboard",
-                description: "Track visits, spending, and program performance with real-time insights"
-              },
-              {
-                icon: <Users size={24} className="text-white" />,
-                bgColor: "from-teal-500 to-emerald-600",
-                title: "Customer Engagement",
-                description: "Build stronger relationships through personalized loyalty experiences"
-              }
-            ].map((feature, index) => (
-              <Card key={index} className={`border-0 shadow-lg rounded-xl overflow-hidden staggered-fade-in staggered-delay-${index + 1} hover:shadow-xl transition-all duration-300 h-full`}>
+            {[{
+            icon: <QrCode size={24} className="text-white" />,
+            bgColor: "from-blue-500 to-blue-600",
+            title: "Digital Loyalty Cards",
+            description: "Create beautiful digital stamp cards that your customers can access on any device"
+          }, {
+            icon: <Gift size={24} className="text-white" />,
+            bgColor: "from-purple-500 to-indigo-600",
+            title: "Custom Rewards",
+            description: "Set milestones and create custom rewards that keep your customers coming back"
+          }, {
+            icon: <TrendingUp size={24} className="text-white" />,
+            bgColor: "from-pink-500 to-rose-600",
+            title: "Analytics Dashboard",
+            description: "Track visits, spending, and program performance with real-time insights"
+          }, {
+            icon: <Users size={24} className="text-white" />,
+            bgColor: "from-teal-500 to-emerald-600",
+            title: "Customer Engagement",
+            description: "Build stronger relationships through personalized loyalty experiences"
+          }].map((feature, index) => <Card key={index} className={`border-0 shadow-lg rounded-xl overflow-hidden staggered-fade-in staggered-delay-${index + 1} hover:shadow-xl transition-all duration-300 h-full`}>
                 <div className="p-6 flex flex-col h-full">
                   <div className={`feature-icon-container from-${feature.bgColor.split(' ')[0]} to-${feature.bgColor.split(' ')[1]}`}>
                     {feature.icon}
@@ -355,8 +292,7 @@ const LandingPage = () => {
                   <h3 className="text-xl font-semibold mb-3 text-gray-800">{feature.title}</h3>
                   <p className="text-gray-600">{feature.description}</p>
                 </div>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -373,35 +309,29 @@ const LandingPage = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              {
-                step: 1,
-                title: "Sign Up",
-                description: "Create an account and customize your loyalty program to match your brand",
-                icon: <CreditCard size={32} className="text-blue-600" />
-              },
-              {
-                step: 2,
-                title: "Share With Customers",
-                description: "Invite customers via QR code or your unique link to join your program",
-                icon: <QrCode size={32} className="text-blue-600" />
-              },
-              {
-                step: 3,
-                title: "Reward Loyalty",
-                description: "Track visits, add stamps, and deliver rewards that keep them coming back",
-                icon: <Award size={32} className="text-blue-600" />
-              }
-            ].map((step, index) => (
-              <div key={index} className={`step-card bg-white staggered-fade-in staggered-delay-${index + 1}`}>
+            {[{
+            step: 1,
+            title: "Sign Up",
+            description: "Create an account and customize your loyalty program to match your brand",
+            icon: <CreditCard size={32} className="text-blue-600" />
+          }, {
+            step: 2,
+            title: "Share With Customers",
+            description: "Invite customers via QR code or your unique link to join your program",
+            icon: <QrCode size={32} className="text-blue-600" />
+          }, {
+            step: 3,
+            title: "Reward Loyalty",
+            description: "Track visits, add stamps, and deliver rewards that keep them coming back",
+            icon: <Award size={32} className="text-blue-600" />
+          }].map((step, index) => <div key={index} className={`step-card bg-white staggered-fade-in staggered-delay-${index + 1}`}>
                 <div className="step-number">{step.step}</div>
                 <div className="flex flex-col items-center text-center pt-2">
                   <div className="mb-4">{step.icon}</div>
                   <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
                   <p className="text-gray-600">{step.description}</p>
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
       </section>
@@ -427,18 +357,10 @@ const LandingPage = () => {
               </div>
               
               <ul className="space-y-4">
-                {[
-                  "Increase customer retention by up to 35%",
-                  "Drive more repeat visits and higher spending",
-                  "Collect valuable customer data and insights",
-                  "Build stronger relationships with your audience",
-                  "Differentiate from competitors"
-                ].map((benefit, i) => (
-                  <li key={i} className="flex items-start gap-3">
+                {["Increase customer retention by up to 35%", "Drive more repeat visits and higher spending", "Collect valuable customer data and insights", "Build stronger relationships with your audience", "Differentiate from competitors"].map((benefit, i) => <li key={i} className="flex items-start gap-3">
                     <Check size={20} className="text-blue-600 mt-1 flex-shrink-0" />
                     <span>{benefit}</span>
-                  </li>
-                ))}
+                  </li>)}
               </ul>
             </Card>
             
@@ -451,18 +373,10 @@ const LandingPage = () => {
               </div>
               
               <ul className="space-y-4">
-                {[
-                  "Earn rewards at their favorite local businesses",
-                  "No need to download apps or carry physical cards",
-                  "Access loyalty program from any device",
-                  "Track progress toward rewards in real-time",
-                  "Discover exclusive offers and promotions"
-                ].map((benefit, i) => (
-                  <li key={i} className="flex items-start gap-3">
+                {["Earn rewards at their favorite local businesses", "No need to download apps or carry physical cards", "Access loyalty program from any device", "Track progress toward rewards in real-time", "Discover exclusive offers and promotions"].map((benefit, i) => <li key={i} className="flex items-start gap-3">
                     <Check size={20} className="text-purple-600 mt-1 flex-shrink-0" />
                     <span>{benefit}</span>
-                  </li>
-                ))}
+                  </li>)}
               </ul>
             </Card>
           </div>
@@ -481,27 +395,22 @@ const LandingPage = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              {
-                quote: "Since implementing InStamp, we've seen a 35% increase in repeat customers. The digital loyalty cards are so much better than the paper ones we used to use!",
-                author: "Sarah Johnson",
-                business: "Bloom Coffee Shop",
-                color: "bg-blue-50 border-blue-100"
-              },
-              {
-                quote: "The analytics alone made it worth switching to InStamp. We can now track which rewards drive customer loyalty and adjust our offerings accordingly.",
-                author: "Michael Chen",
-                business: "Urban Bakery",
-                color: "bg-purple-50 border-purple-100"
-              },
-              {
-                quote: "Our customers love the convenience of digital stamp cards. No more lost paper cards, and they can check their progress anytime. It's a game-changer!",
-                author: "Amanda Wilson",
-                business: "Sunshine Cafe", 
-                color: "bg-amber-50 border-amber-100"
-              }
-            ].map((testimonial, index) => (
-              <div key={index} className={`testimonial-card ${testimonial.color} staggered-fade-in staggered-delay-${index + 1}`}>
+            {[{
+            quote: "Since implementing InStamp, we've seen a 35% increase in repeat customers. The digital loyalty cards are so much better than the paper ones we used to use!",
+            author: "Sarah Johnson",
+            business: "Bloom Coffee Shop",
+            color: "bg-blue-50 border-blue-100"
+          }, {
+            quote: "The analytics alone made it worth switching to InStamp. We can now track which rewards drive customer loyalty and adjust our offerings accordingly.",
+            author: "Michael Chen",
+            business: "Urban Bakery",
+            color: "bg-purple-50 border-purple-100"
+          }, {
+            quote: "Our customers love the convenience of digital stamp cards. No more lost paper cards, and they can check their progress anytime. It's a game-changer!",
+            author: "Amanda Wilson",
+            business: "Sunshine Cafe",
+            color: "bg-amber-50 border-amber-100"
+          }].map((testimonial, index) => <div key={index} className={`testimonial-card ${testimonial.color} staggered-fade-in staggered-delay-${index + 1}`}>
                 <div className="flex items-center gap-1 mb-4 text-amber-400">
                   {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
                 </div>
@@ -515,8 +424,7 @@ const LandingPage = () => {
                     <p className="text-xs text-gray-500">{testimonial.business}</p>
                   </div>
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
       </section>
@@ -535,20 +443,11 @@ const LandingPage = () => {
             Join thousands of businesses that have increased customer retention and revenue with our digital loyalty platform.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button 
-              className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg text-lg rounded-full" 
-              size="xxl" 
-              onClick={() => navigate("/admin")}
-            >
+            <Button className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg text-lg rounded-full" size="xxl" onClick={() => navigate("/admin")}>
               Get Started Free
               <ChevronRight size={20} />
             </Button>
-            <Button 
-              variant="outline" 
-              className="border-white text-white hover:bg-white/10 text-lg rounded-full" 
-              size="xxl" 
-              onClick={() => navigate("/admin")}
-            >
+            <Button variant="outline" size="xxl" onClick={() => navigate("/admin")} className="border-white text-white text-lg rounded-full bg-white/0">
               Schedule a Demo
             </Button>
           </div>
@@ -638,8 +537,6 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default LandingPage;
