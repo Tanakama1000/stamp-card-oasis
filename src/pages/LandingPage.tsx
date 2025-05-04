@@ -434,9 +434,7 @@ const LandingPage = () => {
         
         <div className="container mx-auto max-w-4xl text-center relative z-10">
           <h2 className="text-4xl font-bold mb-6">Ready to Turn Visitors Into Loyal Fans?</h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Join thousands of businesses that have increased customer retention and revenue with our digital loyalty platform.
-          </p>
+          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">Join other businesses that have increased customer retention and revenue with our digital loyalty platform.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg text-lg rounded-full" size="xxl" onClick={() => navigate("/admin")}>
               Get Started Free
