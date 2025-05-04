@@ -461,7 +461,7 @@ const LandingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <img src="/lovable-uploads/09d9d85d-a5be-4ff5-8719-cc0a75ecc273.png" alt="InStamp Logo" className="h-10 w-auto" />
+                <img alt="InStamp Logo" className="h-10 w-auto" src="/lovable-uploads/6fc2dbb4-28b5-47dc-8c4c-3bd3445340ca.png" />
                 <span className="text-xl font-bold">InStamp</span>
               </div>
               <p className="text-gray-400 mb-4">
