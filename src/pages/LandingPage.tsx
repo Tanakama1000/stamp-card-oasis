@@ -153,9 +153,7 @@ const LandingPage = () => {
               
               <div className="flex flex-wrap gap-4">
                 
-                <Button variant="outlineModern" size="pillLg" onClick={() => navigate("/")}>
-                  See It In Action
-                </Button>
+                
               </div>
             </div>
             
