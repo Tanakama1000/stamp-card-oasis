@@ -8,6 +8,7 @@ import SlugChecker from "@/components/SlugChecker";
 import useWindowSize from "@/hooks/useWindowSize";
 import RewardsCard from "@/components/loyalty/RewardsCard";
 import CookieConsent from "@/components/CookieConsent";
+
 const LandingPage = () => {
   const navigate = useNavigate();
   const {
@@ -25,6 +26,7 @@ const LandingPage = () => {
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
+
   useEffect(() => {
     const sections = ['features', 'how-it-works', 'benefits', 'testimonials', 'faq'];
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
@@ -65,6 +67,7 @@ const LandingPage = () => {
     question: "Is my data secure with InStamp?",
     answer: "Yes, security is our priority. InStamp uses industry-standard encryption and security practices to protect your business and customer data. We're compliant with privacy regulations and never share your data with third parties without consent."
   }];
+  
   return <div className="min-h-screen bg-white font-['Inter'] overflow-x-hidden">
       {/* Header/Navigation */}
       <header className="bg-white text-slate-800 px-4 py-4 sticky top-0 z-50 border-b border-slate-100 shadow-sm">
@@ -297,12 +300,12 @@ const LandingPage = () => {
             icon: <TrendingUp size={24} className="text-white" />,
             bgColor: "from-pink-500 to-rose-600",
             title: "Analytics Dashboard",
-            description: "Track visits, spending, and program performance with real-time insights"
+            description: "Track customers, rewards, and program performance with real-time insights"
           }, {
-            icon: <Users size={24} className="text-white" />,
+            icon: <Shield size={24} className="text-white" />,
             bgColor: "from-teal-500 to-emerald-600",
-            title: "Customer Engagement",
-            description: "Build stronger relationships through personalized loyalty experiences"
+            title: "Secure QR Code Verification",
+            description: "Prevent fraud by verifying each scan with a secure, one-time QR code and device/location check"
           }].map((feature, index) => <Card key={index} className={`border-0 shadow-lg rounded-xl overflow-hidden staggered-fade-in staggered-delay-${index + 1} hover:shadow-xl transition-all duration-300 h-full`}>
                 <div className="p-6 flex flex-col h-full">
                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 shadow-md bg-gradient-to-br ${feature.bgColor}`}>
@@ -513,7 +516,7 @@ const LandingPage = () => {
               <div className="flex space-x-4">
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z" />
+                    <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z" />
                   </svg>
                 </a>
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">
