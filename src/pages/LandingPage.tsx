@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -20,6 +21,7 @@ const LandingPage = () => {
     [key: string]: boolean;
   }>({});
   const [openFaqItem, setOpenFaqItem] = useState<number | null>(null);
+  const [activeTestimonial, setActiveTestimonial] = useState(2); // Center testimonial active by default
   const toggleFaqItem = (index: number) => {
     setOpenFaqItem(openFaqItem === index ? null : index);
   };
@@ -67,6 +69,73 @@ const LandingPage = () => {
     question: "Is my data secure with InStamp?",
     answer: "Yes, security is our priority. InStamp uses industry-standard encryption and security practices to protect your business and customer data. We're compliant with privacy regulations and never share your data with third parties without consent."
   }];
+  
+  // Testimonials data
+  const testimonials = [
+    {
+      id: 1,
+      avatar: "/lovable-uploads/599690ec-9fc9-4b0e-a18e-d559b6a9425c.png",
+      quote: "Since implementing InStamp, we've seen a 35% increase in repeat customers. The digital loyalty cards are so much better!",
+      author: "Sarah Johnson",
+      business: "Bloom Coffee Shop",
+    },
+    {
+      id: 2,
+      avatar: "/lovable-uploads/599690ec-9fc9-4b0e-a18e-d559b6a9425c.png",
+      quote: "The analytics alone made it worth switching to InStamp. We can now track which rewards drive customer loyalty.",
+      author: "Michael Chen",
+      business: "Urban Bakery",
+    },
+    {
+      id: 3,
+      avatar: "/lovable-uploads/599690ec-9fc9-4b0e-a18e-d559b6a9425c.png",
+      quote: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.",
+      author: "Lora Smith",
+      business: "Sunshine Cafe",
+    },
+    {
+      id: 4,
+      avatar: "/lovable-uploads/599690ec-9fc9-4b0e-a18e-d559b6a9425c.png",
+      quote: "Our customers love the convenience of digital stamp cards. No more lost paper cards, and they can check their progress anytime.",
+      author: "Amanda Wilson",
+      business: "Wellness Studio",
+    },
+    {
+      id: 5,
+      avatar: "/lovable-uploads/599690ec-9fc9-4b0e-a18e-d559b6a9425c.png",
+      quote: "InStamp has completely transformed how we engage with our regular customers. The ROI is incredible.",
+      author: "David Brown",
+      business: "City Barbershop",
+    },
+  ];
+
+  // Platform categories data
+  const platformCategories = [
+    {
+      name: "Salon",
+      image: "/lovable-uploads/5b52f6e6-36b8-41d4-933e-e79b67cd5ac1.png"
+    },
+    {
+      name: "Spas",
+      image: "/lovable-uploads/5b52f6e6-36b8-41d4-933e-e79b67cd5ac1.png"
+    },
+    {
+      name: "Nails",
+      image: "/lovable-uploads/5b52f6e6-36b8-41d4-933e-e79b67cd5ac1.png"
+    },
+    {
+      name: "Barbers",
+      image: "/lovable-uploads/5b52f6e6-36b8-41d4-933e-e79b67cd5ac1.png"
+    },
+    {
+      name: "Fitness",
+      image: "/lovable-uploads/5b52f6e6-36b8-41d4-933e-e79b67cd5ac1.png"
+    },
+    {
+      name: "Health practices",
+      image: "/lovable-uploads/5b52f6e6-36b8-41d4-933e-e79b67cd5ac1.png"
+    }
+  ];
   
   return <div className="min-h-screen bg-white font-['Inter'] overflow-x-hidden">
       {/* Header/Navigation */}
@@ -247,25 +316,30 @@ const LandingPage = () => {
         </div>
       </section>
       
-      {/* Trusted By Section */}
-      <section className="py-12 bg-white">
+      {/* A Platform Suitable For All Section */}
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-8">
-            <p className="text-gray-500 font-medium">TRUSTED BY BUSINESSES EVERYWHERE</p>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-2">
+              A Platform Suitable For <span className="text-blue-600">All</span>
+            </h2>
           </div>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
-            <div className="grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition-all duration-300">
-              <img src="/lovable-uploads/26067f6a-e63b-4ab5-bd59-6e318bdf705d.png" alt="Company Logo" className="h-8 md:h-10" />
-            </div>
-            <div className="grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition-all duration-300">
-              <img src="/lovable-uploads/e96cc08e-37f2-4ba1-bdf4-b00665a89d2d.png" alt="Company Logo" className="h-8 md:h-10" />
-            </div>
-            <div className="grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition-all duration-300">
-              <img src="/lovable-uploads/ec60039d-0d09-4ec3-94ff-8e66e6c380a5.png" alt="Company Logo" className="h-8 md:h-10" />
-            </div>
-            <div className="grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition-all duration-300">
-              <img src="/lovable-uploads/ea829b14-3811-434f-8770-4c7e1d35e177.png" alt="Company Logo" className="h-8 md:h-10" />
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {platformCategories.map((category, index) => (
+              <div key={index} className="relative overflow-hidden rounded-xl hover:shadow-lg transition-all duration-300 group">
+                <div className="aspect-[4/3] bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden relative">
+                  <img 
+                    src={category.image} 
+                    alt={category.name} 
+                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+                  <div className="absolute bottom-6 left-6 text-white font-semibold text-2xl">
+                    {category.name}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -405,7 +479,7 @@ const LandingPage = () => {
         </div>
       </section>
       
-      {/* Testimonials Section */}
+      {/* Testimonials Section - Updated to match picture 1 */}
       <section id="testimonials" className="section-padding bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -416,37 +490,77 @@ const LandingPage = () => {
             <p className="text-lg text-gray-600">Join thousands of businesses that have increased customer retention with InStamp</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[{
-            quote: "Since implementing InStamp, we've seen a 35% increase in repeat customers. The digital loyalty cards are so much better than the paper ones we used to use!",
-            author: "Sarah Johnson",
-            business: "Bloom Coffee Shop",
-            color: "bg-blue-50 border-blue-100"
-          }, {
-            quote: "The analytics alone made it worth switching to InStamp. We can now track which rewards drive customer loyalty and adjust our offerings accordingly.",
-            author: "Michael Chen",
-            business: "Urban Bakery",
-            color: "bg-purple-50 border-purple-100"
-          }, {
-            quote: "Our customers love the convenience of digital stamp cards. No more lost paper cards, and they can check their progress anytime. It's a game-changer!",
-            author: "Amanda Wilson",
-            business: "Sunshine Cafe",
-            color: "bg-amber-50 border-amber-100"
-          }].map((testimonial, index) => <div key={index} className={`testimonial-card ${testimonial.color} staggered-fade-in staggered-delay-${index + 1}`}>
-                <div className="flex items-center gap-1 mb-4 text-amber-400">
-                  {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
+          <div className="max-w-6xl mx-auto relative">
+            <div className="flex flex-col md:flex-row items-stretch">
+              {/* Left side - Floating avatars */}
+              <div className="md:w-1/2 relative hidden md:block">
+                <div className="absolute top-[10%] left-[15%] w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                  <img src={testimonials[0].avatar} alt="User" className="w-full h-full object-cover" />
                 </div>
-                <p className="mb-6 text-gray-700 italic">"{testimonial.quote}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">
-                    {testimonial.author.split(' ').map(name => name[0]).join('')}
+                <div className="absolute top-[30%] right-[25%] w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-lg z-10">
+                  <img src={testimonials[1].avatar} alt="User" className="w-full h-full object-cover" />
+                </div>
+                <div className="absolute top-[60%] left-[25%] w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                  <img src={testimonials[2].avatar} alt="User" className="w-full h-full object-cover" />
+                </div>
+                <div className="absolute bottom-[5%] right-[15%] w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                  <img src={testimonials[3].avatar} alt="User" className="w-full h-full object-cover" />
+                </div>
+                <div className="absolute top-[45%] left-[60%] w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                  <img src={testimonials[4].avatar} alt="User" className="w-full h-full object-cover" />
+                </div>
+              </div>
+              
+              {/* Right side - Active testimonial */}
+              <div className="md:w-1/2 flex items-center justify-center px-4">
+                <div className="max-w-md">
+                  <div className="mb-6">
+                    <div className="relative">
+                      <div className="text-green-700 text-6xl font-serif absolute -top-8 -left-4 opacity-30">"</div>
+                      <p className="text-lg md:text-xl text-gray-700 relative z-10 italic">
+                        {testimonials[activeTestimonial - 1].quote}
+                      </p>
+                      <div className="text-green-700 text-6xl font-serif absolute bottom-0 right-0 opacity-30">"</div>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-semibold text-gray-800">{testimonial.author}</p>
-                    <p className="text-xs text-gray-500">{testimonial.business}</p>
+                  
+                  <div className="flex items-center">
+                    <div className="mr-4">
+                      <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-blue-100 md:hidden">
+                        <img src={testimonials[activeTestimonial - 1].avatar} alt="User" className="w-full h-full object-cover" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-800">{testimonials[activeTestimonial - 1].author}</p>
+                      <p className="text-gray-500 text-sm">{testimonials[activeTestimonial - 1].business}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Testimonial navigation dots */}
+                  <div className="flex justify-center mt-8 md:justify-start space-x-2">
+                    {testimonials.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setActiveTestimonial(index + 1)}
+                        className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                          activeTestimonial === index + 1 ? 'bg-blue-600 w-6' : 'bg-gray-300'
+                        }`}
+                        aria-label={`View testimonial ${index + 1}`}
+                      />
+                    ))}
                   </div>
                 </div>
-              </div>)}
+              </div>
+            </div>
+            
+            {/* Timeline line element */}
+            <div className="hidden md:block absolute top-0 bottom-0 right-[50%] w-0.5 bg-gray-200">
+              <div className="absolute top-[10%] right-0 transform translate-x-1/2 w-3 h-3 bg-blue-600 rounded-full"></div>
+              <div className="absolute top-[30%] right-0 transform translate-x-1/2 w-3 h-3 bg-blue-600 rounded-full"></div>
+              <div className="absolute top-[50%] right-0 transform translate-x-1/2 w-3 h-3 bg-blue-600 rounded-full"></div>
+              <div className="absolute top-[70%] right-0 transform translate-x-1/2 w-3 h-3 bg-blue-600 rounded-full"></div>
+              <div className="absolute top-[90%] right-0 transform translate-x-1/2 w-3 h-3 bg-blue-600 rounded-full"></div>
+            </div>
           </div>
         </div>
       </section>
