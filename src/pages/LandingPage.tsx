@@ -152,10 +152,7 @@ const LandingPage = () => {
               </div>
               
               <div className="flex flex-wrap gap-4">
-                <Button variant="cta" size="pillLg" onClick={() => navigate("/admin")} className="group">
-                  Get Started Free
-                  <ChevronRight className="group-hover:translate-x-1 transition-transform" size={20} />
-                </Button>
+                
                 <Button variant="outlineModern" size="pillLg" onClick={() => navigate("/")}>
                   See It In Action
                 </Button>
