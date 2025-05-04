@@ -9,6 +9,7 @@ import SlugChecker from "@/components/SlugChecker";
 import useWindowSize from "@/hooks/useWindowSize";
 import RewardsCard from "@/components/loyalty/RewardsCard";
 import CookieConsent from "@/components/CookieConsent";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"; 
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -70,71 +71,67 @@ const LandingPage = () => {
     answer: "Yes, security is our priority. InStamp uses industry-standard encryption and security practices to protect your business and customer data. We're compliant with privacy regulations and never share your data with third parties without consent."
   }];
   
-  // Testimonials data
+  // Testimonials data with updated Unsplash images
   const testimonials = [
     {
       id: 1,
-      avatar: "/lovable-uploads/599690ec-9fc9-4b0e-a18e-d559b6a9425c.png",
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
       quote: "Since implementing InStamp, we've seen a 35% increase in repeat customers. The digital loyalty cards are so much better!",
       author: "Sarah Johnson",
       business: "Bloom Coffee Shop",
     },
     {
       id: 2,
-      avatar: "/lovable-uploads/599690ec-9fc9-4b0e-a18e-d559b6a9425c.png",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
       quote: "The analytics alone made it worth switching to InStamp. We can now track which rewards drive customer loyalty.",
       author: "Michael Chen",
       business: "Urban Bakery",
     },
     {
       id: 3,
-      avatar: "/lovable-uploads/599690ec-9fc9-4b0e-a18e-d559b6a9425c.png",
+      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2",
       quote: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.",
       author: "Lora Smith",
       business: "Sunshine Cafe",
     },
     {
       id: 4,
-      avatar: "/lovable-uploads/599690ec-9fc9-4b0e-a18e-d559b6a9425c.png",
+      avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956",
       quote: "Our customers love the convenience of digital stamp cards. No more lost paper cards, and they can check their progress anytime.",
       author: "Amanda Wilson",
       business: "Wellness Studio",
     },
     {
       id: 5,
-      avatar: "/lovable-uploads/599690ec-9fc9-4b0e-a18e-d559b6a9425c.png",
+      avatar: "https://images.unsplash.com/photo-1567515004624-219c11d31f2e",
       quote: "InStamp has completely transformed how we engage with our regular customers. The ROI is incredible.",
       author: "David Brown",
       business: "City Barbershop",
     },
   ];
 
-  // Platform categories data
-  const platformCategories = [
+  // Top categories data
+  const topCategories = [
     {
-      name: "Salon",
-      image: "/lovable-uploads/5b52f6e6-36b8-41d4-933e-e79b67cd5ac1.png"
+      name: "Salons",
+      icon: "💇‍♀️",
     },
     {
       name: "Spas",
-      image: "/lovable-uploads/5b52f6e6-36b8-41d4-933e-e79b67cd5ac1.png"
+      icon: "💆‍♀️",
     },
     {
-      name: "Nails",
-      image: "/lovable-uploads/5b52f6e6-36b8-41d4-933e-e79b67cd5ac1.png"
+      name: "Nail Bars",
+      icon: "💅",
     },
     {
-      name: "Barbers",
-      image: "/lovable-uploads/5b52f6e6-36b8-41d4-933e-e79b67cd5ac1.png"
+      name: "Cafes",
+      icon: "☕",
     },
     {
-      name: "Fitness",
-      image: "/lovable-uploads/5b52f6e6-36b8-41d4-933e-e79b67cd5ac1.png"
+      name: "Car Wash",
+      icon: "🚗",
     },
-    {
-      name: "Health practices",
-      image: "/lovable-uploads/5b52f6e6-36b8-41d4-933e-e79b67cd5ac1.png"
-    }
   ];
   
   return <div className="min-h-screen bg-white font-['Inter'] overflow-x-hidden">
@@ -316,28 +313,24 @@ const LandingPage = () => {
         </div>
       </section>
       
-      {/* A Platform Suitable For All Section */}
+      {/* Top Categories Section - New section replacing "A Platform Suitable For All" */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-2">
-              A Platform Suitable For <span className="text-blue-600">All</span>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Top <span className="text-blue-600">Categories</span>
             </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Our digital loyalty platform works perfectly for all these business types and more
+            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {platformCategories.map((category, index) => (
-              <div key={index} className="relative overflow-hidden rounded-xl hover:shadow-lg transition-all duration-300 group">
-                <div className="aspect-[4/3] bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden relative">
-                  <img 
-                    src={category.image} 
-                    alt={category.name} 
-                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
-                  <div className="absolute bottom-6 left-6 text-white font-semibold text-2xl">
-                    {category.name}
-                  </div>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 max-w-4xl mx-auto">
+            {topCategories.map((category, index) => (
+              <div key={index} className="flex flex-col items-center group">
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-blue-50 flex items-center justify-center mb-4 text-4xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
+                  {category.icon}
                 </div>
+                <h3 className="text-lg font-semibold text-gray-800">{category.name}</h3>
               </div>
             ))}
           </div>
@@ -479,7 +472,7 @@ const LandingPage = () => {
         </div>
       </section>
       
-      {/* Testimonials Section - Updated to match picture 1 */}
+      {/* Testimonials Section - Updated with Unsplash images */}
       <section id="testimonials" className="section-padding bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -495,19 +488,34 @@ const LandingPage = () => {
               {/* Left side - Floating avatars */}
               <div className="md:w-1/2 relative hidden md:block">
                 <div className="absolute top-[10%] left-[15%] w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                  <img src={testimonials[0].avatar} alt="User" className="w-full h-full object-cover" />
+                  <Avatar className="w-full h-full">
+                    <AvatarImage src={testimonials[0].avatar} alt="User" className="w-full h-full object-cover" />
+                    <AvatarFallback>SJ</AvatarFallback>
+                  </Avatar>
                 </div>
                 <div className="absolute top-[30%] right-[25%] w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-lg z-10">
-                  <img src={testimonials[1].avatar} alt="User" className="w-full h-full object-cover" />
+                  <Avatar className="w-full h-full">
+                    <AvatarImage src={testimonials[1].avatar} alt="User" className="w-full h-full object-cover" />
+                    <AvatarFallback>MC</AvatarFallback>
+                  </Avatar>
                 </div>
                 <div className="absolute top-[60%] left-[25%] w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                  <img src={testimonials[2].avatar} alt="User" className="w-full h-full object-cover" />
+                  <Avatar className="w-full h-full">
+                    <AvatarImage src={testimonials[2].avatar} alt="User" className="w-full h-full object-cover" />
+                    <AvatarFallback>LS</AvatarFallback>
+                  </Avatar>
                 </div>
                 <div className="absolute bottom-[5%] right-[15%] w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                  <img src={testimonials[3].avatar} alt="User" className="w-full h-full object-cover" />
+                  <Avatar className="w-full h-full">
+                    <AvatarImage src={testimonials[3].avatar} alt="User" className="w-full h-full object-cover" />
+                    <AvatarFallback>AW</AvatarFallback>
+                  </Avatar>
                 </div>
                 <div className="absolute top-[45%] left-[60%] w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                  <img src={testimonials[4].avatar} alt="User" className="w-full h-full object-cover" />
+                  <Avatar className="w-full h-full">
+                    <AvatarImage src={testimonials[4].avatar} alt="User" className="w-full h-full object-cover" />
+                    <AvatarFallback>DB</AvatarFallback>
+                  </Avatar>
                 </div>
               </div>
               
@@ -527,7 +535,10 @@ const LandingPage = () => {
                   <div className="flex items-center">
                     <div className="mr-4">
                       <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-blue-100 md:hidden">
-                        <img src={testimonials[activeTestimonial - 1].avatar} alt="User" className="w-full h-full object-cover" />
+                        <Avatar>
+                          <AvatarImage src={testimonials[activeTestimonial - 1].avatar} alt="User" className="w-full h-full object-cover" />
+                          <AvatarFallback>{testimonials[activeTestimonial - 1].author.substring(0, 2)}</AvatarFallback>
+                        </Avatar>
                       </div>
                     </div>
                     <div>
