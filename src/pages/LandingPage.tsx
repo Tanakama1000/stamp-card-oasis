@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -602,21 +601,21 @@ const LandingPage = () => {
               <h4 className="font-semibold text-lg mb-4">Contact</h4>
               <ul className="space-y-2 text-gray-400">
                 <li>
-                  <a href="mailto:hello@instamp.com" className="hover:text-white transition-colors flex items-center gap-2">
+                  <a href="mailto:tananakacamesgapara@gmail.com" className="hover:text-white transition-colors flex items-center gap-2">
                     <Mail size={16} />
-                    <span>hello@instamp.com</span>
+                    <span>tananakacamesgapara@gmail.com</span>
                   </a>
                 </li>
                 <li>
-                  <a href="tel:+11234567890" className="hover:text-white transition-colors flex items-center gap-2">
+                  <a href="tel:+27676324068" className="hover:text-white transition-colors flex items-center gap-2">
                     <Phone size={16} />
-                    <span>+1 (123) 456-7890</span>
+                    <span>+27 67 632 4068</span>
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors flex items-center gap-2">
+                  <a href="https://paystack.com/pay/instamp" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-2">
                     <Globe size={16} />
-                    <span>123 Business St, San Francisco, CA</span>
+                    <span>paystack.com/pay/instamp</span>
                   </a>
                 </li>
               </ul>
