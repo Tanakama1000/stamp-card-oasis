@@ -1,24 +1,24 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
-import { 
-  Award, 
-  Check, 
+import {
+  Award,
+  Check,
   ChevronRight,
   Coffee,
-  CreditCard, 
-  Gift, 
+  CreditCard,
+  Gift,
   Globe,
   Mail,
   Menu,
   Phone,
-  QrCode, 
-  Shield, 
-  Star, 
-  TrendingUp, 
+  QrCode,
+  Shield,
+  Star,
+  TrendingUp,
   Users,
   X
 } from "lucide-react";
@@ -31,15 +31,42 @@ const LandingPage = () => {
   const { width } = useWindowSize();
   const isMobile = width < 768;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+  const [isIntersecting, setIsIntersecting] = useState<{[key: string]: boolean}>({});
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
+  
+  useEffect(() => {
+    const sections = ['features', 'how-it-works', 'benefits', 'testimonials'];
+    
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach(entry => {
+        setIsIntersecting(prev => ({
+          ...prev,
+          [entry.target.id]: entry.isIntersecting
+        }));
+      });
+    };
+    
+    const observer = new IntersectionObserver(observerCallback, {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    });
+    
+    sections.forEach(section => {
+      const element = document.getElementById(section);
+      if (element) observer.observe(element);
+    });
+    
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="min-h-screen bg-white font-[Inter] overflow-x-hidden">
+    <div className="min-h-screen bg-white font-['Inter'] overflow-x-hidden">
       {/* Header/Navigation */}
-      <header className="bg-white text-slate-800 px-4 py-3 sticky top-0 z-50 border-b border-slate-100 shadow-sm">
+      <header className="bg-white text-slate-800 px-4 py-4 sticky top-0 z-50 border-b border-slate-100 shadow-sm">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
             <img 
@@ -56,19 +83,21 @@ const LandingPage = () => {
               <ul className="flex space-x-8">
                 <li><a href="#features" className="text-gray-600 hover:text-blue-600 font-medium">Features</a></li>
                 <li><a href="#how-it-works" className="text-gray-600 hover:text-blue-600 font-medium">How It Works</a></li>
-                <li><a href="#pricing" className="text-gray-600 hover:text-blue-600 font-medium">Pricing</a></li>
+                <li><a href="#benefits" className="text-gray-600 hover:text-blue-600 font-medium">Benefits</a></li>
                 <li><a href="#testimonials" className="text-gray-600 hover:text-blue-600 font-medium">Testimonials</a></li>
               </ul>
             </nav>
             <div className="flex items-center gap-3">
               <Button 
                 variant="outlineModern" 
+                size="pill"
                 onClick={() => navigate("/admin")}
               >
                 Log In
               </Button>
               <Button 
-                variant="modern"
+                variant="vibrant"
+                size="pill"
                 onClick={() => navigate("/admin")}
               >
                 Get Started
@@ -91,7 +120,7 @@ const LandingPage = () => {
               <ul className="space-y-4 mb-6">
                 <li><a href="#features" onClick={toggleMobileMenu} className="text-gray-600 block py-2">Features</a></li>
                 <li><a href="#how-it-works" onClick={toggleMobileMenu} className="text-gray-600 block py-2">How It Works</a></li>
-                <li><a href="#pricing" onClick={toggleMobileMenu} className="text-gray-600 block py-2">Pricing</a></li>
+                <li><a href="#benefits" onClick={toggleMobileMenu} className="text-gray-600 block py-2">Benefits</a></li>
                 <li><a href="#testimonials" onClick={toggleMobileMenu} className="text-gray-600 block py-2">Testimonials</a></li>
               </ul>
               <div className="space-y-3">
@@ -103,7 +132,7 @@ const LandingPage = () => {
                   Log In
                 </Button>
                 <Button 
-                  variant="modern"
+                  variant="vibrant"
                   onClick={() => navigate("/admin")}
                   className="w-full justify-center"
                 >
@@ -116,7 +145,7 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-16 pb-20 md:pt-20 md:pb-28 overflow-hidden bg-gradient-to-b from-white to-blue-50/30">
+      <section className="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden bg-gradient-to-b from-white to-blue-50/40">
         {/* Background decorations */}
         <div className="absolute inset-0 overflow-hidden z-0">
           <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-blue-50 rounded-full opacity-60 blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
@@ -129,22 +158,21 @@ const LandingPage = () => {
             <div className="animate-fade-in">
               <div className="flex items-center mb-4 bg-blue-50 w-max px-3 py-1.5 rounded-full text-blue-600 text-sm font-medium">
                 <span className="animate-pulse mr-2">●</span> 
-                Digital Loyalty Cards Made Simple
+                Turn Repeat Customers into Loyal Fans
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                Build Customer <span className="text-gradient-primary">Loyalty</span><br />
-                Boost <span className="text-gradient-primary">Repeat Business</span>
+                Build Customer <span className="text-gradient-vibrant">Loyalty</span><br />
+                Boost <span className="text-gradient-vibrant">Repeat Business</span>
               </h1>
               
               <p className="text-lg text-gray-600 mb-8 max-w-lg">
-                Create digital loyalty programs that your customers will love. No app downloads required, works instantly on any device.
+                The all-in-one digital loyalty solution that helps local businesses create, manage, and grow customer reward programs. No app downloads required.
               </p>
               
-              <div className="mb-8">
-                <div className="bg-white p-4 rounded-lg shadow-lg">
-                  <SlugChecker className="overflow-hidden" />
-                </div>
+              <div className="mb-8 bg-white p-5 rounded-xl shadow-lg border border-blue-100/50">
+                <h3 className="text-sm font-medium text-gray-500 mb-2">Get your unique loyalty page:</h3>
+                <SlugChecker className="overflow-hidden" />
               </div>
               
               <div className="flex flex-wrap gap-4 mb-8">
@@ -166,6 +194,25 @@ const LandingPage = () => {
                   </div>
                   <span className="text-gray-600">Works on any device</span>
                 </div>
+              </div>
+              
+              <div className="flex flex-wrap gap-4">
+                <Button 
+                  variant="cta"
+                  size="pillLg"
+                  onClick={() => navigate("/admin")}
+                  className="group"
+                >
+                  Get Started Free
+                  <ChevronRight className="group-hover:translate-x-1 transition-transform" size={20} />
+                </Button>
+                <Button 
+                  variant="outlineModern"
+                  size="pillLg"
+                  onClick={() => navigate("/")}
+                >
+                  See It In Action
+                </Button>
               </div>
             </div>
             
@@ -221,6 +268,13 @@ const LandingPage = () => {
                   </div>
                 </div>
 
+                {/* QR Code element */}
+                <div className="absolute top-1/2 -right-8 bg-white p-3 rounded-lg shadow-xl z-20 animate-bounce-slow">
+                  <div className="w-20 h-20 rounded-md bg-gray-200 flex items-center justify-center">
+                    <QrCode size={48} className="text-gray-600" />
+                  </div>
+                </div>
+
                 {/* Background decoration */}
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-3xl transform rotate-3 scale-105 -z-10"></div>
               </div>
@@ -252,122 +306,55 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Feature preview section */}
-      <section id="features" className="py-20 bg-blue-50/50">
+      {/* Features Section */}
+      <section id="features" className="section-padding bg-blue-50/30">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-3">
-              BEAUTIFUL LOYALTY CARDS
+              POWERFUL FEATURES
             </span>
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-800">
-              Digital Loyalty Cards That Customers Love
+              Everything Your Business Needs
             </h2>
             <p className="text-lg text-gray-600">
-              Make your customers feel special with personalized loyalty cards that are always at their fingertips
+              Our platform gives you powerful tools to create, manage, and analyze your digital loyalty program
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="animate-slide-in-left" style={{ animationDelay: "0.1s" }}>
-              <RewardsCard 
-                rewardsCount={2}
-                totalEarned={36}
-                totalStamps={124}
-                textColor="#3B82F6"
-                accentColor="#EBF5FF"
-              />
-            </div>
-            <div className="animate-slide-in-left" style={{ animationDelay: "0.3s" }}>
-              <RewardsCard 
-                rewardsCount={4}
-                totalEarned={52}
-                totalStamps={205}
-                textColor="#8B5CF6" 
-                accentColor="#F3EEFF"
-              />
-            </div>
-            <div className="animate-slide-in-left" style={{ animationDelay: "0.5s" }}>
-              <RewardsCard 
-                rewardsCount={3}
-                totalEarned={29}
-                totalStamps={98}
-                textColor="#EC4899"
-                accentColor="#FCE7F3"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-3xl font-bold mb-4 text-gray-800">Proven Results for Business Growth</h2>
-            <p className="text-gray-600">Our digital stamp card system drives measurable business results</p>
-          </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-            {[
-              { value: "2.5M+", label: "Stamps Collected", delay: 0 },
-              { value: "15k+", label: "Business Users", delay: 1 },
-              { value: "98%", label: "Customer Satisfaction", delay: 2 },
-              { value: "35%", label: "Avg. Revenue Boost", delay: 3 }
-            ].map((stat, index) => (
-              <div key={index} className="text-center" style={{"--animation-order": stat.delay} as React.CSSProperties}>
-                <div className="text-4xl font-bold text-blue-600 mb-2 animate-count">{stat.value}</div>
-                <div className="text-gray-600">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-20 px-4 bg-gradient-to-b from-white to-blue-50/30">
-        <div className="container mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-3">POWERFUL FEATURES</span>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-800">Everything You Need for Customer Loyalty</h2>
-            <p className="text-lg text-gray-600">Our platform gives you powerful tools to create, manage, and analyze your digital loyalty program.</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
-                icon: <QrCode size={24} className="text-blue-600" />,
-                title: "Digital Stamp Cards",
-                description: "Create beautiful digital loyalty cards that work on any device without app downloads.",
-                benefits: ["Customizable design", "Works on all devices", "Easy to setup and share"]
+                icon: <QrCode size={24} className="text-white" />,
+                bgColor: "from-blue-500 to-blue-600",
+                title: "Digital Loyalty Cards",
+                description: "Create beautiful digital stamp cards that your customers can access on any device"
               },
               {
-                icon: <TrendingUp size={24} className="text-blue-600" />,
+                icon: <Gift size={24} className="text-white" />,
+                bgColor: "from-purple-500 to-indigo-600",
+                title: "Custom Rewards",
+                description: "Set milestones and create custom rewards that keep your customers coming back"
+              },
+              {
+                icon: <TrendingUp size={24} className="text-white" />,
+                bgColor: "from-pink-500 to-rose-600",
                 title: "Analytics Dashboard",
-                description: "Track customer engagement and program performance with real-time analytics.",
-                benefits: ["Customer insights", "Revenue tracking", "Performance metrics"]
+                description: "Track visits, spending, and program performance with real-time insights"
               },
               {
-                icon: <Gift size={24} className="text-blue-600" />,
-                title: "Reward Management",
-                description: "Create and manage rewards that keep customers coming back again and again.",
-                benefits: ["Flexible reward options", "Automatic redemption", "Custom milestones"]
+                icon: <Users size={24} className="text-white" />,
+                bgColor: "from-teal-500 to-emerald-600",
+                title: "Customer Engagement",
+                description: "Build stronger relationships through personalized loyalty experiences"
               }
             ].map((feature, index) => (
-              <Card key={index} className="border-0 shadow-lg rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 feature-card-hover">
-                <div className="p-6">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-5">
+              <Card key={index} className={`border-0 shadow-lg rounded-xl overflow-hidden staggered-fade-in staggered-delay-${index + 1} hover:shadow-xl transition-all duration-300 h-full`}>
+                <div className="p-6 flex flex-col h-full">
+                  <div className={`feature-icon-container from-${feature.bgColor.split(' ')[0]} to-${feature.bgColor.split(' ')[1]}`}>
                     {feature.icon}
                   </div>
                   <h3 className="text-xl font-semibold mb-3 text-gray-800">{feature.title}</h3>
-                  <p className="text-gray-600 mb-4">{feature.description}</p>
-                  <ul className="space-y-3">
-                    {feature.benefits.map((benefit, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <Check size={18} className="text-blue-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-600">{benefit}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <p className="text-gray-600">{feature.description}</p>
                 </div>
               </Card>
             ))}
@@ -376,250 +363,161 @@ const LandingPage = () => {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 px-4 bg-gray-50 relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-blue-50/50 rounded-l-full -translate-y-1/4 transform rotate-12 opacity-70"></div>
-        
-        <div className="container mx-auto relative z-10">
+      <section id="how-it-works" className="section-padding bg-white">
+        <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-3">GETTING STARTED</span>
+            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-3">
+              SIMPLE PROCESS
+            </span>
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-800">How InStamp Works</h2>
-            <p className="text-lg text-gray-600">Three simple steps to launch your digital loyalty program</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto relative">
-            {/* Connecting lines (desktop only) */}
-            <div className="hidden md:block absolute top-16 left-[25%] right-[25%] h-0.5 bg-blue-200"></div>
-            
-            <div className="relative text-center">
-              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6 shadow-lg relative z-10">
-                1
-              </div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-800">Create Your Account</h3>
-              <p className="text-gray-600">Sign up in minutes and customize your digital stamp card to match your brand.</p>
-            </div>
-            
-            <div className="relative text-center">
-              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6 shadow-lg relative z-10">
-                2
-              </div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-800">Share Your Link</h3>
-              <p className="text-gray-600">Invite customers to join your loyalty program via QR code or personalized link.</p>
-            </div>
-            
-            <div className="relative text-center">
-              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6 shadow-lg relative z-10">
-                3
-              </div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-800">Reward Customers</h3>
-              <p className="text-gray-600">Scan customer QR codes to add stamps and watch your customer loyalty grow.</p>
-            </div>
-          </div>
-
-          <div className="text-center mt-12">
-            <Button 
-              variant="modern" 
-              size="lg" 
-              onClick={() => navigate("/admin")} 
-              className="px-8"
-            >
-              Get Started Now
-              <ChevronRight size={18} />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4 bg-white">
-        <div className="container mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-3">PRICING</span>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-800">Simple, Transparent Pricing</h2>
-            <p className="text-lg text-gray-600">Choose the plan that's right for your business</p>
+            <p className="text-lg text-gray-600">Start rewarding loyal customers in three easy steps</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Free Plan */}
-            <Card className="border border-gray-100 rounded-xl overflow-hidden hover:border-blue-200 transition-all duration-300">
-              <div className="p-6 flex flex-col h-full">
-                <div className="mb-4">
-                  <div className="text-lg font-medium text-gray-400 mb-1">Free</div>
-                  <div className="flex items-end">
-                    <span className="text-4xl font-bold text-gray-800">$0</span>
-                    <span className="text-gray-500 ml-1 mb-1">/month</span>
-                  </div>
-                  <p className="text-gray-500 mt-2">Perfect for small businesses just getting started</p>
+            {[
+              {
+                step: 1,
+                title: "Sign Up",
+                description: "Create an account and customize your loyalty program to match your brand",
+                icon: <CreditCard size={32} className="text-blue-600" />
+              },
+              {
+                step: 2,
+                title: "Share With Customers",
+                description: "Invite customers via QR code or your unique link to join your program",
+                icon: <QrCode size={32} className="text-blue-600" />
+              },
+              {
+                step: 3,
+                title: "Reward Loyalty",
+                description: "Track visits, add stamps, and deliver rewards that keep them coming back",
+                icon: <Award size={32} className="text-blue-600" />
+              }
+            ].map((step, index) => (
+              <div key={index} className={`step-card bg-white staggered-fade-in staggered-delay-${index + 1}`}>
+                <div className="step-number">{step.step}</div>
+                <div className="flex flex-col items-center text-center pt-2">
+                  <div className="mb-4">{step.icon}</div>
+                  <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
+                  <p className="text-gray-600">{step.description}</p>
                 </div>
-                
-                <Separator className="my-4" />
-                
-                <ul className="space-y-3 mb-8">
-                  {["1 Digital Loyalty Card", "Up to 100 customers", "Basic analytics", "Email support"].map((item, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <Check size={18} className="text-blue-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-600">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                
-                <Button 
-                  variant="outlineModern" 
-                  className="mt-auto w-full"
-                  onClick={() => navigate("/admin")}
-                >
-                  Get Started
-                </Button>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* Benefits Section */}
+      <section id="benefits" className="section-padding bg-gradient-to-b from-blue-50/30 to-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-3">
+              DOUBLE VALUE
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-800">For Businesses & Customers</h2>
+            <p className="text-lg text-gray-600">Benefits that create a win-win loyalty experience</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <Card className="card-gradient p-8 shadow-lg rounded-xl staggered-fade-in staggered-delay-1">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                  <CreditCard size={24} className="text-blue-600" />
+                </div>
+                <h3 className="text-2xl font-semibold">For Businesses</h3>
+              </div>
+              
+              <ul className="space-y-4">
+                {[
+                  "Increase customer retention by up to 35%",
+                  "Drive more repeat visits and higher spending",
+                  "Collect valuable customer data and insights",
+                  "Build stronger relationships with your audience",
+                  "Differentiate from competitors"
+                ].map((benefit, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <Check size={20} className="text-blue-600 mt-1 flex-shrink-0" />
+                    <span>{benefit}</span>
+                  </li>
+                ))}
+              </ul>
             </Card>
             
-            {/* Pro Plan */}
-            <Card className="border-2 border-blue-500 rounded-xl overflow-hidden shadow-xl relative transform scale-105">
-              <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-3 py-1">
-                MOST POPULAR
-              </div>
-              <div className="p-8 flex flex-col h-full">
-                <div className="mb-4">
-                  <div className="text-lg font-medium text-blue-600 mb-1">Pro</div>
-                  <div className="flex items-end">
-                    <span className="text-4xl font-bold text-gray-800">$29</span>
-                    <span className="text-gray-500 ml-1 mb-1">/month</span>
-                  </div>
-                  <p className="text-gray-500 mt-2">Perfect for growing businesses</p>
+            <Card className="card-gradient p-8 shadow-lg rounded-xl staggered-fade-in staggered-delay-2">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                  <Users size={24} className="text-purple-600" />
                 </div>
-                
-                <Separator className="my-4" />
-                
-                <ul className="space-y-3 mb-8">
-                  {[
-                    "5 Digital Loyalty Cards",
-                    "Unlimited customers",
-                    "Advanced analytics",
-                    "Priority support",
-                    "Custom branding",
-                    "Export customer data"
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <Check size={18} className="text-blue-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-600">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                
-                <Button 
-                  variant="modern" 
-                  className="mt-auto w-full"
-                  onClick={() => navigate("/admin")}
-                >
-                  Get Started
-                </Button>
+                <h3 className="text-2xl font-semibold">For Customers</h3>
               </div>
-            </Card>
-            
-            {/* Business Plan */}
-            <Card className="border border-gray-100 rounded-xl overflow-hidden hover:border-blue-200 transition-all duration-300">
-              <div className="p-6 flex flex-col h-full">
-                <div className="mb-4">
-                  <div className="text-lg font-medium text-gray-400 mb-1">Business</div>
-                  <div className="flex items-end">
-                    <span className="text-4xl font-bold text-gray-800">$99</span>
-                    <span className="text-gray-500 ml-1 mb-1">/month</span>
-                  </div>
-                  <p className="text-gray-500 mt-2">For businesses with multiple locations</p>
-                </div>
-                
-                <Separator className="my-4" />
-                
-                <ul className="space-y-3 mb-8">
-                  {[
-                    "Unlimited Digital Cards",
-                    "Unlimited customers",
-                    "Enterprise analytics",
-                    "24/7 priority support",
-                    "Team management",
-                    "API access",
-                    "Custom integration"
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <Check size={18} className="text-blue-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-600">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                
-                <Button 
-                  variant="outlineModern" 
-                  className="mt-auto w-full"
-                  onClick={() => navigate("/admin")}
-                >
-                  Contact Sales
-                </Button>
-              </div>
+              
+              <ul className="space-y-4">
+                {[
+                  "Earn rewards at their favorite local businesses",
+                  "No need to download apps or carry physical cards",
+                  "Access loyalty program from any device",
+                  "Track progress toward rewards in real-time",
+                  "Discover exclusive offers and promotions"
+                ].map((benefit, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <Check size={20} className="text-purple-600 mt-1 flex-shrink-0" />
+                    <span>{benefit}</span>
+                  </li>
+                ))}
+              </ul>
             </Card>
           </div>
         </div>
       </section>
-
+      
       {/* Testimonials Section */}
-      <section id="testimonials" className="py-20 px-4 bg-gray-50">
-        <div className="container mx-auto">
+      <section id="testimonials" className="section-padding bg-white">
+        <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-3">TESTIMONIALS</span>
+            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-3">
+              SUCCESS STORIES
+            </span>
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-800">Loved by Businesses & Customers</h2>
             <p className="text-lg text-gray-600">Join thousands of businesses that have increased customer retention with InStamp</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Testimonial cards */}
-            <Card className="bg-white border border-gray-100 shadow-md p-6 hover:shadow-lg transition-all duration-300 rounded-xl">
-              <div className="flex items-center gap-1 mb-4 text-amber-400">
-                {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
-              </div>
-              <p className="mb-6 text-gray-700">"Since implementing InStamp, we've seen a 35% increase in repeat customers. The digital loyalty cards are so much better than the paper ones we used to use!"</p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                  SJ
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              {
+                quote: "Since implementing InStamp, we've seen a 35% increase in repeat customers. The digital loyalty cards are so much better than the paper ones we used to use!",
+                author: "Sarah Johnson",
+                business: "Bloom Coffee Shop",
+                color: "bg-blue-50 border-blue-100"
+              },
+              {
+                quote: "The analytics alone made it worth switching to InStamp. We can now track which rewards drive customer loyalty and adjust our offerings accordingly.",
+                author: "Michael Chen",
+                business: "Urban Bakery",
+                color: "bg-purple-50 border-purple-100"
+              },
+              {
+                quote: "Our customers love the convenience of digital stamp cards. No more lost paper cards, and they can check their progress anytime. It's a game-changer!",
+                author: "Amanda Wilson",
+                business: "Sunshine Cafe", 
+                color: "bg-amber-50 border-amber-100"
+              }
+            ].map((testimonial, index) => (
+              <div key={index} className={`testimonial-card ${testimonial.color} staggered-fade-in staggered-delay-${index + 1}`}>
+                <div className="flex items-center gap-1 mb-4 text-amber-400">
+                  {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
                 </div>
-                <div>
-                  <p className="font-semibold text-gray-800">Sarah Johnson</p>
-                  <p className="text-xs text-gray-500">Bloom Coffee Shop</p>
-                </div>
-              </div>
-            </Card>
-            
-            {/* Testimonial 2 */}
-            <Card className="bg-white border border-gray-100 shadow-md p-6 hover:shadow-lg transition-all duration-300 rounded-xl">
-              <div className="flex items-center gap-1 mb-4 text-amber-400">
-                {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
-              </div>
-              <p className="mb-6 text-gray-700">"The analytics alone made it worth switching to InStamp. We can now track which rewards drive customer loyalty and adjust our offerings accordingly."</p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold">
-                  MC
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-800">Michael Chen</p>
-                  <p className="text-xs text-gray-500">Urban Bakery</p>
-                </div>
-              </div>
-            </Card>
-            
-            {/* Testimonial 3 */}
-            <Card className="bg-white border border-gray-100 shadow-md p-6 hover:shadow-lg transition-all duration-300 rounded-xl">
-              <div className="flex items-center gap-1 mb-4 text-amber-400">
-                {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
-              </div>
-              <p className="mb-6 text-gray-700">"Our customers love the convenience of digital stamp cards. No more lost paper cards, and they can check their progress anytime. It's a game-changer!"</p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold">
-                  AW
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-800">Amanda Wilson</p>
-                  <p className="text-xs text-gray-500">Sunshine Cafe</p>
+                <p className="mb-6 text-gray-700 italic">"{testimonial.quote}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">
+                    {testimonial.author.split(' ').map(name => name[0]).join('')}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-800">{testimonial.author}</p>
+                    <p className="text-xs text-gray-500">{testimonial.business}</p>
+                  </div>
                 </div>
               </div>
-            </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -633,7 +531,7 @@ const LandingPage = () => {
         </div>
         
         <div className="container mx-auto max-w-4xl text-center relative z-10">
-          <h2 className="text-4xl font-bold mb-6">Ready to Transform Your Loyalty Program?</h2>
+          <h2 className="text-4xl font-bold mb-6">Ready to Turn Visitors Into Loyal Fans?</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
             Join thousands of businesses that have increased customer retention and revenue with our digital loyalty platform.
           </p>
@@ -655,6 +553,7 @@ const LandingPage = () => {
               Schedule a Demo
             </Button>
           </div>
+          <p className="text-sm mt-4 opacity-80">No credit card required • Free 14-day trial • Setup in minutes</p>
         </div>
       </section>
 
@@ -693,7 +592,7 @@ const LandingPage = () => {
               <h4 className="font-semibold text-lg mb-4">Product</h4>
               <ul className="space-y-2 text-gray-400">
                 <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
+                <li><a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a></li>
                 <li><a href="#testimonials" className="hover:text-white transition-colors">Testimonials</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
               </ul>

@@ -26,6 +26,9 @@ const buttonVariants = cva(
         modern: "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md hover:shadow-xl transform transition-all duration-300 hover:translate-y-[-2px] font-medium",
         outlineModern: "border-2 border-blue-600 text-blue-600 hover:bg-blue-50 transition-all duration-300",
         premium: "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg hover:shadow-xl transform transition-all duration-300 hover:translate-y-[-2px] font-medium",
+        vibrant: "bg-gradient-to-r from-blue-500 to-teal-400 text-white shadow-lg hover:shadow-xl transform transition-all duration-300 hover:translate-y-[-2px] font-medium",
+        cta: "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg hover:shadow-xl transform transition-all duration-300 hover:translate-y-[-2px] font-medium",
+        primary: "bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg transition-all duration-300",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -35,6 +38,8 @@ const buttonVariants = cva(
         xl: "h-12 px-8 py-3 text-base",
         xxl: "h-14 px-10 py-4 text-lg rounded-xl",
         hero: "h-14 px-8 py-4 text-lg rounded-lg",
+        pill: "h-10 px-6 py-2 rounded-full",
+        pillLg: "h-12 px-8 py-3 rounded-full text-base",
       },
     },
     defaultVariants: {
