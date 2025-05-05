@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
-import { Award, Check, ChevronRight, Coffee, CreditCard, Gift, Globe, Mail, Menu, Phone, QrCode, Shield, Star, TrendingUp, Users, X, PlusCircle, MinusCircle } from "lucide-react";
+import { Award, Check, ChevronRight, Coffee, CreditCard, Gift, Globe, Mail, Menu, Phone, QrCode, Shield, Star, TrendingUp, Users, X, PlusCircle, MinusCircle, Scissors, Car, Dumbbell } from "lucide-react";
 import SlugChecker from "@/components/SlugChecker";
 import useWindowSize from "@/hooks/useWindowSize";
 import RewardsCard from "@/components/loyalty/RewardsCard";
@@ -109,27 +109,31 @@ const LandingPage = () => {
     },
   ];
 
-  // Top categories data
+  // Top categories data with Lucide icons
   const topCategories = [
     {
       name: "Salons",
-      icon: "💇‍♀️",
+      icon: Scissors,
     },
     {
       name: "Spas",
-      icon: "💆‍♀️",
+      icon: Gift, // Using Gift as a substitute for spa
     },
     {
       name: "Nail Bars",
-      icon: "💅",
+      icon: Star, // Using Star as a substitute for nail bar
     },
     {
       name: "Cafes",
-      icon: "☕",
+      icon: Coffee,
     },
     {
       name: "Car Wash",
-      icon: "🚗",
+      icon: Car,
+    },
+    {
+      name: "Fitness",
+      icon: Dumbbell,
     },
   ];
   
@@ -312,7 +316,7 @@ const LandingPage = () => {
         </div>
       </section>
       
-      {/* Top Categories Section - Improved UI */}
+      {/* Top Categories Section - Updated with stamp icons */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -323,15 +327,18 @@ const LandingPage = () => {
               Our digital loyalty platform works perfectly for all these business types and more
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 max-w-4xl mx-auto">
-            {topCategories.map((category, index) => (
-              <div key={index} className="flex flex-col items-center group">
-                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-blue-50 flex items-center justify-center mb-4 text-4xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
-                  {category.icon}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+            {topCategories.map((category, index) => {
+              const IconComponent = category.icon;
+              return (
+                <div key={index} className="flex flex-col items-center group">
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-blue-50 flex items-center justify-center mb-4 shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
+                    <IconComponent size={36} className="text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800">{category.name}</h3>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-800">{category.name}</h3>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -416,7 +423,7 @@ const LandingPage = () => {
                 <div className="step-number">{step.step}</div>
                 <div className="flex flex-col items-center text-center pt-2">
                   <div className="mb-4">{step.icon}</div>
-                  <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
+                  <h3 className="text-xl font-semibold">{step.title}</h3>
                   <p className="text-gray-600">{step.description}</p>
                 </div>
               </div>)}
