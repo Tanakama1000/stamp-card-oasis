@@ -9,7 +9,6 @@ import useWindowSize from "@/hooks/useWindowSize";
 import RewardsCard from "@/components/loyalty/RewardsCard";
 import CookieConsent from "@/components/CookieConsent";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-
 const LandingPage = () => {
   const navigate = useNavigate();
   const {
@@ -243,7 +242,7 @@ const LandingPage = () => {
               <div className="w-full h-full flex items-center justify-center perspective-1000">
                 {/* Main device mockup */}
                 <div className="relative z-20 shadow-2xl rounded-xl transform transition-all duration-500 hover:rotate-1 hover:scale-105">
-                  <div className="relative overflow-hidden rounded-xl border-8 border-gray-800 shadow-lg">
+                  <div className="relative overflow-hidden rounded-xl border-0 border-gray-800 shadow-lg">
                     <img alt="InStamp App Demo" className="w-full h-auto" src="/lovable-uploads/d908b478-e744-4c08-9541-181035cb18dd.jpg" />
                     <div className="absolute bottom-0 left-0 right-0 h-6 bg-gray-800/0"></div>
                     <div className="absolute top-0 left-0 right-0 h-6 flex justify-center items-center bg-gray-800/0">
@@ -306,16 +305,14 @@ const LandingPage = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-3 md:grid-cols-6 gap-4 max-w-5xl mx-auto">
             {topCategories.map((category, index) => {
-              const IconComponent = category.icon;
-              return (
-                <div key={index} className="flex flex-col items-center group transition-all duration-300 hover:scale-105">
+            const IconComponent = category.icon;
+            return <div key={index} className="flex flex-col items-center group transition-all duration-300 hover:scale-105">
                   <div className="w-16 h-16 rounded-full bg-blue-100 border-2 border-blue-200 flex items-center justify-center mb-2 text-blue-600 shadow-sm hover:shadow-md transition-all duration-300">
                     <IconComponent size={24} />
                   </div>
                   <h3 className="text-sm font-semibold text-gray-800">{category.name}</h3>
-                </div>
-              );
-            })}
+                </div>;
+          })}
           </div>
         </div>
       </section>
