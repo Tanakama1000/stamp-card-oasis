@@ -8,8 +8,7 @@ import SlugChecker from "@/components/SlugChecker";
 import useWindowSize from "@/hooks/useWindowSize";
 import RewardsCard from "@/components/loyalty/RewardsCard";
 import CookieConsent from "@/components/CookieConsent";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"; 
-
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 const LandingPage = () => {
   const navigate = useNavigate();
   const {
@@ -28,7 +27,6 @@ const LandingPage = () => {
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
-
   useEffect(() => {
     const sections = ['features', 'how-it-works', 'benefits', 'testimonials', 'faq'];
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
@@ -69,74 +67,60 @@ const LandingPage = () => {
     question: "Is my data secure with InStamp?",
     answer: "Yes, security is our priority. InStamp uses industry-standard encryption and security practices to protect your business and customer data. We're compliant with privacy regulations and never share your data with third parties without consent."
   }];
-  
+
   // Testimonials data with updated Unsplash images
-  const testimonials = [
-    {
-      id: 1,
-      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-      quote: "Since implementing InStamp, we've seen a 35% increase in repeat customers. The digital loyalty cards are so much better!",
-      author: "Sarah Johnson",
-      business: "Bloom Coffee Shop",
-    },
-    {
-      id: 2,
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
-      quote: "The analytics alone made it worth switching to InStamp. We can now track which rewards drive customer loyalty.",
-      author: "Michael Chen",
-      business: "Urban Bakery",
-    },
-    {
-      id: 3,
-      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2",
-      quote: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.",
-      author: "Lora Smith",
-      business: "Sunshine Cafe",
-    },
-    {
-      id: 4,
-      avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956",
-      quote: "Our customers love the convenience of digital stamp cards. No more lost paper cards, and they can check their progress anytime.",
-      author: "Amanda Wilson",
-      business: "Wellness Studio",
-    },
-    {
-      id: 5,
-      avatar: "https://images.unsplash.com/photo-1567515004624-219c11d31f2e",
-      quote: "InStamp has completely transformed how we engage with our regular customers. The ROI is incredible.",
-      author: "David Brown",
-      business: "City Barbershop",
-    },
-  ];
+  const testimonials = [{
+    id: 1,
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+    quote: "Since implementing InStamp, we've seen a 35% increase in repeat customers. The digital loyalty cards are so much better!",
+    author: "Sarah Johnson",
+    business: "Bloom Coffee Shop"
+  }, {
+    id: 2,
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    quote: "The analytics alone made it worth switching to InStamp. We can now track which rewards drive customer loyalty.",
+    author: "Michael Chen",
+    business: "Urban Bakery"
+  }, {
+    id: 3,
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2",
+    quote: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.",
+    author: "Lora Smith",
+    business: "Sunshine Cafe"
+  }, {
+    id: 4,
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956",
+    quote: "Our customers love the convenience of digital stamp cards. No more lost paper cards, and they can check their progress anytime.",
+    author: "Amanda Wilson",
+    business: "Wellness Studio"
+  }, {
+    id: 5,
+    avatar: "https://images.unsplash.com/photo-1567515004624-219c11d31f2e",
+    quote: "InStamp has completely transformed how we engage with our regular customers. The ROI is incredible.",
+    author: "David Brown",
+    business: "City Barbershop"
+  }];
 
   // Top categories data with Lucide icons
-  const topCategories = [
-    {
-      name: "Salons",
-      icon: Scissors,
-    },
-    {
-      name: "Spas",
-      icon: Gift, // Using Gift as a substitute for spa
-    },
-    {
-      name: "Nail Bars",
-      icon: Star, // Using Star as a substitute for nail bar
-    },
-    {
-      name: "Cafes",
-      icon: Coffee,
-    },
-    {
-      name: "Car Wash",
-      icon: Car,
-    },
-    {
-      name: "Fitness",
-      icon: Dumbbell,
-    },
-  ];
-  
+  const topCategories = [{
+    name: "Salons",
+    icon: Scissors
+  }, {
+    name: "Spas",
+    icon: Gift // Using Gift as a substitute for spa
+  }, {
+    name: "Nail Bars",
+    icon: Star // Using Star as a substitute for nail bar
+  }, {
+    name: "Cafes",
+    icon: Coffee
+  }, {
+    name: "Car Wash",
+    icon: Car
+  }, {
+    name: "Fitness",
+    icon: Dumbbell
+  }];
   return <div className="min-h-screen bg-white font-['Inter'] overflow-x-hidden">
       {/* Header/Navigation */}
       <header className="bg-white text-slate-800 px-4 py-4 sticky top-0 z-50 border-b border-slate-100 shadow-sm">
@@ -320,25 +304,21 @@ const LandingPage = () => {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Top <span className="text-blue-600">Categories</span>
-            </h2>
+            
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Our digital loyalty platform works perfectly for all these business types and more
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
             {topCategories.map((category, index) => {
-              const IconComponent = category.icon;
-              return (
-                <div key={index} className="flex flex-col items-center group">
+            const IconComponent = category.icon;
+            return <div key={index} className="flex flex-col items-center group">
                   <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-blue-50 flex items-center justify-center mb-4 shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
                     <IconComponent size={36} className="text-blue-600" />
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800">{category.name}</h3>
-                </div>
-              );
-            })}
+                </div>;
+          })}
           </div>
         </div>
       </section>
@@ -675,16 +655,7 @@ const LandingPage = () => {
                   
                   {/* Testimonial navigation dots */}
                   <div className="flex justify-center mt-8 md:justify-start space-x-2">
-                    {testimonials.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setActiveTestimonial(index + 1)}
-                        className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                          activeTestimonial === index + 1 ? 'bg-blue-600 w-6' : 'bg-gray-300'
-                        }`}
-                        aria-label={`View testimonial ${index + 1}`}
-                      />
-                    ))}
+                    {testimonials.map((_, index) => <button key={index} onClick={() => setActiveTestimonial(index + 1)} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${activeTestimonial === index + 1 ? 'bg-blue-600 w-6' : 'bg-gray-300'}`} aria-label={`View testimonial ${index + 1}`} />)}
                   </div>
                 </div>
               </div>
