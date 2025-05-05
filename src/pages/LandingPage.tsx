@@ -9,6 +9,7 @@ import useWindowSize from "@/hooks/useWindowSize";
 import RewardsCard from "@/components/loyalty/RewardsCard";
 import CookieConsent from "@/components/CookieConsent";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
 const LandingPage = () => {
   const navigate = useNavigate();
   const {
@@ -300,23 +301,21 @@ const LandingPage = () => {
         </div>
       </section>
       
-      {/* Top Categories Section - Updated with stamp icons */}
-      <section className="py-16 bg-white">
+      {/* Top Categories Section - Redesigned to be more compact and themed */}
+      <section className="py-12 bg-gradient-to-b from-blue-50/50 to-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            
-            
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-4 max-w-5xl mx-auto">
             {topCategories.map((category, index) => {
-            const IconComponent = category.icon;
-            return <div key={index} className="flex flex-col items-center group">
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-blue-50 flex items-center justify-center mb-4 shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
-                    <IconComponent size={36} className="text-blue-600" />
+              const IconComponent = category.icon;
+              return (
+                <div key={index} className="flex flex-col items-center group transition-all duration-300 hover:scale-105">
+                  <div className="w-16 h-16 rounded-full bg-blue-100 border-2 border-blue-200 flex items-center justify-center mb-2 text-blue-600 shadow-sm hover:shadow-md transition-all duration-300">
+                    <IconComponent size={24} />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800">{category.name}</h3>
-                </div>;
-          })}
+                  <h3 className="text-sm font-semibold text-gray-800">{category.name}</h3>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
