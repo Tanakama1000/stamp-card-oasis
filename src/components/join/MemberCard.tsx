@@ -7,6 +7,7 @@ import { Coffee, ScanQrCode } from "lucide-react";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import QRScannerDialog from "@/components/QRScannerDialog";
 import RewardsCard from "@/components/loyalty/RewardsCard";
+import CookieConsent from "@/components/CookieConsent";
 
 interface MemberCardProps {
   businessName: string;
@@ -106,7 +107,6 @@ const MemberCard: React.FC<MemberCardProps> = ({
           
           <div className="mt-6">
             <RewardsCard 
-              rewardsCount={Math.floor(stamps / (loyaltyCardConfig?.maxStamps || 10))}
               totalStamps={totalStampsCollected}
               textColor={themeColor}
               accentColor={loyaltyCardConfig?.stampBgColor || "#E5F0FF"}
@@ -120,6 +120,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
           onSuccessfulScan={onSuccessfulScan}
         />
       </div>
+      <CookieConsent />
     </Layout>
   );
 };

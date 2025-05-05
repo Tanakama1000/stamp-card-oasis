@@ -80,7 +80,7 @@ const RewardCard: React.FC<RewardCardProps> = ({
     updateRewardStats();
   }, [showReward, businessId]);
 
-  // Reset handler
+  // Reset handler - preserve total_stamps_collected when resetting the card
   const handleReset = async () => {
     if (!businessId) {
       console.error('No business ID provided');
