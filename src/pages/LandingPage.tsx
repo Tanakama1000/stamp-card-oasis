@@ -305,9 +305,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Our digital loyalty platform works perfectly for all these business types and more
-            </p>
+            
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
             {topCategories.map((category, index) => {
