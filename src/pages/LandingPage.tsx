@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -59,7 +58,7 @@ const LandingPage = () => {
     answer: "No! That's one of the main benefits of InStamp. Your customers can access their loyalty cards directly through a link or QR code scan in their mobile browser. No app downloads required, making it incredibly convenient."
   }, {
     question: "How much does InStamp cost?",
-    answer: "InStamp offers a 30-day free trial with full access to all features. After that, we have affordable monthly plans starting at $29/month for small businesses. Custom enterprise plans are available for larger businesses with multiple locations."
+    answer: "InStamp offers a 30-day free trial with full access to all features. After that, we have affordable monthly plans at R200/month for small businesses."
   }, {
     question: "Can I customize the loyalty cards to match my brand?",
     answer: "Absolutely! InStamp allows you to customize your loyalty cards with your logo, brand colors, custom rewards, and personalized messaging. Make your loyalty program an extension of your brand identity."
@@ -313,7 +312,7 @@ const LandingPage = () => {
         </div>
       </section>
       
-      {/* Top Categories Section - New section replacing "A Platform Suitable For All" */}
+      {/* Top Categories Section - Improved UI */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -425,7 +424,7 @@ const LandingPage = () => {
         </div>
       </section>
       
-      {/* Benefits Section */}
+      {/* Benefits Section - Styled similar to first picture */}
       <section id="benefits" className="section-padding bg-gradient-to-b from-blue-50/30 to-white">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -436,38 +435,158 @@ const LandingPage = () => {
             <p className="text-lg text-gray-600">Benefits that create a win-win loyalty experience</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <Card className="card-gradient p-8 shadow-lg rounded-xl staggered-fade-in staggered-delay-1">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                  <CreditCard size={24} className="text-blue-600" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+            {/* Traditional Cold Outbound */}
+            <div className="bg-gray-50 rounded-xl p-8 relative overflow-hidden border border-gray-100">
+              <div className="absolute top-6 right-6">
+                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                  <X size={16} className="text-red-500" />
                 </div>
-                <h3 className="text-2xl font-semibold">For Businesses</h3>
               </div>
               
-              <ul className="space-y-4">
-                {["Increase customer retention by up to 35%", "Drive more repeat visits and higher spending", "Collect valuable customer data and insights", "Build stronger relationships with your audience", "Differentiate from competitors"].map((benefit, i) => <li key={i} className="flex items-start gap-3">
-                    <Check size={20} className="text-blue-600 mt-1 flex-shrink-0" />
-                    <span>{benefit}</span>
-                  </li>)}
-              </ul>
-            </Card>
+              <h3 className="text-2xl font-bold mb-8 text-gray-800">Traditional Loyalty Programs</h3>
+              
+              <div className="space-y-6">
+                <div className="flex items-start">
+                  <div className="mr-4 mt-1">
+                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                      <X size={16} className="text-red-500" />
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800 text-lg">Physical cards get lost</h4>
+                    <p className="text-gray-600">Customers forget or lose punch cards</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="mr-4 mt-1">
+                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                      <X size={16} className="text-red-500" />
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800 text-lg">No valuable data</h4>
+                    <p className="text-gray-600">No insights on customer behavior</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="mr-4 mt-1">
+                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                      <X size={16} className="text-red-500" />
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800 text-lg">Prone to fraud</h4>
+                    <p className="text-gray-600">Easy to counterfeit paper cards</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4 mt-10">
+                <div className="text-center">
+                  <div className="flex justify-center">
+                    <div className="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center mb-2">
+                      <CreditCard size={24} className="text-red-500" />
+                    </div>
+                  </div>
+                  <p className="text-sm font-medium text-red-500">Paper Cards</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex justify-center">
+                    <div className="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center mb-2">
+                      <Mail size={24} className="text-red-500" />
+                    </div>
+                  </div>
+                  <p className="text-sm font-medium text-red-500">Manual Tracking</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex justify-center">
+                    <div className="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center mb-2">
+                      <Users size={24} className="text-red-500" />
+                    </div>
+                  </div>
+                  <p className="text-sm font-medium text-red-500">Basic Rewards</p>
+                </div>
+              </div>
+            </div>
             
-            <Card className="card-gradient p-8 shadow-lg rounded-xl staggered-fade-in staggered-delay-2">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                  <Users size={24} className="text-purple-600" />
+            {/* AI Organic Outbound */}
+            <div className="bg-blue-50 rounded-xl p-8 relative overflow-hidden border border-blue-100">
+              <div className="absolute top-6 right-6">
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                  <Check size={16} className="text-blue-600" />
                 </div>
-                <h3 className="text-2xl font-semibold">For Customers</h3>
               </div>
               
-              <ul className="space-y-4">
-                {["Earn rewards at their favorite local businesses", "No need to download apps or carry physical cards", "Access loyalty program from any device", "Track progress toward rewards in real-time", "Discover exclusive offers and promotions"].map((benefit, i) => <li key={i} className="flex items-start gap-3">
-                    <Check size={20} className="text-purple-600 mt-1 flex-shrink-0" />
-                    <span>{benefit}</span>
-                  </li>)}
-              </ul>
-            </Card>
+              <h3 className="text-2xl font-bold mb-8 text-gray-800">InStamp Digital Loyalty</h3>
+              
+              <div className="space-y-6">
+                <div className="flex items-start">
+                  <div className="mr-4 mt-1">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                      <Check size={16} className="text-blue-600" />
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800 text-lg">15x higher retention rates</h4>
+                    <p className="text-gray-600">Build loyalty that drives repeat business</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="mr-4 mt-1">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                      <Check size={16} className="text-blue-600" />
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800 text-lg">Key customer insights</h4>
+                    <p className="text-gray-600">Track the entire customer journey</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="mr-4 mt-1">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                      <Check size={16} className="text-blue-600" />
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800 text-lg">Fully automated growth</h4>
+                    <p className="text-gray-600">Digital-first loyalty engagement</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4 mt-10">
+                <div className="text-center">
+                  <div className="flex justify-center">
+                    <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center mb-2">
+                      <Users size={24} className="text-blue-600" />
+                    </div>
+                  </div>
+                  <p className="text-sm font-medium text-blue-600">Engagement</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex justify-center">
+                    <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center mb-2">
+                      <Star size={24} className="text-blue-600" />
+                    </div>
+                  </div>
+                  <p className="text-sm font-medium text-blue-600">Trust Building</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex justify-center">
+                    <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center mb-2">
+                      <TrendingUp size={24} className="text-blue-600" />
+                    </div>
+                  </div>
+                  <p className="text-sm font-medium text-blue-600">Win More Deals</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -534,7 +653,7 @@ const LandingPage = () => {
                   
                   <div className="flex items-center">
                     <div className="mr-4">
-                      <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-blue-100 md:hidden">
+                      <div className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center">
                         <Avatar>
                           <AvatarImage src={testimonials[activeTestimonial - 1].avatar} alt="User" className="w-full h-full object-cover" />
                           <AvatarFallback>{testimonials[activeTestimonial - 1].author.substring(0, 2)}</AvatarFallback>
