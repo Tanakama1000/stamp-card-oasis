@@ -96,6 +96,7 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
 
           // Calculate total stamps collected over all time (permanent stat)
           const totalStampCountAllTime = membersData.reduce((sum, member) => {
+            // Sum up total_stamps_collected across all members for the business
             const totalCollected = member.total_stamps_collected !== null && 
                                   member.total_stamps_collected !== undefined ? 
                                   member.total_stamps_collected : 0;
