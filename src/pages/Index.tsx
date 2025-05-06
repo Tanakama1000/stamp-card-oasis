@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -9,6 +8,7 @@ import { Gift, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
 import { supabase } from "@/integrations/supabase/client";
+import CookieConsent from "@/components/CookieConsent";
 
 const Index = () => {
   const { toast } = useToast();
@@ -18,6 +18,8 @@ const Index = () => {
   const maxStamps = cardStyle?.maxStamps || 10;
   const [totalEarned, setTotalEarned] = useState<number>(0);
   const [businessId, setBusinessId] = useState<string>("");
+  const [totalStampsCollected, setTotalStampsCollected] = useState<number>(0);
+  const [memberId, setMemberId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserStats = async () => {
@@ -59,11 +61,15 @@ const Index = () => {
             .maybeSingle();
 
           if (!error && membershipData) {
+            // Set all membership data including persistent total_stamps_collected
+            setMemberId(membershipData.id);
             setStamps(membershipData.stamps || 0);
             setTotalEarned(membershipData.total_rewards_earned || 0);
             setCustomerName(membershipData.customer_name || '');
+            setTotalStampsCollected(membershipData.total_stamps_collected || 0);
+            console.log("Retrieved total_stamps_collected from database:", membershipData.total_stamps_collected);
           } else {
-            const { error: insertError } = await supabase
+            const { data: newMember, error: insertError } = await supabase
               .from('business_members')
               .insert({
                 business_id: businessId,
@@ -72,10 +78,14 @@ const Index = () => {
                 stamps: 0,
                 total_rewards_earned: 0,
                 total_stamps_collected: 0
-              });
+              })
+              .select('id')
+              .single();
 
             if (insertError) {
               console.error('Error creating membership:', insertError);
+            } else if (newMember) {
+              setMemberId(newMember.id);
             }
           }
         }
@@ -113,6 +123,7 @@ const Index = () => {
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
 
+      // Fetch current membership data first
       const { data: membership, error: fetchError } = await supabase
         .from('business_members')
         .select('*')
@@ -123,21 +134,25 @@ const Index = () => {
       if (fetchError) throw fetchError;
 
       const newStamps = stamps + 1;
-      // Increment both current stamps and total stamps collected (permanent stat)
+      
+      // Important: Increment both current stamps and total stamps collected (permanent stat)
+      // Even if we reset the card, total_stamps_collected keeps growing
       const newTotalStampsCollected = membership ? (membership.total_stamps_collected || 0) + 1 : 1;
+      setTotalStampsCollected(newTotalStampsCollected);
       
       if (membership) {
         const { error: updateError } = await supabase
           .from('business_members')
           .update({
-            stamps: newStamps, // Card-cycle data
-            total_stamps_collected: newTotalStampsCollected // Permanent stat
+            stamps: newStamps, 
+            total_stamps_collected: newTotalStampsCollected // Update the persistent counter
           })
           .eq('id', membership.id);
 
         if (updateError) throw updateError;
+        setMemberId(membership.id);
       } else {
-        const { error: insertError } = await supabase
+        const { data: newMembership, error: insertError } = await supabase
           .from('business_members')
           .insert({
             business_id: businessId,
@@ -145,9 +160,12 @@ const Index = () => {
             is_anonymous: !userId,
             stamps: newStamps,
             total_stamps_collected: 1
-          });
+          })
+          .select('id')
+          .single();
 
         if (insertError) throw insertError;
+        if (newMembership) setMemberId(newMembership.id);
       }
 
       setStamps(newStamps);
@@ -167,9 +185,31 @@ const Index = () => {
     }
   };
   
-  const handleCardReset = () => {
+  const handleCardReset = async () => {
     console.log("Card reset in Index.tsx");
+    
+    // Reset the current card stamps but NOT the total stamps collected
     setStamps(0);
+    
+    // Update Supabase if we have a membership ID
+    if (businessId && memberId) {
+      try {
+        const { error } = await supabase
+          .from('business_members')
+          .update({
+            stamps: 0 // Reset only the current stamps
+            // Do NOT update total_stamps_collected here
+          })
+          .eq('id', memberId);
+          
+        if (error) {
+          console.error("Error resetting stamps in database:", error);
+        }
+      } catch (error) {
+        console.error("Exception while resetting stamps:", error);
+      }
+    }
+    
     localStorage.setItem('stamps', '0');
     
     const historicalEarned = totalEarned;
@@ -178,7 +218,8 @@ const Index = () => {
   
   useEffect(() => {
     console.log("Current business ID:", businessId);
-  }, [businessId]);
+    console.log("Current total stamps collected:", totalStampsCollected);
+  }, [businessId, totalStampsCollected]);
   
   const handleSaveName = async () => {
     if (!businessId) return;
@@ -303,6 +344,7 @@ const Index = () => {
           />
         </div>
       </div>
+      <CookieConsent />
     </Layout>
   );
 };

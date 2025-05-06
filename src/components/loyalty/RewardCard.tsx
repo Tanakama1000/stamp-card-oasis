@@ -106,6 +106,7 @@ const RewardCard: React.FC<RewardCardProps> = ({
         const newRedeemedRewards = (membership.redeemed_rewards || 0) + 1;
         
         // Update redeemed rewards count in database
+        // IMPORTANT: Do NOT modify total_stamps_collected here
         const { error: updateError } = await supabase
           .from('business_members')
           .update({
