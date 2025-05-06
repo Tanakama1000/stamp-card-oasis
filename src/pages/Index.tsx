@@ -20,9 +20,11 @@ const Index = () => {
   const [businessId, setBusinessId] = useState<string>("");
   const [totalStampsCollected, setTotalStampsCollected] = useState<number>(0);
   const [memberId, setMemberId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchUserStats = async () => {
+      setIsLoading(true);
       try {
         const { data: { session } } = await supabase.auth.getSession();
         const userId = session?.user?.id;
@@ -53,6 +55,16 @@ const Index = () => {
         }
 
         if (businessId) {
+          // Generate a consistent anonymous ID if user is not logged in
+          let anonymousId = localStorage.getItem('anonymousUserId');
+          if (!userId && !anonymousId) {
+            anonymousId = crypto.randomUUID();
+            localStorage.setItem('anonymousUserId', anonymousId);
+          }
+          
+          console.log("Fetching membership data with businessId:", businessId);
+          console.log("User ID:", userId || "Anonymous");
+          
           const { data: membershipData, error } = await supabase
             .from('business_members')
             .select('*')
@@ -60,15 +72,25 @@ const Index = () => {
             .eq(userId ? 'user_id' : 'is_anonymous', userId || true)
             .maybeSingle();
 
-          if (!error && membershipData) {
+          if (error) {
+            console.error('Error fetching membership data:', error);
+            throw error;
+          }
+
+          if (membershipData) {
+            console.log("Retrieved membership data:", membershipData);
             // Set all membership data including persistent total_stamps_collected
             setMemberId(membershipData.id);
             setStamps(membershipData.stamps || 0);
             setTotalEarned(membershipData.total_rewards_earned || 0);
             setCustomerName(membershipData.customer_name || '');
-            setTotalStampsCollected(membershipData.total_stamps_collected || 0);
-            console.log("Retrieved total_stamps_collected from database:", membershipData.total_stamps_collected);
+            
+            // Explicitly set total stamps collected with proper logging
+            const totalStamps = membershipData.total_stamps_collected || 0;
+            setTotalStampsCollected(totalStamps);
+            console.log("Retrieved total_stamps_collected from database:", totalStamps);
           } else {
+            console.log("No existing membership found, creating new one");
             const { data: newMember, error: insertError } = await supabase
               .from('business_members')
               .insert({
@@ -77,32 +99,81 @@ const Index = () => {
                 is_anonymous: !userId,
                 stamps: 0,
                 total_rewards_earned: 0,
-                total_stamps_collected: 0
+                total_stamps_collected: 0,
+                customer_name: ''
               })
               .select('id')
               .single();
 
             if (insertError) {
               console.error('Error creating membership:', insertError);
+              toast({
+                title: "Error",
+                description: "Failed to create your loyalty card. Please try again.",
+                variant: "destructive",
+              });
             } else if (newMember) {
+              console.log("Created new membership:", newMember);
               setMemberId(newMember.id);
+              setStamps(0);
+              setTotalStampsCollected(0);
             }
           }
         }
       } catch (error) {
         console.error('Error fetching user stats:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load your loyalty card. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchUserStats();
-  }, [businessId]);
+  }, [businessId, toast]);
+
+  useEffect(() => {
+    // Only run this when we have a valid businessId and we're not initially loading
+    if (businessId && !isLoading) {
+      console.log("Business ID is set, checking for membership data");
+      const checkMembershipData = async () => {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          const userId = session?.user?.id;
+          
+          const { data: membershipData, error } = await supabase
+            .from('business_members')
+            .select('total_stamps_collected, stamps')
+            .eq('business_id', businessId)
+            .eq(userId ? 'user_id' : 'is_anonymous', userId || true)
+            .maybeSingle();
+            
+          if (error) {
+            console.error('Error checking membership data:', error);
+            return;
+          }
+          
+          if (membershipData) {
+            console.log("Membership data validation check:", membershipData);
+            // Ensure our state matches what's in the database
+            setTotalStampsCollected(membershipData.total_stamps_collected || 0);
+            setStamps(membershipData.stamps || 0);
+          }
+        } catch (error) {
+          console.error('Error checking membership data:', error);
+        }
+      };
+      
+      checkMembershipData();
+    }
+  }, [businessId, isLoading]);
 
   useEffect(() => {
     const earnedRewards = Math.floor(stamps / maxStamps);
     setTotalEarned(earnedRewards);
-    
-    localStorage.setItem('stamps', stamps.toString());
-    localStorage.setItem('totalEarned', earnedRewards.toString());
   }, [stamps, maxStamps]);
 
   const handleFallbackBusinessId = () => {
@@ -117,7 +188,10 @@ const Index = () => {
   };
 
   const handleStampCollected = async () => {
-    if (!businessId) return;
+    if (!businessId) {
+      console.error("No business ID available");
+      return;
+    }
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -131,13 +205,17 @@ const Index = () => {
         .eq(userId ? 'user_id' : 'is_anonymous', userId || true)
         .maybeSingle();
 
-      if (fetchError) throw fetchError;
+      if (fetchError) {
+        console.error('Error fetching membership:', fetchError);
+        throw fetchError;
+      }
 
       const newStamps = stamps + 1;
       
       // Important: Increment both current stamps and total stamps collected (permanent stat)
       // Even if we reset the card, total_stamps_collected keeps growing
-      const newTotalStampsCollected = membership ? (membership.total_stamps_collected || 0) + 1 : 1;
+      const newTotalStampsCollected = (membership?.total_stamps_collected || 0) + 1;
+      console.log("Incrementing total stamps collected to:", newTotalStampsCollected);
       setTotalStampsCollected(newTotalStampsCollected);
       
       if (membership) {
@@ -149,8 +227,12 @@ const Index = () => {
           })
           .eq('id', membership.id);
 
-        if (updateError) throw updateError;
+        if (updateError) {
+          console.error('Error updating stamps:', updateError);
+          throw updateError;
+        }
         setMemberId(membership.id);
+        console.log("Updated membership:", membership.id, "stamps:", newStamps, "total:", newTotalStampsCollected);
       } else {
         const { data: newMembership, error: insertError } = await supabase
           .from('business_members')
@@ -159,13 +241,20 @@ const Index = () => {
             user_id: userId,
             is_anonymous: !userId,
             stamps: newStamps,
-            total_stamps_collected: 1
+            total_stamps_collected: 1,
+            customer_name: customerName
           })
           .select('id')
           .single();
 
-        if (insertError) throw insertError;
-        if (newMembership) setMemberId(newMembership.id);
+        if (insertError) {
+          console.error('Error creating new membership:', insertError);
+          throw insertError;
+        }
+        if (newMembership) {
+          console.log("Created new membership with stamps:", newStamps);
+          setMemberId(newMembership.id);
+        }
       }
 
       setStamps(newStamps);
@@ -188,38 +277,57 @@ const Index = () => {
   const handleCardReset = async () => {
     console.log("Card reset in Index.tsx");
     
-    // Reset the current card stamps but NOT the total stamps collected
-    setStamps(0);
-    
-    // Update Supabase if we have a membership ID
-    if (businessId && memberId) {
-      try {
-        const { error } = await supabase
-          .from('business_members')
-          .update({
-            stamps: 0 // Reset only the current stamps
-            // Do NOT update total_stamps_collected here
-          })
-          .eq('id', memberId);
-          
-        if (error) {
-          console.error("Error resetting stamps in database:", error);
-        }
-      } catch (error) {
-        console.error("Exception while resetting stamps:", error);
-      }
+    if (!businessId || !memberId) {
+      console.error("Missing business ID or member ID for reset");
+      return;
     }
     
-    localStorage.setItem('stamps', '0');
-    
-    const historicalEarned = totalEarned;
-    localStorage.setItem('totalEarned', historicalEarned.toString());
+    try {
+      // Get current data before updating to ensure we keep the total_stamps_collected value
+      const { data: currentMembership, error: fetchError } = await supabase
+        .from('business_members')
+        .select('total_stamps_collected')
+        .eq('id', memberId)
+        .single();
+        
+      if (fetchError) {
+        console.error("Error fetching current membership data:", fetchError);
+        throw fetchError;
+      }
+      
+      // Make sure we preserve the total_stamps_collected value
+      const preservedTotal = currentMembership?.total_stamps_collected || 0;
+      console.log("Preserving total stamps collected during reset:", preservedTotal);
+      
+      // Reset the current card stamps but NOT the total stamps collected
+      const { error } = await supabase
+        .from('business_members')
+        .update({
+          stamps: 0, // Reset only the current stamps
+          // Explicitly set the total_stamps_collected to its current value to ensure it's preserved
+          total_stamps_collected: preservedTotal
+        })
+        .eq('id', memberId);
+          
+      if (error) {
+        console.error("Error resetting stamps in database:", error);
+        throw error;
+      }
+      
+      // Update local state
+      setStamps(0);
+      setTotalStampsCollected(preservedTotal);
+      console.log("Card reset complete. Stamps: 0, Total preserved:", preservedTotal);
+      
+    } catch (error) {
+      console.error("Exception while resetting stamps:", error);
+      toast({
+        title: "Error",
+        description: "Failed to reset your card. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
-  
-  useEffect(() => {
-    console.log("Current business ID:", businessId);
-    console.log("Current total stamps collected:", totalStampsCollected);
-  }, [businessId, totalStampsCollected]);
   
   const handleSaveName = async () => {
     if (!businessId) return;
@@ -237,8 +345,6 @@ const Index = () => {
         .eq(userId ? 'user_id' : 'is_anonymous', userId || true);
 
       if (error) throw error;
-
-      localStorage.setItem('customerName', customerName);
       
       if (customerName.trim()) {
         toast({
@@ -265,7 +371,6 @@ const Index = () => {
 
   const miniRewards = cardStyle?.rewards || [];
   const sortedRewards = [...(miniRewards || [])].sort((a, b) => a.stampNumber - b.stampNumber);
-  const availableRewards = Math.floor(stamps / maxStamps);
 
   return (
     <Layout>

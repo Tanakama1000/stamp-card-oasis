@@ -27,6 +27,7 @@ const RewardsCard: React.FC<RewardsCardProps> = ({
         <div 
           className="text-5xl font-bold mb-2" 
           style={{ color: textColor }}
+          data-testid="total-stamps-count"
         >
           {totalStamps}
         </div>

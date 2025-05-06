@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import LoyaltyCard from "@/components/LoyaltyCard";
 import QRScannerDialog from "@/components/QRScannerDialog";
 import RewardsCard from "@/components/loyalty/RewardsCard";
 import CookieConsent from "@/components/CookieConsent";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MemberCardProps {
   businessName: string;
@@ -41,6 +42,41 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onSuccessfulScan
 }) => {
   const themeColor = loyaltyCardConfig?.businessNameColor || "#0EA5E9";
+  const [verifiedTotalStamps, setVerifiedTotalStamps] = useState<number>(totalStampsCollected);
+  
+  // Double check the total stamps value from database to ensure it's accurate
+  useEffect(() => {
+    const verifyTotalStamps = async () => {
+      if (!businessData?.id) return;
+      
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const currentUserId = session?.user?.id;
+        
+        const { data: membershipData, error } = await supabase
+          .from('business_members')
+          .select('total_stamps_collected')
+          .eq('business_id', businessData.id)
+          .eq(currentUserId ? 'user_id' : 'is_anonymous', currentUserId || true)
+          .maybeSingle();
+          
+        if (error) {
+          console.error('Error verifying total stamps:', error);
+          return;
+        }
+        
+        if (membershipData) {
+          const dbTotalStamps = membershipData.total_stamps_collected || 0;
+          console.log("Verified total stamps from database:", dbTotalStamps);
+          setVerifiedTotalStamps(dbTotalStamps);
+        }
+      } catch (error) {
+        console.error('Exception verifying total stamps:', error);
+      }
+    };
+    
+    verifyTotalStamps();
+  }, [businessData?.id, totalStampsCollected]);
   
   return (
     <Layout>
@@ -107,7 +143,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
           
           <div className="mt-6">
             <RewardsCard 
-              totalStamps={totalStampsCollected}
+              totalStamps={verifiedTotalStamps}
               textColor={themeColor}
               accentColor={loyaltyCardConfig?.stampBgColor || "#E5F0FF"}
             />
