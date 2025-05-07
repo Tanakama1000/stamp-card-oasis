@@ -1,6 +1,6 @@
 
 import { Card } from "@/components/ui/card";
-import { Users, Award, Coffee, TrendingUp } from "lucide-react";
+import { Users, Award, Coffee, TrendingUp, Stamp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -47,6 +47,7 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
   const [totalStamps, setTotalStamps] = useState(0);
   const [rewardsRedeemed, setRewardsRedeemed] = useState(0);
   const [conversionRate, setConversionRate] = useState("0%");
+  const [allCustomerStamps, setAllCustomerStamps] = useState(0); // New state for all stamps
   const [isLoading, setIsLoading] = useState(true);
 
   const saveStatsToStorage = (stats: any) => {
@@ -76,6 +77,7 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
         setTotalStamps(savedStats.totalStamps || 0);
         setRewardsRedeemed(savedStats.rewardsRedeemed || 0);
         setConversionRate(savedStats.conversionRate || "0%");
+        setAllCustomerStamps(savedStats.allCustomerStamps || 0); // Load from storage
         setIsLoading(false);
       }
       await updateStatsFromSupabase();
@@ -109,6 +111,14 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
             return sum + totalCollected;
           }, 0);
 
+          // Calculate all customer stamps (sum of current active stamps)
+          const activeStampsCount = membersData.reduce((sum, member) => {
+            const currentStamps = member.stamps !== null && 
+                                member.stamps !== undefined ? 
+                                member.stamps : 0;
+            return sum + currentStamps;
+          }, 0);
+
           // Calculate total rewards redeemed (permanent stat)
           const totalRewardsRedeemed = membersData.reduce((sum, member) => {
             const redeemed = member.redeemed_rewards !== null && 
@@ -133,12 +143,14 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
 
           setTotalCustomers(customerCount);
           setTotalStamps(totalStampCount);
+          setAllCustomerStamps(activeStampsCount); // Set the active stamps count
           setRewardsRedeemed(totalRewardsRedeemed);
           setConversionRate(conversionRateValue);
 
           saveStatsToStorage({
             totalCustomers: customerCount,
             totalStamps: totalStampCount,
+            allCustomerStamps: activeStampsCount, // Save to storage
             rewardsRedeemed: totalRewardsRedeemed,
             conversionRate: conversionRateValue
           });
@@ -162,7 +174,7 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
   }, [businessId]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
       <StatsCard 
         title="Total Customers" 
         value={totalCustomers} 
@@ -184,6 +196,14 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
         value={totalStamps} 
         icon={<Coffee size={20} />} 
         description="All-time stamps collected" 
+        isLoading={isLoading} 
+      />
+
+      <StatsCard 
+        title="Active Stamps" 
+        value={allCustomerStamps} 
+        icon={<Stamp size={20} />} 
+        description="Current stamps on cards" 
         isLoading={isLoading} 
       />
       
