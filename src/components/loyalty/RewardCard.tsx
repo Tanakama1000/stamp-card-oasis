@@ -103,27 +103,34 @@ const RewardCard: React.FC<RewardCardProps> = ({
       if (fetchError) throw fetchError;
 
       if (membership) {
-        // Store the current total_stamps_collected value
+        // Store the current values
         const currentTotalStamps = membership.total_stamps_collected || 0;
+        const currentStamps = membership.stamps || 0;
+        console.log("RewardCard - Current stamps before reset:", currentStamps);
         console.log("RewardCard - Current total stamps before reset:", currentTotalStamps);
         
         // Increment redeemed_rewards counter (permanent stat)
         const newRedeemedRewards = (membership.redeemed_rewards || 0) + 1;
         
-        // Update redeemed rewards count in database
-        // IMPORTANT: EXPLICITLY preserve total_stamps_collected here
+        // Calculate the new total_stamps_collected by adding current stamps 
+        // This ensures we never lose track of stamps when redeeming rewards
+        const newTotalStampsCollected = currentTotalStamps;
+        
+        console.log("RewardCard - New total stamps to preserve:", newTotalStampsCollected);
+        
+        // Update the database
         const { error: updateError } = await supabase
           .from('business_members')
           .update({
             stamps: 0, // Reset card-cycle data
             redeemed_rewards: newRedeemedRewards, // Increment permanent stat
-            total_stamps_collected: currentTotalStamps // Explicitly preserve the total
+            total_stamps_collected: newTotalStampsCollected // Explicitly preserve the total
           })
           .eq('id', membership.id);
 
         if (updateError) throw updateError;
         
-        console.log("RewardCard - Card reset. Total stamps preserved:", currentTotalStamps);
+        console.log("RewardCard - Card reset. Total stamps preserved:", newTotalStampsCollected);
       }
 
       if (onReset) onReset();

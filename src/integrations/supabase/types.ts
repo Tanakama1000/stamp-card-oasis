@@ -178,6 +178,10 @@ export type Database = {
         Args: { business_id_param: string }
         Returns: undefined
       }
+      fix_inconsistent_stamp_data: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       generate_unique_slug: {
         Args: { business_name: string }
         Returns: string

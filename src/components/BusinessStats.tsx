@@ -106,7 +106,14 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
                                   member.total_stamps_collected !== undefined ? 
                                   member.total_stamps_collected : 0;
             
-            return sum + totalCollected;
+            // We need to make sure we're using the larger value between total_stamps_collected
+            // and the sum of current stamps + (redeemed_rewards * maxStamps)
+            // This ensures we never lose track of stamps due to data inconsistencies
+            const redeemedRewards = member.redeemed_rewards || 0;
+            const estimatedTotalFromRedeemed = currentStamps + (redeemedRewards * 10); // assuming 10 stamps per reward
+            const bestTotalEstimate = Math.max(totalCollected, estimatedTotalFromRedeemed);
+            
+            return sum + bestTotalEstimate;
           }, 0);
 
           // Calculate total rewards redeemed (permanent stat)
@@ -142,6 +149,9 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
             rewardsRedeemed: totalRewardsRedeemed,
             conversionRate: conversionRateValue
           });
+          
+          // Log for debugging
+          console.log("BusinessStats - Total stamps calculated:", totalStampCount);
         }
       } catch (error) {
         console.error("Error fetching business stats:", error);
