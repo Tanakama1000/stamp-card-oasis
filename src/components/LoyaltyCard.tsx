@@ -13,6 +13,7 @@ import RewardCard from "./loyalty/RewardCard";
 import CardDialogs from "./loyalty/CardDialogs";
 import CardAnimations from "./loyalty/CardAnimations";
 import CustomerName from "./loyalty/CustomerName";
+import RewardsCard from "./loyalty/RewardsCard";
 import { LoyaltyCardProps } from "./loyalty/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 

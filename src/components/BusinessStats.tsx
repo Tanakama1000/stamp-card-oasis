@@ -94,12 +94,18 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
           // Calculate total customers (permanent stat)
           const customerCount = membersData.length;
 
-          // Calculate total stamps collected over all time (permanent stat)
-          const totalStampCountAllTime = membersData.reduce((sum, member) => {
-            // Sum up total_stamps_collected across all members for the business
+          // Calculate total stamps by summing both current active stamps and the historical total
+          const totalStampCount = membersData.reduce((sum, member) => {
+            // Current active stamps on cards
+            const currentStamps = member.stamps !== null && 
+                                member.stamps !== undefined ? 
+                                member.stamps : 0;
+            
+            // Plus all stamps ever collected (includes redeemed stamps)
             const totalCollected = member.total_stamps_collected !== null && 
                                   member.total_stamps_collected !== undefined ? 
                                   member.total_stamps_collected : 0;
+            
             return sum + totalCollected;
           }, 0);
 
@@ -126,13 +132,13 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
           }
 
           setTotalCustomers(customerCount);
-          setTotalStamps(totalStampCountAllTime);
+          setTotalStamps(totalStampCount);
           setRewardsRedeemed(totalRewardsRedeemed);
           setConversionRate(conversionRateValue);
 
           saveStatsToStorage({
             totalCustomers: customerCount,
-            totalStamps: totalStampCountAllTime,
+            totalStamps: totalStampCount,
             rewardsRedeemed: totalRewardsRedeemed,
             conversionRate: conversionRateValue
           });
