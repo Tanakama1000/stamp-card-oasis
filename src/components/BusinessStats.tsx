@@ -44,10 +44,9 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
   businessId
 }) => {
   const [totalCustomers, setTotalCustomers] = useState(0);
-  const [totalStamps, setTotalStamps] = useState(0);
   const [rewardsRedeemed, setRewardsRedeemed] = useState(0);
   const [conversionRate, setConversionRate] = useState("0%");
-  const [allCustomerStamps, setAllCustomerStamps] = useState(0); // New state for all stamps
+  const [allCustomerStamps, setAllCustomerStamps] = useState(0); // Renamed to represent all stamps collected
   const [isLoading, setIsLoading] = useState(true);
 
   const saveStatsToStorage = (stats: any) => {
@@ -74,10 +73,9 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
       const savedStats = loadStatsFromStorage();
       if (savedStats !== null && savedStats !== undefined) {
         setTotalCustomers(savedStats.totalCustomers || 0);
-        setTotalStamps(savedStats.totalStamps || 0);
         setRewardsRedeemed(savedStats.rewardsRedeemed || 0);
         setConversionRate(savedStats.conversionRate || "0%");
-        setAllCustomerStamps(savedStats.allCustomerStamps || 0); // Load from storage
+        setAllCustomerStamps(savedStats.allCustomerStamps || 0); 
         setIsLoading(false);
       }
       await updateStatsFromSupabase();
@@ -95,8 +93,8 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
         if (membersData) {
           // Calculate total customers (permanent stat)
           const customerCount = membersData.length;
-
-          // Calculate total stamps by summing both current active stamps and the historical total
+          
+          // Calculate all stamps ever collected (total of current active + redeemed stamps)
           const totalStampCount = membersData.reduce((sum, member) => {
             // Current active stamps on cards
             const currentStamps = member.stamps !== null && 
@@ -109,14 +107,6 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
                                   member.total_stamps_collected : 0;
             
             return sum + totalCollected;
-          }, 0);
-
-          // Calculate all customer stamps (sum of current active stamps)
-          const activeStampsCount = membersData.reduce((sum, member) => {
-            const currentStamps = member.stamps !== null && 
-                                member.stamps !== undefined ? 
-                                member.stamps : 0;
-            return sum + currentStamps;
           }, 0);
 
           // Calculate total rewards redeemed (permanent stat)
@@ -142,15 +132,13 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
           }
 
           setTotalCustomers(customerCount);
-          setTotalStamps(totalStampCount);
-          setAllCustomerStamps(activeStampsCount); // Set the active stamps count
+          setAllCustomerStamps(totalStampCount); // Now using totalStampCount for all stamps collected
           setRewardsRedeemed(totalRewardsRedeemed);
           setConversionRate(conversionRateValue);
 
           saveStatsToStorage({
             totalCustomers: customerCount,
-            totalStamps: totalStampCount,
-            allCustomerStamps: activeStampsCount, // Save to storage
+            allCustomerStamps: totalStampCount, // Save total stamps collected
             rewardsRedeemed: totalRewardsRedeemed,
             conversionRate: conversionRateValue
           });
@@ -174,7 +162,7 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
   }, [businessId]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       <StatsCard 
         title="Total Customers" 
         value={totalCustomers} 
@@ -190,20 +178,12 @@ const BusinessStats: React.FC<BusinessStatsProps> = ({
         description="Total rewards claimed" 
         isLoading={isLoading} 
       />
-      
-      <StatsCard 
-        title="Total Stamps" 
-        value={totalStamps} 
-        icon={<Coffee size={20} />} 
-        description="All-time stamps collected" 
-        isLoading={isLoading} 
-      />
 
       <StatsCard 
-        title="Active Stamps" 
+        title="All Stamps" 
         value={allCustomerStamps} 
         icon={<Stamp size={20} />} 
-        description="Current stamps on cards" 
+        description="All stamps ever collected" 
         isLoading={isLoading} 
       />
       
