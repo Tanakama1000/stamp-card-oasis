@@ -1,8 +1,6 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
-import RewardsCard from "@/components/loyalty/RewardsCard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -419,7 +417,7 @@ const Index = () => {
           </div>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8">
           <Card className="p-4 bg-white card-shadow">
             <h3 className="font-semibold text-coffee-dark mb-3">Update Your Name</h3>
             <div className="flex gap-2">
@@ -436,16 +434,6 @@ const Index = () => {
                 Save
               </Button>
             </div>
-          </Card>
-          
-          <Card className="p-4 bg-white card-shadow">
-            <h3 className="font-semibold text-coffee-dark mb-3">Your Collection Stats</h3>
-            <RewardsCard 
-              totalStamps={totalStampsCollected} 
-              businessId={businessId}
-              textColor="#8B4513"
-              accentColor="#F5F5DC"
-            />
           </Card>
         </div>
 

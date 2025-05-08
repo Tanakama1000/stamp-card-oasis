@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Coffee, ScanQrCode } from "lucide-react";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import QRScannerDialog from "@/components/QRScannerDialog";
-import RewardsCard from "@/components/loyalty/RewardsCard";
 import CookieConsent from "@/components/CookieConsent";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -141,13 +140,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
             </Button>
           </div>
           
-          <div className="mt-6">
-            <RewardsCard 
-              totalStamps={verifiedTotalStamps}
-              textColor={themeColor}
-              accentColor={loyaltyCardConfig?.stampBgColor || "#E5F0FF"}
-            />
-          </div>
+          {/* Removed the RewardsCard component from here */}
         </Card>
 
         <QRScannerDialog 
