@@ -69,7 +69,6 @@ const JoinForm: React.FC<JoinFormProps> = ({
                 onStampCollected={() => {}}
                 onReset={() => {}}
                 businessId=""
-                isPreview={true}
               />
             </div>
           )}
