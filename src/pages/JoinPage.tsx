@@ -223,7 +223,7 @@ const JoinPage = () => {
     fetchBusinessData();
   }, [businessSlug, businessName, userId, customerName]);
 
-  const handleJoin = async (e: React.FormEvent) => {
+  const handleJoin = async (e: React.FormEvent, referralCode?: string) => {
     e.preventDefault();
     
     if (!customerName.trim()) {
@@ -246,7 +246,8 @@ const JoinPage = () => {
             customer_name: customerName,
             is_anonymous: !userId,
             total_stamps_collected: 0,
-            total_rewards_earned: 0
+            total_rewards_earned: 0,
+            referred_by_code: referralCode?.toUpperCase() || null
           };
           
           if (userId) {
@@ -283,7 +284,8 @@ const JoinPage = () => {
               joinedAt: new Date().toISOString(),
               stamps: 0,
               totalStampsCollected: 0,
-              totalRewardsEarned: 0
+              totalRewardsEarned: 0,
+              referredByCode: referralCode?.toUpperCase() || null
             };
             
             const savedMemberships = localStorage.getItem('memberships') || '[]';
@@ -320,7 +322,7 @@ const JoinPage = () => {
     }
   };
 
-  const handleAuthSubmit = async (e: React.FormEvent) => {
+  const handleAuthSubmit = async (e: React.FormEvent, referralCode?: string) => {
     e.preventDefault();
     setAuthLoading(true);
     setAuthError(null);
@@ -361,7 +363,8 @@ const JoinPage = () => {
                 user_id: data.user.id,
                 is_anonymous: false,
                 total_stamps_collected: 0,
-                total_rewards_earned: 0
+                total_rewards_earned: 0,
+                referred_by_code: referralCode?.toUpperCase() || null
               };
               
               const { data: membership, error: membershipError } = await supabase
@@ -441,7 +444,8 @@ const JoinPage = () => {
                   user_id: data.user.id,
                   is_anonymous: false,
                   total_stamps_collected: 0,
-                  total_rewards_earned: 0
+                  total_rewards_earned: 0,
+                  referred_by_code: referralCode?.toUpperCase() || null
                 };
                 
                 const { data: newMembership, error: newMembershipError } = await supabase
@@ -506,6 +510,9 @@ const JoinPage = () => {
     const newRewards = Math.floor(newStamps / (loyaltyCardConfig?.maxStamps || 10));
     const newEarnedRewards = totalRewardsEarned + (newRewards > oldRewards ? 1 : 0);
     
+    // Check if this is the first stamp
+    const isFirstStamp = stamps === 0 && newStamps > 0;
+    
     setStamps(newStamps);
     setTotalStampsCollected(newTotalStamps);
     setTotalRewardsEarned(newEarnedRewards);
@@ -521,13 +528,20 @@ const JoinPage = () => {
     });
     
     if (businessData?.id && memberId) {
+      const updateData = { 
+        stamps: newStamps,
+        total_stamps_collected: newTotalStamps,
+        total_rewards_earned: newEarnedRewards
+      };
+      
+      // Mark first stamp as completed if this is the first stamp
+      if (isFirstStamp) {
+        updateData['first_stamp_completed'] = true;
+      }
+      
       supabase
         .from('business_members')
-        .update({ 
-          stamps: newStamps,
-          total_stamps_collected: newTotalStamps,
-          total_rewards_earned: newEarnedRewards
-        })
+        .update(updateData)
         .eq('id', memberId)
         .then(({ error }) => {
           if (error) {

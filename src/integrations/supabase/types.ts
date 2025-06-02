@@ -37,10 +37,14 @@ export type Database = {
         Row: {
           business_id: string
           customer_name: string | null
+          first_stamp_completed: boolean | null
           id: string
           is_anonymous: boolean | null
           joined_at: string
           redeemed_rewards: number | null
+          referral_bonus_awarded: boolean | null
+          referral_code: string | null
+          referred_by_code: string | null
           stamps: number | null
           total_rewards_earned: number | null
           total_stamps_collected: number | null
@@ -49,10 +53,14 @@ export type Database = {
         Insert: {
           business_id: string
           customer_name?: string | null
+          first_stamp_completed?: boolean | null
           id?: string
           is_anonymous?: boolean | null
           joined_at?: string
           redeemed_rewards?: number | null
+          referral_bonus_awarded?: boolean | null
+          referral_code?: string | null
+          referred_by_code?: string | null
           stamps?: number | null
           total_rewards_earned?: number | null
           total_stamps_collected?: number | null
@@ -61,10 +69,14 @@ export type Database = {
         Update: {
           business_id?: string
           customer_name?: string | null
+          first_stamp_completed?: boolean | null
           id?: string
           is_anonymous?: boolean | null
           joined_at?: string
           redeemed_rewards?: number | null
+          referral_bonus_awarded?: boolean | null
+          referral_code?: string | null
+          referred_by_code?: string | null
           stamps?: number | null
           total_rewards_earned?: number | null
           total_stamps_collected?: number | null
@@ -87,6 +99,8 @@ export type Database = {
           is_active: boolean
           name: string
           owner_id: string
+          referral_bonus_points: number | null
+          referral_enabled: boolean | null
           slug: string
           updated_at: string
         }
@@ -96,6 +110,8 @@ export type Database = {
           is_active?: boolean
           name: string
           owner_id: string
+          referral_bonus_points?: number | null
+          referral_enabled?: boolean | null
           slug: string
           updated_at?: string
         }
@@ -105,6 +121,8 @@ export type Database = {
           is_active?: boolean
           name?: string
           owner_id?: string
+          referral_bonus_points?: number | null
+          referral_enabled?: boolean | null
           slug?: string
           updated_at?: string
         }
@@ -181,6 +199,10 @@ export type Database = {
       fix_inconsistent_stamp_data: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      generate_referral_code: {
+        Args: { customer_name: string; member_id: string }
+        Returns: string
       }
       generate_unique_slug: {
         Args: { business_name: string }

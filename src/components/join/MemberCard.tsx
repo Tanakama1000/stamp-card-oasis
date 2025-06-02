@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
@@ -7,6 +6,7 @@ import { Coffee, ScanQrCode } from "lucide-react";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import QRScannerDialog from "@/components/QRScannerDialog";
 import CookieConsent from "@/components/CookieConsent";
+import ReferralCard from "@/components/referral/ReferralCard";
 import { supabase } from "@/integrations/supabase/client";
 
 interface MemberCardProps {
@@ -42,6 +42,9 @@ const MemberCard: React.FC<MemberCardProps> = ({
 }) => {
   const themeColor = loyaltyCardConfig?.businessNameColor || "#0EA5E9";
   const [verifiedTotalStamps, setVerifiedTotalStamps] = useState<number>(totalStampsCollected);
+  const [referralCode, setReferralCode] = useState<string>("");
+  const [referralEnabled, setReferralEnabled] = useState<boolean>(false);
+  const [bonusPoints, setBonusPoints] = useState<number>(5);
   
   // Double check the total stamps value from database to ensure it's accurate
   useEffect(() => {
@@ -76,6 +79,46 @@ const MemberCard: React.FC<MemberCardProps> = ({
     
     verifyTotalStamps();
   }, [businessData?.id, totalStampsCollected]);
+  
+  // Fetch referral code and business settings
+  useEffect(() => {
+    const fetchReferralData = async () => {
+      if (!businessData?.id) return;
+      
+      try {
+        // Get business referral settings
+        const { data: businessInfo, error: businessError } = await supabase
+          .from('businesses')
+          .select('referral_enabled, referral_bonus_points')
+          .eq('id', businessData.id)
+          .single();
+          
+        if (!businessError && businessInfo) {
+          setReferralEnabled(businessInfo.referral_enabled || false);
+          setBonusPoints(businessInfo.referral_bonus_points || 5);
+        }
+        
+        // Get user's referral code
+        const { data: { session } } = await supabase.auth.getSession();
+        const currentUserId = session?.user?.id;
+        
+        const { data: membershipData, error } = await supabase
+          .from('business_members')
+          .select('referral_code')
+          .eq('business_id', businessData.id)
+          .eq(currentUserId ? 'user_id' : 'is_anonymous', currentUserId || true)
+          .maybeSingle();
+          
+        if (!error && membershipData?.referral_code) {
+          setReferralCode(membershipData.referral_code);
+        }
+      } catch (error) {
+        console.error('Error fetching referral data:', error);
+      }
+    };
+    
+    fetchReferralData();
+  }, [businessData?.id]);
   
   return (
     <Layout>
@@ -140,7 +183,15 @@ const MemberCard: React.FC<MemberCardProps> = ({
             </Button>
           </div>
           
-          {/* Removed the RewardsCard component from here */}
+          {/* Show referral card if enabled and user has a referral code */}
+          {referralEnabled && referralCode && (
+            <ReferralCard
+              referralCode={referralCode}
+              businessName={businessName}
+              bonusPoints={bonusPoints}
+              themeColor={themeColor}
+            />
+          )}
         </Card>
 
         <QRScannerDialog 

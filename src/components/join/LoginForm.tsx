@@ -1,21 +1,23 @@
 
-import React from "react";
+import React, { useState } from "react";
 import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Coffee, LogIn, UserPlus, Loader2 } from "lucide-react";
+import ReferralInput from "@/components/referral/ReferralInput";
 
 interface LoginFormProps {
   isSignup: boolean;
-  setIsSignup: (value: boolean) => void;
+  setIsSignup: (signup: boolean) => void;
   email: string;
-  setEmail: (value: string) => void;
+  setEmail: (email: string) => void;
   password: string;
-  setPassword: (value: string) => void;
+  setPassword: (password: string) => void;
   customerName: string;
-  setCustomerName: (value: string) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  setCustomerName: (name: string) => void;
+  onSubmit: (e: React.FormEvent, referralCode?: string) => void;
   authLoading: boolean;
   authError: string | null;
 }
@@ -33,94 +35,95 @@ const LoginForm: React.FC<LoginFormProps> = ({
   authLoading,
   authError
 }) => {
+  const [referralCode, setReferralCode] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    onSubmit(e, referralCode);
+  };
+
   return (
     <Layout>
       <div className="max-w-md mx-auto mt-8">
         <Card className="p-6 bg-white card-shadow">
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold mb-1">
-              {isSignup ? 'Create an Account' : 'Login'}
+            <Coffee size={40} className="mx-auto mb-2 text-coffee-medium" />
+            <h2 className="text-2xl font-bold mb-2 text-coffee-dark">
+              {isSignup ? 'Create Account' : 'Sign In'}
             </h2>
-            <p className="text-gray-600">
-              {isSignup 
-                ? 'Join with an account to access loyalty cards and rewards' 
-                : 'Welcome back! Login to access your loyalty cards'}
+            <p className="text-coffee-medium">
+              {isSignup ? 'Join the loyalty program' : 'Access your loyalty cards'}
             </p>
           </div>
-          
+
           {authError && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
-              {authError}
-            </div>
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>{authError}</AlertDescription>
+            </Alert>
           )}
-          
-          <form onSubmit={onSubmit} className="space-y-4">
+
+          <form onSubmit={handleSubmit} className="space-y-4">
             {isSignup && (
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium mb-1">
-                  Your Name
-                </label>
-                <Input
-                  id="name"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder="Enter your name"
-                  required
-                />
-              </div>
+              <Input
+                type="text"
+                placeholder="Full Name"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                required
+              />
             )}
             
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-1">
-                Email Address
-              </label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                required
-              />
-            </div>
+            <Input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
             
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-1">
-                Password
-              </label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                minLength={6}
+            <Input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+
+            {isSignup && (
+              <ReferralInput
+                businessId="signup"
+                referralCode={referralCode}
+                setReferralCode={setReferralCode}
               />
-            </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full"
+            )}
+
+            <Button
+              type="submit"
+              className="w-full flex items-center justify-center gap-2"
               disabled={authLoading}
             >
-              {authLoading 
-                ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
-                : isSignup ? 'Create Account' : 'Login'}
+              {authLoading ? (
+                <Loader2 size={20} className="animate-spin" />
+              ) : isSignup ? (
+                <UserPlus size={20} />
+              ) : (
+                <LogIn size={20} />
+              )}
+              {authLoading ? 'Processing...' : (isSignup ? 'Create Account' : 'Sign In')}
             </Button>
-            
-            <div className="text-center mt-4">
-              <Button 
-                type="button" 
-                variant="link"
-                onClick={() => setIsSignup(!isSignup)}
-              >
-                {isSignup 
-                  ? 'Already have an account? Login' 
-                  : "Don't have an account? Sign Up"}
-              </Button>
-            </div>
           </form>
+
+          <div className="mt-4 text-center">
+            <Button
+              type="button"
+              variant="link"
+              onClick={() => setIsSignup(!isSignup)}
+              className="text-coffee-medium hover:text-coffee-dark"
+            >
+              {isSignup 
+                ? 'Already have an account? Sign In' 
+                : 'Need an account? Sign Up'}
+            </Button>
+          </div>
         </Card>
       </div>
     </Layout>
