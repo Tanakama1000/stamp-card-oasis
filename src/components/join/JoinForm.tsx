@@ -1,21 +1,20 @@
 
-import React, { useState } from "react";
+import React from "react";
 import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Coffee, UserPlus, LogIn } from "lucide-react";
 import LoyaltyCard from "@/components/LoyaltyCard";
-import ReferralInput from "@/components/referral/ReferralInput";
 
 interface JoinFormProps {
   businessName: string;
   loyaltyCardConfig: any;
   customerName: string;
-  setCustomerName: (name: string) => void;
-  onJoin: (e: React.FormEvent, referralCode?: string) => void;
-  setIsAuthMode: (mode: boolean) => void;
-  setIsSignup: (signup: boolean) => void;
+  setCustomerName: (value: string) => void;
+  onJoin: (e: React.FormEvent) => void;
+  setIsAuthMode: (value: boolean) => void;
+  setIsSignup: (value: boolean) => void;
 }
 
 const JoinForm: React.FC<JoinFormProps> = ({
@@ -27,13 +26,6 @@ const JoinForm: React.FC<JoinFormProps> = ({
   setIsAuthMode,
   setIsSignup
 }) => {
-  const [referralCode, setReferralCode] = useState("");
-  const themeColor = loyaltyCardConfig?.businessNameColor || "#0EA5E9";
-
-  const handleJoin = (e: React.FormEvent) => {
-    onJoin(e, referralCode);
-  };
-
   return (
     <Layout>
       <div className="max-w-md mx-auto mt-8">
@@ -43,78 +35,57 @@ const JoinForm: React.FC<JoinFormProps> = ({
               <img 
                 src={loyaltyCardConfig.businessLogo} 
                 alt={businessName}
-                className="h-12 w-12 object-contain mx-auto mb-2"
+                className="h-16 w-16 object-contain mx-auto mb-2"
               />
             ) : (
-              <Coffee size={40} className="mx-auto mb-2" style={{ color: themeColor }} />
+              <Coffee size={40} className="mx-auto text-coffee-dark mb-2" />
             )}
             <h2 
-              className="text-2xl font-bold mb-2"
-              style={{ color: themeColor }}
+              className="text-2xl font-bold"
+              style={{ color: loyaltyCardConfig?.businessNameColor || "#2563EB" }}
             >
               Join {businessName}
             </h2>
-            <p style={{ color: themeColor }}>
-              Start collecting stamps and earn rewards!
+            <p 
+              className="text-coffee-light mt-1"
+              style={{ color: loyaltyCardConfig?.textColor || "#6F4E37" }}
+            >
+              Create an account to join the loyalty program
             </p>
           </div>
-          
-          {loyaltyCardConfig && (
-            <div className="mb-6">
-              <LoyaltyCard 
-                customerName={customerName || "Your Name"}
-                maxStamps={loyaltyCardConfig.maxStamps || 10}
-                currentStamps={0}
-                cardStyle={loyaltyCardConfig}
-                onStampCollected={() => {}}
-                onReset={() => {}}
-                businessId=""
-              />
-            </div>
-          )}
 
-          <form onSubmit={handleJoin} className="space-y-4">
-            <Input
-              type="text"
-              placeholder="Enter your name"
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              required
+          <div className="mb-6">
+            <p className="text-sm text-center mb-2 text-gray-500">Here's what your loyalty card will look like:</p>
+            <LoyaltyCard 
+              customerName="Your Name"
+              maxStamps={loyaltyCardConfig?.maxStamps || 10}
+              currentStamps={0}
+              cardStyle={loyaltyCardConfig}
+              onStampCollected={() => {}}
+              onReset={() => {}}
             />
-            
-            <ReferralInput
-              businessId="preview"
-              referralCode={referralCode}
-              setReferralCode={setReferralCode}
-              themeColor={themeColor}
-            />
+          </div>
 
+          <div className="flex flex-col gap-2">
             <Button
-              type="submit"
-              className="w-full flex items-center justify-center gap-2 text-white"
-              style={{ backgroundColor: themeColor }}
-            >
-              <UserPlus size={20} />
-              Join Loyalty Program
-            </Button>
-          </form>
-
-          <div className="mt-4 text-center">
-            <p className="text-sm text-gray-600 mb-2">
-              Already have an account?
-            </p>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setIsSignup(false);
-                setIsAuthMode(true);
+              onClick={() => { setIsSignup(true); setIsAuthMode(true); }}
+              className="w-full bg-coffee-medium hover:bg-coffee-dark text-white flex items-center justify-center gap-2"
+              style={{ 
+                backgroundColor: loyaltyCardConfig?.stampActiveColor || "#F97316",
+                borderColor: loyaltyCardConfig?.stampActiveColor || "#F97316"
               }}
-              className="w-full flex items-center justify-center gap-2"
-              style={{ borderColor: themeColor, color: themeColor }}
             >
-              <LogIn size={20} />
-              Sign In
+              <UserPlus size={18} />
+              Create Account
+            </Button>
+            
+            <Button
+              onClick={() => { setIsSignup(false); setIsAuthMode(true); }}
+              variant="outline"
+              className="w-full flex items-center justify-center gap-2"
+            >
+              <LogIn size={18} />
+              Login
             </Button>
           </div>
         </Card>
