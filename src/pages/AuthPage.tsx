@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
@@ -37,7 +37,8 @@ const AuthPage = () => {
             data: {
               full_name: fullName,
               user_type: userType
-            }
+            },
+            emailRedirectTo: `${window.location.origin}/auth`
           }
         });
 
@@ -47,12 +48,19 @@ const AuthPage = () => {
           return;
         }
 
+        // Check if email confirmation is required
+        if (data.user && !data.session) {
+          // Email confirmation required - redirect to confirmation page
+          navigate(`/email-confirmation?email=${encodeURIComponent(email)}`);
+          return;
+        }
+
         toast({
           title: "Account Created",
           description: "Your account has been created successfully!",
         });
 
-        // After successful signup, navigate to admin page
+        // After successful signup with immediate session, navigate to admin page
         navigate('/admin');
       } else {
         // Login existing user
@@ -144,18 +152,30 @@ const AuthPage = () => {
             >
               {isLoading ? 'Processing...' : (isSignup ? 'Create Account' : 'Login')}
             </Button>
-            <div className="text-center mt-4">
-              <Button 
-                type="button" 
-                variant="link"
-                onClick={() => setIsSignup(!isSignup)}
-              >
-                {isSignup 
-                  ? 'Already have an account? Login' 
-                  : 'Need an account? Sign Up'}
-              </Button>
-            </div>
           </form>
+          
+          {!isSignup && (
+            <div className="text-center mt-4">
+              <Link 
+                to="/forgot-password"
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
+                Forgot your password?
+              </Link>
+            </div>
+          )}
+          
+          <div className="text-center mt-4">
+            <Button 
+              type="button" 
+              variant="link"
+              onClick={() => setIsSignup(!isSignup)}
+            >
+              {isSignup 
+                ? 'Already have an account? Login' 
+                : 'Need an account? Sign Up'}
+            </Button>
+          </div>
         </Card>
       </div>
     </Layout>
