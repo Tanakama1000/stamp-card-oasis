@@ -37,14 +37,10 @@ export type Database = {
         Row: {
           business_id: string
           customer_name: string | null
-          first_stamp_completed: boolean | null
           id: string
           is_anonymous: boolean | null
           joined_at: string
           redeemed_rewards: number | null
-          referral_bonus_awarded: boolean | null
-          referral_code: string | null
-          referred_by_code: string | null
           stamps: number | null
           total_rewards_earned: number | null
           total_stamps_collected: number | null
@@ -53,14 +49,10 @@ export type Database = {
         Insert: {
           business_id: string
           customer_name?: string | null
-          first_stamp_completed?: boolean | null
           id?: string
           is_anonymous?: boolean | null
           joined_at?: string
           redeemed_rewards?: number | null
-          referral_bonus_awarded?: boolean | null
-          referral_code?: string | null
-          referred_by_code?: string | null
           stamps?: number | null
           total_rewards_earned?: number | null
           total_stamps_collected?: number | null
@@ -69,14 +61,10 @@ export type Database = {
         Update: {
           business_id?: string
           customer_name?: string | null
-          first_stamp_completed?: boolean | null
           id?: string
           is_anonymous?: boolean | null
           joined_at?: string
           redeemed_rewards?: number | null
-          referral_bonus_awarded?: boolean | null
-          referral_code?: string | null
-          referred_by_code?: string | null
           stamps?: number | null
           total_rewards_earned?: number | null
           total_stamps_collected?: number | null
@@ -99,13 +87,8 @@ export type Database = {
           is_active: boolean
           name: string
           owner_id: string
-          referral_bonus_points: number | null
-          referral_enabled: boolean | null
           slug: string
-          stamp_expiry_days: number | null
           updated_at: string
-          welcome_stamps: number | null
-          welcome_stamps_enabled: boolean | null
         }
         Insert: {
           created_at?: string
@@ -113,13 +96,8 @@ export type Database = {
           is_active?: boolean
           name: string
           owner_id: string
-          referral_bonus_points?: number | null
-          referral_enabled?: boolean | null
           slug: string
-          stamp_expiry_days?: number | null
           updated_at?: string
-          welcome_stamps?: number | null
-          welcome_stamps_enabled?: boolean | null
         }
         Update: {
           created_at?: string
@@ -127,57 +105,10 @@ export type Database = {
           is_active?: boolean
           name?: string
           owner_id?: string
-          referral_bonus_points?: number | null
-          referral_enabled?: boolean | null
           slug?: string
-          stamp_expiry_days?: number | null
           updated_at?: string
-          welcome_stamps?: number | null
-          welcome_stamps_enabled?: boolean | null
         }
         Relationships: []
-      }
-      expired_stamps_log: {
-        Row: {
-          business_id: string
-          business_member_id: string
-          customer_name: string | null
-          expired_at: string
-          id: string
-          stamps_expired: number
-        }
-        Insert: {
-          business_id: string
-          business_member_id: string
-          customer_name?: string | null
-          expired_at?: string
-          id?: string
-          stamps_expired: number
-        }
-        Update: {
-          business_id?: string
-          business_member_id?: string
-          customer_name?: string | null
-          expired_at?: string
-          id?: string
-          stamps_expired?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "expired_stamps_log_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "expired_stamps_log_business_member_id_fkey"
-            columns: ["business_member_id"]
-            isOneToOne: false
-            referencedRelation: "business_members"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       loyalty_card_configs: {
         Row: {
@@ -238,48 +169,6 @@ export type Database = {
         }
         Relationships: []
       }
-      stamp_records: {
-        Row: {
-          business_id: string
-          business_member_id: string
-          created_at: string
-          expired_at: string | null
-          id: string
-          is_expired: boolean | null
-        }
-        Insert: {
-          business_id: string
-          business_member_id: string
-          created_at?: string
-          expired_at?: string | null
-          id?: string
-          is_expired?: boolean | null
-        }
-        Update: {
-          business_id?: string
-          business_member_id?: string
-          created_at?: string
-          expired_at?: string | null
-          id?: string
-          is_expired?: boolean | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "stamp_records_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "stamp_records_business_member_id_fkey"
-            columns: ["business_member_id"]
-            isOneToOne: false
-            referencedRelation: "business_members"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       [_ in never]: never
@@ -289,32 +178,13 @@ export type Database = {
         Args: { business_id_param: string }
         Returns: undefined
       }
-      expire_old_stamps: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
       fix_inconsistent_stamp_data: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
-      generate_referral_code: {
-        Args: { customer_name: string; member_id: string }
-        Returns: string
-      }
       generate_unique_slug: {
         Args: { business_name: string }
         Returns: string
-      }
-      get_expiring_stamps: {
-        Args: { days_ahead?: number }
-        Returns: {
-          business_id: string
-          business_member_id: string
-          customer_name: string
-          business_name: string
-          stamps_expiring: number
-          expires_in_days: number
-        }[]
       }
       increment_redeemed_rewards: {
         Args: { user_id_param: string; business_id_param: string }
