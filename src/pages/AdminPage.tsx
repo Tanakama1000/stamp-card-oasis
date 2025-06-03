@@ -9,7 +9,7 @@ import RecentActivity from "@/components/RecentActivity";
 import CardCustomization from "@/components/loyalty/CardCustomization";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { QrCode, BarChart2, Users, UserCircle, Link as LinkIcon, Copy, CreditCard, Clock } from "lucide-react";
+import { QrCode, BarChart2, Users, UserCircle, Link as LinkIcon, Copy, CreditCard, Clock, Gift } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";

@@ -1,96 +1,153 @@
-
-import React from "react";
-import Layout from "@/components/Layout";
-import { Card } from "@/components/ui/card";
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Coffee, UserPlus, LogIn } from "lucide-react";
-import LoyaltyCard from "@/components/LoyaltyCard";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { Business } from "@/types";
+import { supabase } from "@/integrations/supabase/client";
+import WelcomeStampsMessage from "@/components/WelcomeStampsMessage";
 
 interface JoinFormProps {
-  businessName: string;
-  loyaltyCardConfig: any;
-  customerName: string;
-  setCustomerName: (value: string) => void;
-  onJoin: (e: React.FormEvent) => void;
-  setIsAuthMode: (value: boolean) => void;
-  setIsSignup: (value: boolean) => void;
+  business: Business;
+  onJoinSuccess: (member: any) => void;
 }
 
-const JoinForm: React.FC<JoinFormProps> = ({
-  businessName,
-  loyaltyCardConfig,
-  customerName,
-  setCustomerName,
-  onJoin,
-  setIsAuthMode,
-  setIsSignup
-}) => {
+const JoinForm: React.FC<JoinFormProps> = ({ business, onJoinSuccess }) => {
+  const [customerName, setCustomerName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [referralCode, setReferralCode] = useState('');
+  const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
+  const [welcomeStampsAwarded, setWelcomeStampsAwarded] = useState(0);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const storedName = localStorage.getItem('customerName');
+    if (storedName) {
+      setCustomerName(storedName);
+    }
+  }, []);
+
+  const handleJoin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to join this loyalty program.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Check if user is already a member
+      const { data: existingMember } = await supabase
+        .from('business_members')
+        .select('id')
+        .eq('business_id', business.id)
+        .eq('user_id', user.id)
+        .single();
+
+      if (existingMember) {
+        toast({
+          title: "Already a Member",
+          description: "You're already part of this loyalty program!",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Create new member
+      const memberData = {
+        business_id: business.id,
+        user_id: user.id,
+        customer_name: customerName.trim(),
+        referred_by_code: referralCode.trim() || null,
+        is_anonymous: false
+      };
+
+      const { data: newMember, error } = await supabase
+        .from('business_members')
+        .insert(memberData)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Check if welcome stamps were awarded
+      if (business.welcome_stamps_enabled && business.welcome_stamps > 0) {
+        setWelcomeStampsAwarded(business.welcome_stamps);
+        setShowWelcomeMessage(true);
+      }
+
+      toast({
+        title: "Welcome!",
+        description: `You've successfully joined ${business.name}'s loyalty program!`
+      });
+
+      onJoinSuccess(newMember);
+    } catch (error) {
+      console.error('Error joining business:', error);
+      toast({
+        title: "Error",
+        description: "Failed to join loyalty program. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <Layout>
-      <div className="max-w-md mx-auto mt-8">
-        <Card className="p-6 bg-white card-shadow">
-          <div className="text-center mb-6">
-            {loyaltyCardConfig?.businessLogo ? (
-              <img 
-                src={loyaltyCardConfig.businessLogo} 
-                alt={businessName}
-                className="h-16 w-16 object-contain mx-auto mb-2"
+    <>
+      {showWelcomeMessage && (
+        <WelcomeStampsMessage
+          stampsAwarded={welcomeStampsAwarded}
+          onDismiss={() => setShowWelcomeMessage(false)}
+        />
+      )}
+      
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader>
+          <CardTitle>Join {business?.name}'s Loyalty Program</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleJoin} className="space-y-4">
+            <div>
+              <Label htmlFor="customerName">Your Name</Label>
+              <Input
+                type="text"
+                id="customerName"
+                placeholder="Enter your name"
+                value={customerName}
+                onChange={(e) => {
+                  setCustomerName(e.target.value);
+                  localStorage.setItem('customerName', e.target.value);
+                }}
+                required
               />
-            ) : (
-              <Coffee size={40} className="mx-auto text-coffee-dark mb-2" />
-            )}
-            <h2 
-              className="text-2xl font-bold"
-              style={{ color: loyaltyCardConfig?.businessNameColor || "#2563EB" }}
-            >
-              Join {businessName}
-            </h2>
-            <p 
-              className="text-coffee-light mt-1"
-              style={{ color: loyaltyCardConfig?.textColor || "#6F4E37" }}
-            >
-              Create an account to join the loyalty program
-            </p>
-          </div>
-
-          <div className="mb-6">
-            <p className="text-sm text-center mb-2 text-gray-500">Here's what your loyalty card will look like:</p>
-            <LoyaltyCard 
-              customerName="Your Name"
-              maxStamps={loyaltyCardConfig?.maxStamps || 10}
-              currentStamps={0}
-              cardStyle={loyaltyCardConfig}
-              onStampCollected={() => {}}
-              onReset={() => {}}
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Button
-              onClick={() => { setIsSignup(true); setIsAuthMode(true); }}
-              className="w-full bg-coffee-medium hover:bg-coffee-dark text-white flex items-center justify-center gap-2"
-              style={{ 
-                backgroundColor: loyaltyCardConfig?.stampActiveColor || "#F97316",
-                borderColor: loyaltyCardConfig?.stampActiveColor || "#F97316"
-              }}
-            >
-              <UserPlus size={18} />
-              Create Account
+            </div>
+            <div>
+              <Label htmlFor="referralCode">Referral Code (Optional)</Label>
+              <Input
+                type="text"
+                id="referralCode"
+                placeholder="Enter referral code"
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value)}
+              />
+            </div>
+            <Button disabled={isLoading} className="w-full">
+              {isLoading ? 'Joining...' : 'Join Now'}
             </Button>
-            
-            <Button
-              onClick={() => { setIsSignup(false); setIsAuthMode(true); }}
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2"
-            >
-              <LogIn size={18} />
-              Login
-            </Button>
-          </div>
-        </Card>
-      </div>
-    </Layout>
+          </form>
+        </CardContent>
+      </Card>
+    </>
   );
 };
 

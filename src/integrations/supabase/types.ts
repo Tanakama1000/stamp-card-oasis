@@ -104,6 +104,8 @@ export type Database = {
           slug: string
           stamp_expiry_days: number | null
           updated_at: string
+          welcome_stamps: number | null
+          welcome_stamps_enabled: boolean | null
         }
         Insert: {
           created_at?: string
@@ -116,6 +118,8 @@ export type Database = {
           slug: string
           stamp_expiry_days?: number | null
           updated_at?: string
+          welcome_stamps?: number | null
+          welcome_stamps_enabled?: boolean | null
         }
         Update: {
           created_at?: string
@@ -128,6 +132,8 @@ export type Database = {
           slug?: string
           stamp_expiry_days?: number | null
           updated_at?: string
+          welcome_stamps?: number | null
+          welcome_stamps_enabled?: boolean | null
         }
         Relationships: []
       }
