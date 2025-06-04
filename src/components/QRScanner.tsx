@@ -56,7 +56,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
         onQRCodeError
       )
       .catch((err) => {
-        console.error("Error starting scanner:", err);
+        console.error("❌ Error starting scanner:", err);
         setScanning(false);
         toast({
           title: "Camera Error",
@@ -74,7 +74,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
           setScanning(false);
         })
         .catch((err) => {
-          console.error("Error stopping scanner:", err);
+          console.error("❌ Error stopping scanner:", err);
         });
     }
   };
@@ -83,7 +83,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
     try {
       console.log(`🔍 Validating business ID: ${idFromQR} (numeric: ${useNumericId})`);
       
-      let query;
       if (useNumericId) {
         const { data, error } = await supabase.from('businesses').select('id');
         if (error) {
@@ -182,7 +181,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
           // First, check existing membership
           const { data: existingMembership, error: fetchError } = await supabase
             .from('business_members')
-            .select('id, stamps')
+            .select('id, stamps, total_stamps_collected')
             .eq('business_id', businessId)
             .eq('user_id', userId)
             .maybeSingle();
@@ -200,13 +199,15 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
           if (existingMembership) {
             // Update existing membership
             const updatedStamps = (existingMembership.stamps || 0) + defaultStamps;
+            const updatedTotalStamps = (existingMembership.total_stamps_collected || 0) + defaultStamps;
             console.log(`🔄 Updating stamps from ${existingMembership.stamps} to ${updatedStamps}`);
+            console.log(`🔄 Updating total stamps from ${existingMembership.total_stamps_collected} to ${updatedTotalStamps}`);
             
             const { error: updateError } = await supabase
               .from('business_members')
               .update({ 
                 stamps: updatedStamps,
-                total_stamps_collected: supabase.raw(`COALESCE(total_stamps_collected, 0) + ${defaultStamps}`)
+                total_stamps_collected: updatedTotalStamps
               })
               .eq('id', existingMembership.id);
               
