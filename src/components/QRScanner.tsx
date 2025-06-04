@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { Card } from "@/components/ui/card";
@@ -80,11 +81,21 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
 
   const validateBusinessExists = async (idFromQR: string, useNumericId: boolean = false): Promise<null | { id: string }> => {
     try {
+      console.log(`🔍 Validating business ID: ${idFromQR} (numeric: ${useNumericId})`);
+      
       let query;
       if (useNumericId) {
         const { data, error } = await supabase.from('businesses').select('id');
-        if (error || !data) return null;
+        if (error) {
+          console.error("❌ Error fetching businesses for numeric ID validation:", error);
+          return null;
+        }
+        if (!data) {
+          console.log("❌ No businesses found in database");
+          return null;
+        }
         const found = data.find((b: { id: string }) => uuidToNumericId(b.id) === idFromQR);
+        console.log(`🔍 Found business with numeric ID: ${found ? 'YES' : 'NO'}`);
         return found ? found : null;
       } else {
         const { data, error } = await supabase
@@ -92,10 +103,16 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
           .select('id')
           .eq('id', idFromQR)
           .single();
-        if (error) return null;
+        
+        if (error) {
+          console.error("❌ Error validating business ID:", error);
+          return null;
+        }
+        console.log(`✅ Business found with UUID: ${data ? 'YES' : 'NO'}`);
         return data;
       }
     } catch (error) {
+      console.error("❌ Exception during business validation:", error);
       return null;
     }
   };
@@ -103,13 +120,17 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
   const onQRCodeSuccess = async (decodedText: string) => {
     if (processingQr) return;
     setProcessingQr(true);
+    
     try {
+      console.log("🔄 Processing QR code:", decodedText);
       stopScanner();
 
       let qrData;
       try {
         qrData = JSON.parse(decodedText);
+        console.log("📄 Parsed QR data:", qrData);
       } catch (error) {
+        console.error("❌ Failed to parse QR code JSON:", error);
         handleInvalidQR("Invalid QR code format. Please scan a valid business QR code.");
         return;
       }
@@ -120,29 +141,45 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
       let foundBusiness: { id: string } | null = null;
 
       if (businessNumericId) {
+        console.log("🔍 Trying numeric ID validation...");
         foundBusiness = await validateBusinessExists(businessNumericId, true);
       } else if (businessId) {
+        console.log("🔍 Trying UUID validation...");
         foundBusiness = await validateBusinessExists(businessId, false);
+      } else {
+        console.error("❌ No business ID found in QR code");
+        handleInvalidQR("Invalid QR code: missing business identifier.");
+        return;
       }
 
       if (!foundBusiness) {
+        console.error("❌ Business not found in database");
         handleInvalidQR("Business not found. This QR code refers to a business that doesn't exist.");
         return;
       }
 
       businessId = foundBusiness.id;
+      console.log("✅ Business validated:", businessId);
 
       const defaultStamps = 1;
 
+      // Check authentication status
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
+        console.error("❌ Session error:", sessionError);
         handleInvalidQR("Authentication error. Please try logging in again.");
         return;
       }
+
       const userId = sessionData?.session?.user?.id;
+      console.log("👤 User ID:", userId || "Anonymous");
+
       if (userId) {
         try {
+          console.log("🔄 Processing authenticated user scan...");
+          
+          // First, check existing membership
           const { data: existingMembership, error: fetchError } = await supabase
             .from('business_members')
             .select('id, stamps')
@@ -150,51 +187,95 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
             .eq('user_id', userId)
             .maybeSingle();
           
-          if (fetchError) throw new Error("Could not check membership status");
+          if (fetchError) {
+            console.error("❌ Error fetching membership:", fetchError);
+            throw new Error(`Database error: ${fetchError.message}`);
+          }
+
+          console.log("📊 Existing membership:", existingMembership);
 
           let newStampCount = defaultStamps;
           let memberId;
           
           if (existingMembership) {
+            // Update existing membership
             const updatedStamps = (existingMembership.stamps || 0) + defaultStamps;
+            console.log(`🔄 Updating stamps from ${existingMembership.stamps} to ${updatedStamps}`);
+            
             const { error: updateError } = await supabase
               .from('business_members')
-              .update({ stamps: updatedStamps })
+              .update({ 
+                stamps: updatedStamps,
+                total_stamps_collected: supabase.raw(`COALESCE(total_stamps_collected, 0) + ${defaultStamps}`)
+              })
               .eq('id', existingMembership.id);
-            if (updateError) throw new Error("Could not update stamps");
+              
+            if (updateError) {
+              console.error("❌ Error updating stamps:", updateError);
+              throw new Error(`Failed to update stamps: ${updateError.message}`);
+            }
+            
             newStampCount = updatedStamps;
             memberId = existingMembership.id;
+            console.log("✅ Successfully updated existing membership");
           } else {
+            // Create new membership
+            console.log("🆕 Creating new membership...");
             const { data: newMembership, error: insertError } = await supabase
               .from('business_members')
               .insert({
                 business_id: businessId,
                 user_id: userId,
                 stamps: defaultStamps,
+                total_stamps_collected: defaultStamps,
                 is_anonymous: false,
               })
               .select('id')
               .single();
-            if (insertError) throw new Error("Could not create membership");
+              
+            if (insertError) {
+              console.error("❌ Error creating membership:", insertError);
+              throw new Error(`Failed to create membership: ${insertError.message}`);
+            }
+            
             if (newMembership) {
               memberId = newMembership.id;
+              console.log("✅ Successfully created new membership:", memberId);
             } else {
               throw new Error("Failed to create membership - no data returned");
             }
           }
+
+          // Verify the operation was successful by checking the database
+          const { data: verifyData, error: verifyError } = await supabase
+            .from('business_members')
+            .select('stamps, total_stamps_collected')
+            .eq('id', memberId)
+            .single();
+
+          if (verifyError) {
+            console.error("❌ Error verifying stamp update:", verifyError);
+            throw new Error("Could not verify stamp was recorded");
+          }
+
+          console.log("✅ Verification successful. Current stamps:", verifyData);
+
           onSuccessfulScan(businessId, new Date().getTime(), defaultStamps);
           setScanResult({
             success: true,
-            message: `Successfully scanned! ${defaultStamps} stamp(s) added to your loyalty card.`,
+            message: `Successfully scanned! ${defaultStamps} stamp(s) added to your loyalty card. Total: ${verifyData.stamps}`,
           });
           toast({
             title: "Stamp Collected!",
             description: `${defaultStamps} stamp(s) have been added to your loyalty card.`,
           });
         } catch (error) {
-          handleInvalidQR("Server error. Please try again.");
+          console.error("❌ Database operation failed:", error);
+          handleInvalidQR(`Database error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`);
         }
       } else {
+        // Anonymous user - use localStorage
+        console.log("🔄 Processing anonymous user scan...");
         onSuccessfulScan(businessId, new Date().getTime(), defaultStamps);
         setScanResult({
           success: true,
@@ -202,6 +283,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
         });
       }
     } catch (err) {
+      console.error("❌ Unexpected error in QR processing:", err);
       handleInvalidQR("Could not process QR code data. Please try again.");
     } finally {
       setProcessingQr(false);
@@ -209,6 +291,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
   };
 
   const handleInvalidQR = (message: string) => {
+    console.error("❌ QR Scan failed:", message);
     setScanResult({
       success: false,
       message,
@@ -265,6 +348,13 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
           <div className="flex items-center gap-2 text-coffee-medium">
             <Loader2 className="animate-spin" size={18} />
             <span>Scanning... Point camera at QR code</span>
+          </div>
+        )}
+
+        {processingQr && (
+          <div className="flex items-center gap-2 text-coffee-medium">
+            <Loader2 className="animate-spin" size={18} />
+            <span>Processing scan...</span>
           </div>
         )}
 

@@ -320,6 +320,10 @@ export type Database = {
         Args: { user_id_param: string; business_id_param: string }
         Returns: number
       }
+      is_business_owner: {
+        Args: { business_id_param: string }
+        Returns: boolean
+      }
       is_superadmin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
