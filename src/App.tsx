@@ -1,8 +1,9 @@
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import AdminPage from "./pages/AdminPage";
 import AdminLogin from "./pages/AdminLogin";
@@ -15,9 +16,6 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminRoute from "./components/AdminRoute";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import EmailConfirmationPage from "./pages/EmailConfirmationPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const queryClient = new QueryClient();
 
@@ -80,9 +78,6 @@ const App = () => {
             </AdminRoute>
           } />
           <Route path="/auth" element={<AuthPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/email-confirmation" element={<EmailConfirmationPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/join/:businessSlug" element={<JoinPage />} />
           <Route path="/scan" element={<ScanPage />} />
           <Route path="/terms" element={<TermsOfService />} />

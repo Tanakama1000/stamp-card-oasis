@@ -17,13 +17,10 @@ const ScanPage = () => {
   const handleSuccessfulScan = async (businessId: string, timestamp: number, stamps: number = 1) => {
     try {
       setError(null);
-      console.log("🎯 ScanPage handling successful scan:", { businessId, stamps });
       
       // Validate business ID
       if (!businessId || businessId.trim() === '') {
-        const errorMsg = "Invalid business QR code. Missing business identifier.";
-        console.error("❌", errorMsg);
-        setError(errorMsg);
+        setError("Invalid business QR code. Missing business identifier.");
         toast({
           title: "Scan Error",
           description: "Invalid QR code format. Please try again with a valid business QR code.",
@@ -32,25 +29,26 @@ const ScanPage = () => {
         return;
       }
 
+      // Success toast notification
+      toast({
+        title: "QR Code Scanned Successfully!",
+        description: `You collected ${stamps} stamp${stamps !== 1 ? 's' : ''}!`,
+        variant: "default",
+      });
+
       // Get the current session to check if user is authenticated
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
-        console.error("❌ Session error in ScanPage:", sessionError);
+        console.error("Session error:", sessionError);
         // Continue with anonymous flow, don't show error to user
       }
       
       if (sessionData?.session?.user?.id) {
         // User is authenticated, database update was handled in QRScanner component
-        console.log("✅ Authenticated user scanned business QR:", businessId);
-        toast({
-          title: "QR Code Scanned Successfully!",
-          description: `You collected ${stamps} stamp${stamps !== 1 ? 's' : ''}! Check your loyalty card to see your progress.`,
-          variant: "default",
-        });
+        console.log("Authenticated user scanned business QR:", businessId);
       } else {
         // For anonymous users, store in localStorage
-        console.log("👤 Anonymous user - storing in localStorage");
         try {
           const savedMemberships = localStorage.getItem('memberships') || '[]';
           const memberships = JSON.parse(savedMemberships);
@@ -60,32 +58,21 @@ const ScanPage = () => {
           
           if (existingIndex >= 0) {
             // Update existing membership
-            const oldStamps = memberships[existingIndex].stamps || 0;
-            memberships[existingIndex].stamps = oldStamps + stamps;
-            console.log(`📊 Updated localStorage stamps from ${oldStamps} to ${memberships[existingIndex].stamps}`);
+            memberships[existingIndex].stamps = (memberships[existingIndex].stamps || 0) + stamps;
           } else {
             // Create new membership
-            const newMembership = {
+            memberships.push({
               id: `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
               businessId: businessId,
               customerName: "Anonymous Customer",
               joinedAt: new Date().toISOString(),
               stamps: stamps
-            };
-            memberships.push(newMembership);
-            console.log("🆕 Created new localStorage membership:", newMembership);
+            });
           }
           
           localStorage.setItem('memberships', JSON.stringify(memberships));
-          console.log("✅ localStorage updated successfully");
-          
-          toast({
-            title: "QR Code Scanned Successfully!",
-            description: `You collected ${stamps} stamp${stamps !== 1 ? 's' : ''}! Sign in to sync your stamps across devices.`,
-            variant: "default",
-          });
         } catch (e) {
-          console.error("❌ Error updating localStorage:", e);
+          console.error("Error updating localStorage:", e);
           setError("Could not save your stamp locally. Please try again or sign in to save your stamps.");
         }
       }
@@ -95,7 +82,7 @@ const ScanPage = () => {
         navigate(-1);
       }, 2000);
     } catch (err) {
-      console.error("❌ Error in handleSuccessfulScan:", err);
+      console.error("Error in handleSuccessfulScan:", err);
       setError("An unexpected error occurred. Please try again.");
       toast({
         title: "Scan Error",
