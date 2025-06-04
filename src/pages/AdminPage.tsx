@@ -9,7 +9,7 @@ import RecentActivity from "@/components/RecentActivity";
 import CardCustomization from "@/components/loyalty/CardCustomization";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { QrCode, BarChart2, Users, UserCircle, Link as LinkIcon, Copy, CreditCard } from "lucide-react";
+import { QrCode, BarChart2, Users, UserCircle, Link as LinkIcon, Copy, CreditCard, Clock, Gift } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,9 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
+import ExpiringStampsAlert from "@/components/admin/ExpiringStampsAlert";
+import StampExpirySettings from "@/components/admin/StampExpirySettings";
+import ExpiredStampsLog from "@/components/admin/ExpiredStampsLog";
 
 const businessSchema = z.object({
   name: z.string().min(2, {
@@ -309,6 +312,13 @@ const AdminPage = () => {
           <p className="text-coffee-light">Manage your loyalty program and generate QR codes</p>
         </div>
         
+        {/* Expiring stamps alert */}
+        {businessData && (
+          <div className="mb-6">
+            <ExpiringStampsAlert businessId={businessData.id} />
+          </div>
+        )}
+        
         <Card className="p-4 mb-4 bg-white card-shadow">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
             <div>
@@ -441,7 +451,7 @@ const AdminPage = () => {
 
         <div className="mt-8">
           <Tabs defaultValue="qr-generator">
-            <TabsList className="grid grid-cols-4 mb-6">
+            <TabsList className="grid grid-cols-5 mb-6">
               <TabsTrigger value="qr-generator" className="flex items-center gap-2">
                 <QrCode size={18} />
                 <span className="hidden sm:inline">QR Generator</span>
@@ -451,6 +461,11 @@ const AdminPage = () => {
                 <CreditCard size={18} />
                 <span className="hidden sm:inline">Card Editor</span>
                 <span className="sm:hidden">Card</span>
+              </TabsTrigger>
+              <TabsTrigger value="stamp-expiry" className="flex items-center gap-2">
+                <Clock size={18} />
+                <span className="hidden sm:inline">Stamp Expiry</span>
+                <span className="sm:hidden">Expiry</span>
               </TabsTrigger>
               <TabsTrigger value="recent-activity" className="flex items-center gap-2">
                 <BarChart2 size={18} />
@@ -479,6 +494,12 @@ const AdminPage = () => {
                   maxStamps: 10
                 }}
               />
+            </TabsContent>
+            <TabsContent value="stamp-expiry">
+              <div className="space-y-6">
+                <StampExpirySettings businessId={businessData.id} />
+                <ExpiredStampsLog businessId={businessData.id} />
+              </div>
             </TabsContent>
             <TabsContent value="recent-activity">
               <RecentActivity businessId={businessData.id} />
