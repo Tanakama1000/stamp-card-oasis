@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import Layout from "@/components/Layout";
-import QRScanner from "@/components/QRScanner";
+import EnhancedQRScanner from "@/components/EnhancedQRScanner";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -11,7 +11,6 @@ import { supabase } from "@/integrations/supabase/client";
 const ScanPage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [scanning, setScanning] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const handleSuccessfulScan = async (businessId: string, timestamp: number, stamps: number = 1) => {
@@ -19,7 +18,6 @@ const ScanPage = () => {
       setError(null);
       console.log("🎯 ScanPage handling successful scan:", { businessId, stamps });
       
-      // Validate business ID
       if (!businessId || businessId.trim() === '') {
         const errorMsg = "Invalid business QR code. Missing business identifier.";
         console.error("❌", errorMsg);
@@ -32,16 +30,13 @@ const ScanPage = () => {
         return;
       }
 
-      // Get the current session to check if user is authenticated
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
         console.error("❌ Session error in ScanPage:", sessionError);
-        // Continue with anonymous flow, don't show error to user
       }
       
       if (sessionData?.session?.user?.id) {
-        // User is authenticated, database update was handled in QRScanner component
         console.log("✅ Authenticated user scanned business QR:", businessId);
         toast({
           title: "QR Code Scanned Successfully!",
@@ -49,22 +44,18 @@ const ScanPage = () => {
           variant: "default",
         });
       } else {
-        // For anonymous users, store in localStorage
         console.log("👤 Anonymous user - storing in localStorage");
         try {
           const savedMemberships = localStorage.getItem('memberships') || '[]';
           const memberships = JSON.parse(savedMemberships);
           
-          // Find if user already has membership with this business
           const existingIndex = memberships.findIndex((m: any) => m.businessId === businessId);
           
           if (existingIndex >= 0) {
-            // Update existing membership
             const oldStamps = memberships[existingIndex].stamps || 0;
             memberships[existingIndex].stamps = oldStamps + stamps;
             console.log(`📊 Updated localStorage stamps from ${oldStamps} to ${memberships[existingIndex].stamps}`);
           } else {
-            // Create new membership
             const newMembership = {
               id: `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
               businessId: businessId,
@@ -90,7 +81,6 @@ const ScanPage = () => {
         }
       }
 
-      // Navigate back or to the appropriate page after a short delay
       setTimeout(() => {
         navigate(-1);
       }, 2000);
@@ -132,20 +122,9 @@ const ScanPage = () => {
               </div>
             )}
             
-            {scanning ? (
-              <div className="w-full max-w-sm mx-auto">
-                <QRScanner onSuccessfulScan={handleSuccessfulScan} />
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <Button
-                  onClick={() => setScanning(true)}
-                  className="bg-orange hover:bg-orange-dark text-white"
-                >
-                  Start Scanning
-                </Button>
-              </div>
-            )}
+            <div className="w-full max-w-sm mx-auto">
+              <EnhancedQRScanner onSuccessfulScan={handleSuccessfulScan} />
+            </div>
           </div>
         </div>
       </div>

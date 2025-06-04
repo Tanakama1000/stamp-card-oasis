@@ -1,6 +1,6 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import QRScanner from "@/components/QRScanner";
+import EnhancedQRScanner from "@/components/EnhancedQRScanner";
 
 interface QRScannerDialogProps {
   isOpen: boolean;
@@ -9,7 +9,6 @@ interface QRScannerDialogProps {
 }
 
 const QRScannerDialog = ({ isOpen, onClose, onSuccessfulScan }: QRScannerDialogProps) => {
-  // When dialog closes, make sure we handle cleanup
   const handleClose = () => {
     onClose();
   };
@@ -25,7 +24,7 @@ const QRScannerDialog = ({ isOpen, onClose, onSuccessfulScan }: QRScannerDialogP
         
         <div className="flex flex-col items-center justify-center p-4">
           <div className="w-full">
-            <QRScanner onSuccessfulScan={onSuccessfulScan} />
+            <EnhancedQRScanner onSuccessfulScan={onSuccessfulScan} />
           </div>
         </div>
       </DialogContent>
