@@ -7,6 +7,7 @@ import BusinessStats from "@/components/BusinessStats";
 import CustomerList from "@/components/CustomerList";
 import RecentActivity from "@/components/RecentActivity";
 import CardCustomization from "@/components/loyalty/CardCustomization";
+import WelcomeStampsSettings from "@/components/admin/WelcomeStampsSettings";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QrCode, BarChart2, Users, UserCircle, Link as LinkIcon, Copy, CreditCard, Clock, Gift } from "lucide-react";
@@ -451,7 +452,7 @@ const AdminPage = () => {
 
         <div className="mt-8">
           <Tabs defaultValue="qr-generator">
-            <TabsList className="grid grid-cols-5 mb-6">
+            <TabsList className="grid grid-cols-6 mb-6">
               <TabsTrigger value="qr-generator" className="flex items-center gap-2">
                 <QrCode size={18} />
                 <span className="hidden sm:inline">QR Generator</span>
@@ -461,6 +462,11 @@ const AdminPage = () => {
                 <CreditCard size={18} />
                 <span className="hidden sm:inline">Card Editor</span>
                 <span className="sm:hidden">Card</span>
+              </TabsTrigger>
+              <TabsTrigger value="welcome-stamps" className="flex items-center gap-2">
+                <Gift size={18} />
+                <span className="hidden sm:inline">Welcome Stamps</span>
+                <span className="sm:hidden">Welcome</span>
               </TabsTrigger>
               <TabsTrigger value="stamp-expiry" className="flex items-center gap-2">
                 <Clock size={18} />
@@ -494,6 +500,9 @@ const AdminPage = () => {
                   maxStamps: 10
                 }}
               />
+            </TabsContent>
+            <TabsContent value="welcome-stamps">
+              <WelcomeStampsSettings businessId={businessData.id} />
             </TabsContent>
             <TabsContent value="stamp-expiry">
               <div className="space-y-6">
