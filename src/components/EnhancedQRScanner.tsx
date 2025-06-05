@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { Card } from "@/components/ui/card";
@@ -503,33 +502,6 @@ const EnhancedQRScanner: React.FC<EnhancedQRScannerProps> = ({ onSuccessfulScan 
             </div>
           </div>
         )}
-
-        <div className="flex gap-2 flex-wrap justify-center">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setFallbackMode('camera')}
-            disabled={!deviceInfo.supportsCamera}
-          >
-            <Camera size={16} className="mr-1" />
-            Camera
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setFallbackMode('file')}
-          >
-            <Upload size={16} className="mr-1" />
-            Upload
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setFallbackMode('manual')}
-          >
-            Manual
-          </Button>
-        </div>
 
         {processingQr && (
           <div className="flex items-center gap-2 text-coffee-medium">
