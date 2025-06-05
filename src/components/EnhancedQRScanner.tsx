@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { Card } from "@/components/ui/card";
@@ -354,13 +353,13 @@ const EnhancedQRScanner: React.FC<EnhancedQRScannerProps> = ({ onSuccessfulScan 
     // Silent - this fires constantly during scanning
   };
 
-  const handleFileUpload = async (dataUrl: string) => {
+  const handleFileUpload = async (file: File) => {
     try {
       setProcessingQr(true);
       console.log("📁 Processing uploaded QR code image");
       
       if (html5QrCode) {
-        const result = await html5QrCode.scanFile(dataUrl, true);
+        const result = await html5QrCode.scanFile(file, true);
         await processQRData(result);
       }
     } catch (err) {

@@ -5,7 +5,7 @@ import { Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface FileUploadProps {
-  onFileUploaded: (dataUrl: string) => void;
+  onFileUploaded: (file: File) => void;
   className?: string;
   accept?: string;
   label?: string;
@@ -38,25 +38,9 @@ const FileUpload = ({
     
     setIsUploading(true);
     
-    const reader = new FileReader();
-    
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        onFileUploaded(event.target.result as string);
-      }
-      setIsUploading(false);
-    };
-    
-    reader.onerror = () => {
-      toast({
-        title: "Upload failed",
-        description: "Failed to read the selected file",
-        variant: "destructive"
-      });
-      setIsUploading(false);
-    };
-    
-    reader.readAsDataURL(file);
+    // Pass the file directly instead of converting to data URL
+    onFileUploaded(file);
+    setIsUploading(false);
   };
   
   return (
