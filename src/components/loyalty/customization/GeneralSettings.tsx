@@ -19,6 +19,26 @@ export const GeneralSettings = ({
   onLogoUpload, 
   onBackgroundUpload 
 }: GeneralSettingsProps) => {
+  const handleLogoUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        onLogoUpload(event.target.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleBackgroundUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        onBackgroundUpload(event.target.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="space-y-4">
       <div>
@@ -63,7 +83,7 @@ export const GeneralSettings = ({
           </div>
         )}
         <FileUpload 
-          onFileUploaded={onLogoUpload}
+          onFileUploaded={handleLogoUpload}
           label="Upload Logo"
           accept="image/*"
         />
@@ -107,7 +127,7 @@ export const GeneralSettings = ({
             </div>
           )}
           <FileUpload
-            onFileUploaded={onBackgroundUpload}
+            onFileUploaded={handleBackgroundUpload}
             label="Upload Background"
             accept="image/*"
           />
