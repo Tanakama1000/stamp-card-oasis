@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { Card } from "@/components/ui/card";
@@ -33,7 +34,6 @@ const EnhancedQRScanner: React.FC<EnhancedQRScannerProps> = ({ onSuccessfulScan 
   const [fallbackMode, setFallbackMode] = useState<'camera' | 'file' | 'manual'>('camera');
   const [retryCount, setRetryCount] = useState(0);
   const [manualInput, setManualInput] = useState<string>('');
-  const scannerInitialized = useRef(false);
 
   useEffect(() => {
     const device = detectDevice();
@@ -44,17 +44,26 @@ const EnhancedQRScanner: React.FC<EnhancedQRScannerProps> = ({ onSuccessfulScan 
       setFallbackMode('file');
       console.log("📱 No camera support detected, switching to file mode");
     }
+  }, []);
 
-    const qrCodeScanner = new Html5Qrcode("qr-reader");
-    setHtml5QrCode(qrCodeScanner);
-    scannerInitialized.current = true;
+  // Initialize scanner only when in camera mode and element exists
+  useEffect(() => {
+    if (fallbackMode === 'camera' && deviceInfo) {
+      // Check if element exists before creating scanner
+      const element = document.getElementById("qr-reader");
+      if (element) {
+        const qrCodeScanner = new Html5Qrcode("qr-reader");
+        setHtml5QrCode(qrCodeScanner);
+        console.log("✅ QR Scanner initialized");
+      }
+    }
 
     return () => {
-      if (qrCodeScanner && qrCodeScanner.isScanning) {
-        qrCodeScanner.stop().catch(err => console.error("Error stopping scanner:", err));
+      if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().catch(err => console.error("Error stopping scanner:", err));
       }
     };
-  }, []);
+  }, [fallbackMode, deviceInfo]);
 
   const validateBusinessExists = async (idFromQR: string, useNumericId: boolean = false): Promise<null | { id: string }> => {
     try {
@@ -249,7 +258,10 @@ const EnhancedQRScanner: React.FC<EnhancedQRScannerProps> = ({ onSuccessfulScan 
   };
 
   const startScanner = async () => {
-    if (!html5QrCode || !deviceInfo || !scannerInitialized.current) return;
+    if (!html5QrCode || !deviceInfo) {
+      console.error("❌ Scanner or device info not ready");
+      return;
+    }
 
     setScanning(true);
     setScanResult(null);
@@ -361,6 +373,11 @@ const EnhancedQRScanner: React.FC<EnhancedQRScannerProps> = ({ onSuccessfulScan 
       if (html5QrCode) {
         const result = await html5QrCode.scanFile(file, true);
         await processQRData(result);
+      } else {
+        // Create a temporary scanner instance for file scanning
+        const tempScanner = new Html5Qrcode("temp-scanner");
+        const result = await tempScanner.scanFile(file, true);
+        await processQRData(result);
       }
     } catch (err) {
       console.error("❌ Error processing uploaded file:", err);
@@ -421,6 +438,7 @@ const EnhancedQRScanner: React.FC<EnhancedQRScannerProps> = ({ onSuccessfulScan 
               <Button
                 onClick={startScanner}
                 className="bg-orange hover:bg-orange-light transition-colors"
+                disabled={!html5QrCode}
               >
                 <Camera className="mr-2" size={18} />
                 Start Scanner
