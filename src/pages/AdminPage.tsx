@@ -10,7 +10,7 @@ import CardCustomization from "@/components/loyalty/CardCustomization";
 import WelcomeStampsSettings from "@/components/admin/WelcomeStampsSettings";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { QrCode, BarChart2, Users, UserCircle, Link as LinkIcon, Copy, CreditCard, Clock, Gift } from "lucide-react";
+import { QrCode, BarChart2, Users, UserCircle, Link as LinkIcon, Copy, CreditCard, Clock, Gift, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig"
 import ExpiringStampsAlert from "@/components/admin/ExpiringStampsAlert";
 import StampExpirySettings from "@/components/admin/StampExpirySettings";
 import ExpiredStampsLog from "@/components/admin/ExpiredStampsLog";
+import TimeBonusSettings from "@/components/admin/TimeBonusSettings";
 
 const businessSchema = z.object({
   name: z.string().min(2, {
@@ -452,7 +453,7 @@ const AdminPage = () => {
 
         <div className="mt-8">
           <Tabs defaultValue="qr-generator">
-            <TabsList className="grid grid-cols-6 mb-6">
+            <TabsList className="grid grid-cols-5 mb-6">
               <TabsTrigger value="qr-generator" className="flex items-center gap-2">
                 <QrCode size={18} />
                 <span className="hidden sm:inline">QR Generator</span>
@@ -463,15 +464,10 @@ const AdminPage = () => {
                 <span className="hidden sm:inline">Card Editor</span>
                 <span className="sm:hidden">Card</span>
               </TabsTrigger>
-              <TabsTrigger value="welcome-stamps" className="flex items-center gap-2">
-                <Gift size={18} />
-                <span className="hidden sm:inline">Welcome Stamps</span>
-                <span className="sm:hidden">Welcome</span>
-              </TabsTrigger>
-              <TabsTrigger value="stamp-expiry" className="flex items-center gap-2">
-                <Clock size={18} />
-                <span className="hidden sm:inline">Stamp Expiry</span>
-                <span className="sm:hidden">Expiry</span>
+              <TabsTrigger value="settings" className="flex items-center gap-2">
+                <Settings size={18} />
+                <span className="hidden sm:inline">Settings</span>
+                <span className="sm:hidden">Settings</span>
               </TabsTrigger>
               <TabsTrigger value="recent-activity" className="flex items-center gap-2">
                 <BarChart2 size={18} />
@@ -501,12 +497,11 @@ const AdminPage = () => {
                 }}
               />
             </TabsContent>
-            <TabsContent value="welcome-stamps">
-              <WelcomeStampsSettings businessId={businessData.id} />
-            </TabsContent>
-            <TabsContent value="stamp-expiry">
+            <TabsContent value="settings">
               <div className="space-y-6">
+                <WelcomeStampsSettings businessId={businessData.id} />
                 <StampExpirySettings businessId={businessData.id} />
+                <TimeBonusSettings businessId={businessData.id} />
                 <ExpiredStampsLog businessId={businessData.id} />
               </div>
             </TabsContent>

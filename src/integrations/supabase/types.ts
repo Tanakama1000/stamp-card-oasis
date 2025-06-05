@@ -94,6 +94,7 @@ export type Database = {
       }
       businesses: {
         Row: {
+          bonus_periods: Json | null
           created_at: string
           id: string
           is_active: boolean
@@ -108,6 +109,7 @@ export type Database = {
           welcome_stamps_enabled: boolean | null
         }
         Insert: {
+          bonus_periods?: Json | null
           created_at?: string
           id?: string
           is_active?: boolean
@@ -122,6 +124,7 @@ export type Database = {
           welcome_stamps_enabled?: boolean | null
         }
         Update: {
+          bonus_periods?: Json | null
           created_at?: string
           id?: string
           is_active?: boolean
