@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -9,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
 import { supabase } from "@/integrations/supabase/client";
 import CookieConsent from "@/components/CookieConsent";
+import BonusTimeAlert from "@/components/BonusTimeAlert";
 
 const Index = () => {
   const { toast } = useToast();
@@ -379,6 +381,9 @@ const Index = () => {
           <h1 className="text-3xl font-bold text-coffee-dark mb-2">Welcome to Stamp Card Oasis</h1>
           <p className="text-coffee-light">Collect stamps and earn rewards from your favorite businesses</p>
         </div>
+
+        {/* Add BonusTimeAlert right after the header */}
+        {businessId && <BonusTimeAlert businessId={businessId} />}
 
         <Card className="bg-gradient-to-r from-coffee-light to-orange p-6 mb-8 text-white">
           <div className="flex items-center gap-3 mb-4">

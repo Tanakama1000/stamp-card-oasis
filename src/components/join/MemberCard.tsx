@@ -7,6 +7,7 @@ import { Coffee, ScanQrCode } from "lucide-react";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import QRScannerDialog from "@/components/QRScannerDialog";
 import CookieConsent from "@/components/CookieConsent";
+import BonusTimeAlert from "@/components/BonusTimeAlert";
 import { supabase } from "@/integrations/supabase/client";
 
 interface MemberCardProps {
@@ -80,6 +81,9 @@ const MemberCard: React.FC<MemberCardProps> = ({
   return (
     <Layout>
       <div className="max-w-md mx-auto mt-8 mb-12">
+        {/* Add BonusTimeAlert at the top */}
+        {businessData?.id && <BonusTimeAlert businessId={businessData.id} />}
+        
         <Card className="p-6 bg-white card-shadow">
           <div className="text-center mb-6">
             {loyaltyCardConfig?.businessLogo ? (
