@@ -23,7 +23,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig";
 import ExpiringStampsAlert from "@/components/admin/ExpiringStampsAlert";
 import StampExpirySettings from "@/components/admin/StampExpirySettings";
-import ExpiredStampsLog from "@/components/admin/ExpiredStampsLog";
 import TimeBonusSettings from "@/components/admin/TimeBonusSettings";
 
 const businessSchema = z.object({
@@ -502,7 +501,6 @@ const AdminPage = () => {
                 <WelcomeStampsSettings businessId={businessData.id} />
                 <StampExpirySettings businessId={businessData.id} />
                 <TimeBonusSettings businessId={businessData.id} />
-                <ExpiredStampsLog businessId={businessData.id} />
               </div>
             </TabsContent>
             <TabsContent value="recent-activity">
