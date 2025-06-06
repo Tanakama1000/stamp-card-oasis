@@ -52,7 +52,10 @@ const TimeBonusSettings: React.FC<TimeBonusSettingsProps> = ({ businessId }) => 
         .single();
 
       if (error) throw error;
-      setBonusPeriods(data.bonus_periods || []);
+      
+      // Safely parse the Json data to BonusPeriod[]
+      const periods = Array.isArray(data.bonus_periods) ? data.bonus_periods as BonusPeriod[] : [];
+      setBonusPeriods(periods);
     } catch (error) {
       console.error('Error fetching bonus periods:', error);
       toast({
@@ -91,9 +94,12 @@ const TimeBonusSettings: React.FC<TimeBonusSettingsProps> = ({ businessId }) => 
   const handleSave = async () => {
     setSaving(true);
     try {
+      // Convert BonusPeriod[] to Json type for Supabase
+      const periodsAsJson = bonusPeriods as any;
+      
       const { error } = await supabase
         .from('businesses')
-        .update({ bonus_periods: bonusPeriods })
+        .update({ bonus_periods: periodsAsJson })
         .eq('id', businessId);
 
       if (error) throw error;
