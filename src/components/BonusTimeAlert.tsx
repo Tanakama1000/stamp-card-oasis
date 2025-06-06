@@ -39,7 +39,7 @@ const BonusTimeAlert: React.FC<BonusTimeAlertProps> = ({ businessId }) => {
         }
 
         if (data?.bonus_periods && Array.isArray(data.bonus_periods)) {
-          const bonusPeriods = data.bonus_periods as BonusPeriod[];
+          const bonusPeriods = data.bonus_periods as unknown as BonusPeriod[];
           const now = new Date();
           const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
           const currentTime = now.toTimeString().substr(0, 5); // "HH:MM" format
