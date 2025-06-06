@@ -99,6 +99,7 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          notification_days: number | null
           owner_id: string
           referral_bonus_points: number | null
           referral_enabled: boolean | null
@@ -114,6 +115,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          notification_days?: number | null
           owner_id: string
           referral_bonus_points?: number | null
           referral_enabled?: boolean | null
@@ -129,6 +131,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          notification_days?: number | null
           owner_id?: string
           referral_bonus_points?: number | null
           referral_enabled?: boolean | null

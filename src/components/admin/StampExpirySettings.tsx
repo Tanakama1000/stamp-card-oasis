@@ -33,8 +33,11 @@ const StampExpirySettings: React.FC<StampExpirySettingsProps> = ({ businessId })
         .single();
 
       if (error) throw error;
-      setExpiryDays(data.stamp_expiry_days || 0);
-      setNotificationDays(data.notification_days || 3);
+      
+      if (data) {
+        setExpiryDays(data.stamp_expiry_days || 0);
+        setNotificationDays(data.notification_days || 3);
+      }
     } catch (error) {
       console.error('Error fetching expiry settings:', error);
       toast({
