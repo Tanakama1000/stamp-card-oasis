@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { Card } from "@/components/ui/card";
@@ -10,6 +9,16 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface QRScannerProps {
   onSuccessfulScan: (businessId: string, timestamp: number, stamps?: number) => void;
+}
+
+interface BonusPeriod {
+  id: string;
+  name: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  bonus_type: "multiplier" | "fixed";
+  bonus_value: number;
 }
 
 function uuidToNumericId(uuid: string): string {
@@ -39,6 +48,50 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
       }
     };
   }, []);
+
+  const checkActiveBonusPeriod = async (businessId: string): Promise<number> => {
+    try {
+      const { data, error } = await supabase
+        .from('businesses')
+        .select('bonus_periods')
+        .eq('id', businessId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching bonus periods:', error);
+        return 1; // Default to 1 stamp
+      }
+
+      if (data?.bonus_periods && Array.isArray(data.bonus_periods)) {
+        const bonusPeriods = data.bonus_periods as unknown as BonusPeriod[];
+        const now = new Date();
+        const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+        const currentTime = now.toTimeString().substr(0, 5); // "HH:MM" format
+
+        const activePeriod = bonusPeriods.find(period => {
+          return (
+            period.day_of_week === currentDay &&
+            currentTime >= period.start_time &&
+            currentTime <= period.end_time
+          );
+        });
+
+        if (activePeriod) {
+          console.log(`🚀 Active bonus period found: ${activePeriod.name}`);
+          if (activePeriod.bonus_type === "multiplier") {
+            return activePeriod.bonus_value; // e.g., 2x stamps = 2 stamps
+          } else {
+            return 1 + activePeriod.bonus_value; // e.g., +1 extra stamp = 2 total stamps
+          }
+        }
+      }
+
+      return 1; // Default to 1 stamp if no bonus period is active
+    } catch (error) {
+      console.error('Error checking bonus period:', error);
+      return 1;
+    }
+  };
 
   const startScanner = () => {
     if (!html5QrCode) return;
@@ -160,7 +213,9 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
       businessId = foundBusiness.id;
       console.log("✅ Business validated:", businessId);
 
-      const defaultStamps = 1;
+      // Check for bonus period and calculate stamps to award
+      const stampsToAward = await checkActiveBonusPeriod(businessId);
+      console.log(`💰 Stamps to award: ${stampsToAward}`);
 
       // Check authentication status
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -193,14 +248,14 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
 
           console.log("📊 Existing membership:", existingMembership);
 
-          let newStampCount = defaultStamps;
+          let newStampCount = stampsToAward;
           let memberId;
           
           if (existingMembership) {
             // Update existing membership
-            const updatedStamps = (existingMembership.stamps || 0) + defaultStamps;
-            const updatedTotalStamps = (existingMembership.total_stamps_collected || 0) + defaultStamps;
-            console.log(`🔄 Updating stamps from ${existingMembership.stamps} to ${updatedStamps}`);
+            const updatedStamps = (existingMembership.stamps || 0) + stampsToAward;
+            const updatedTotalStamps = (existingMembership.total_stamps_collected || 0) + stampsToAward;
+            console.log(`🔄 Updating stamps from ${existingMembership.stamps} to ${updatedStamps} (+${stampsToAward})`);
             console.log(`🔄 Updating total stamps from ${existingMembership.total_stamps_collected} to ${updatedTotalStamps}`);
             
             const { error: updateError } = await supabase
@@ -227,8 +282,8 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
               .insert({
                 business_id: businessId,
                 user_id: userId,
-                stamps: defaultStamps,
-                total_stamps_collected: defaultStamps,
+                stamps: stampsToAward,
+                total_stamps_collected: stampsToAward,
                 is_anonymous: false,
               })
               .select('id')
@@ -261,14 +316,14 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
 
           console.log("✅ Verification successful. Current stamps:", verifyData);
 
-          onSuccessfulScan(businessId, new Date().getTime(), defaultStamps);
+          onSuccessfulScan(businessId, new Date().getTime(), stampsToAward);
           setScanResult({
             success: true,
-            message: `Successfully scanned! ${defaultStamps} stamp(s) added to your loyalty card. Total: ${verifyData.stamps}`,
+            message: `Successfully scanned! ${stampsToAward} stamp(s) added to your loyalty card. Total: ${verifyData.stamps}`,
           });
           toast({
             title: "Stamp Collected!",
-            description: `${defaultStamps} stamp(s) have been added to your loyalty card.`,
+            description: `${stampsToAward} stamp(s) have been added to your loyalty card.`,
           });
         } catch (error) {
           console.error("❌ Database operation failed:", error);
@@ -277,10 +332,10 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
       } else {
         // Anonymous user - use localStorage
         console.log("🔄 Processing anonymous user scan...");
-        onSuccessfulScan(businessId, new Date().getTime(), defaultStamps);
+        onSuccessfulScan(businessId, new Date().getTime(), stampsToAward);
         setScanResult({
           success: true,
-          message: `Successfully scanned! ${defaultStamps} stamp(s) added to your loyalty card.`,
+          message: `Successfully scanned! ${stampsToAward} stamp(s) added to your loyalty card.`,
         });
       }
     } catch (err) {
