@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,8 +52,8 @@ const TimeBonusSettings: React.FC<TimeBonusSettingsProps> = ({ businessId }) => 
 
       if (error) throw error;
       
-      // Safely parse the Json data to BonusPeriod[]
-      const periods = Array.isArray(data.bonus_periods) ? data.bonus_periods as BonusPeriod[] : [];
+      // Safely parse the Json data to BonusPeriod[] by casting through unknown first
+      const periods = Array.isArray(data.bonus_periods) ? (data.bonus_periods as unknown as BonusPeriod[]) : [];
       setBonusPeriods(periods);
     } catch (error) {
       console.error('Error fetching bonus periods:', error);
