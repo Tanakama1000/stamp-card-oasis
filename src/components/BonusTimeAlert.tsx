@@ -21,6 +21,7 @@ interface BonusPeriod {
 const BonusTimeAlert: React.FC<BonusTimeAlertProps> = ({ businessId }) => {
   const [activeBonusPeriod, setActiveBonusPeriod] = useState<BonusPeriod | null>(null);
   const [loading, setLoading] = useState(true);
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
 
   useEffect(() => {
     const checkActiveBonusPeriod = async () => {
@@ -69,6 +70,50 @@ const BonusTimeAlert: React.FC<BonusTimeAlertProps> = ({ businessId }) => {
     return () => clearInterval(interval);
   }, [businessId]);
 
+  useEffect(() => {
+    if (!activeBonusPeriod) {
+      setTimeRemaining("");
+      return;
+    }
+
+    const calculateTimeRemaining = () => {
+      const now = new Date();
+      const endTime = new Date();
+      const [hours, minutes] = activeBonusPeriod.end_time.split(':').map(Number);
+      endTime.setHours(hours, minutes, 0, 0);
+
+      // If end time is before current time, it means it's for the next day
+      if (endTime < now) {
+        endTime.setDate(endTime.getDate() + 1);
+      }
+
+      const timeDiff = endTime.getTime() - now.getTime();
+      
+      if (timeDiff <= 0) {
+        setTimeRemaining("Expired");
+        setActiveBonusPeriod(null);
+        return;
+      }
+
+      const hoursLeft = Math.floor(timeDiff / (1000 * 60 * 60));
+      const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+      const secondsLeft = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+      if (hoursLeft > 0) {
+        setTimeRemaining(`${hoursLeft}h ${minutesLeft}m ${secondsLeft}s`);
+      } else if (minutesLeft > 0) {
+        setTimeRemaining(`${minutesLeft}m ${secondsLeft}s`);
+      } else {
+        setTimeRemaining(`${secondsLeft}s`);
+      }
+    };
+
+    calculateTimeRemaining();
+    const timer = setInterval(calculateTimeRemaining, 1000);
+
+    return () => clearInterval(timer);
+  }, [activeBonusPeriod]);
+
   if (loading || !activeBonusPeriod) {
     return null;
   }
@@ -88,7 +133,10 @@ const BonusTimeAlert: React.FC<BonusTimeAlertProps> = ({ businessId }) => {
         <span className="text-lg">🚀</span>
         <strong>{activeBonusPeriod.name}!</strong>
         <span>{getBonusText()} now!</span>
-        <Clock className="h-4 w-4 ml-auto" />
+        <div className="ml-auto flex items-center gap-1">
+          <Clock className="h-4 w-4" />
+          <span className="font-mono text-sm">{timeRemaining}</span>
+        </div>
       </AlertDescription>
     </Alert>
   );
