@@ -39,10 +39,8 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   const [previousStamps, setPreviousStamps] = useState<number>(currentStamps);
   const [currentReward, setCurrentReward] = useState<{stampNumber: number, description: string, icon: string} | null>(null);
   const [stampsCollected, setStampsCollected] = useState<number[]>([]);
-  const [wasReset, setWasReset] = useState<boolean>(false);
 
   const handleNewCard = () => {
-    setWasReset(true);
     setStamps(0);
     setShowConfetti(false);
     setShowRewardDialog(false);
@@ -56,24 +54,12 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
   };
 
   useEffect(() => {
-    // Only show confetti if stamps increased naturally (not from reset)
-    const stampsIncreased = currentStamps > previousStamps;
-    const reachedMaxStamps = currentStamps === maxStamps;
+    setStamps(currentStamps);
+    setStampsCollected(Array.from({ length: currentStamps }, (_, i) => i));
     
-    if (wasReset) {
-      // Reset the flag after handling reset
-      setWasReset(false);
-    } else if (stampsIncreased) {
-      // Only show confetti when stamps are earned (not reset)
-      if (reachedMaxStamps) {
-        setShowConfetti(true);
-        setTimeout(() => {
-          setShowConfetti(false);
-        }, 5000);
-      }
-      
+    if (currentStamps > previousStamps && currentStamps < maxStamps) {
       const remaining = maxStamps - currentStamps;
-      if (remaining <= 3 && remaining > 0) {
+      if (remaining <= 3) {
         toast({
           title: `Almost There!`,
           description: `You're only ${remaining} stamp${remaining !== 1 ? 's' : ''} away from your reward!`,
@@ -94,10 +80,15 @@ const LoyaltyCard: React.FC<LoyaltyCardProps> = ({
       }
     }
     
-    setStamps(currentStamps);
-    setStampsCollected(Array.from({ length: currentStamps }, (_, i) => i));
+    if (currentStamps === maxStamps && previousStamps < maxStamps) {
+      setShowConfetti(true);
+      setTimeout(() => {
+        setShowConfetti(false);
+      }, 5000);
+    }
+    
     setPreviousStamps(currentStamps);
-  }, [currentStamps, maxStamps, previousStamps, toast, cardStyle, wasReset]);
+  }, [currentStamps, maxStamps, previousStamps, toast, cardStyle]);
 
   const handleStampClick = (index: number) => {
     return;
