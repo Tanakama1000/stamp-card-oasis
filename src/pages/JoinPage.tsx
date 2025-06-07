@@ -38,7 +38,6 @@ const JoinPage = () => {
   
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [isAuthMode, setIsAuthMode] = useState<boolean>(false);
   const [isSignup, setIsSignup] = useState<boolean>(true);
   const [authLoading, setAuthLoading] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -48,8 +47,6 @@ const JoinPage = () => {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
         setUserId(data.session.user.id);
-      } else {
-        setIsAuthMode(true);
       }
     };
     
@@ -223,103 +220,6 @@ const JoinPage = () => {
     fetchBusinessData();
   }, [businessSlug, businessName, userId, customerName]);
 
-  const handleJoin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!customerName.trim()) {
-      toast({
-        title: "Name Required",
-        description: "Please enter your name to join.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (businessData) {
-      try {
-        let membershipId;
-        
-        if (businessData.id) {
-          const memberData = {
-            business_id: businessData.id,
-            stamps: 0,
-            customer_name: customerName,
-            is_anonymous: !userId,
-            total_stamps_collected: 0,
-            total_rewards_earned: 0
-          };
-          
-          if (userId) {
-            memberData['user_id'] = userId;
-          }
-          
-          const { data: membership, error } = await supabase
-            .from('business_members')
-            .insert(memberData)
-            .select('id')
-            .single();
-            
-          if (error) {
-            console.error("Error joining business:", error);
-            toast({
-              title: "Error",
-              description: "Could not join the loyalty program. Please try again.",
-              variant: "destructive"
-            });
-            return;
-          }
-          
-          membershipId = membership.id;
-          setMemberId(membershipId);
-        }
-        
-        if (!userId) {
-          try {
-            const membershipData = {
-              id: membershipId,
-              businessId: businessData.id,
-              businessSlug: businessSlug,
-              customerName: customerName,
-              joinedAt: new Date().toISOString(),
-              stamps: 0,
-              totalStampsCollected: 0,
-              totalRewardsEarned: 0
-            };
-            
-            const savedMemberships = localStorage.getItem('memberships') || '[]';
-            const memberships = JSON.parse(savedMemberships);
-            memberships.push(membershipData);
-            localStorage.setItem('memberships', JSON.stringify(memberships));
-          } catch (e) {
-            console.error("Error saving to localStorage:", e);
-          }
-        }
-        
-        toast({
-          title: "Welcome!",
-          description: `You've successfully joined ${businessName}'s loyalty program!`,
-        });
-        
-        setJoined(true);
-        setCustomer({
-          id: membershipId || 'temp-id',
-          name: customerName,
-          stamps: 0
-        });
-        setStamps(0);
-        setTotalStampsCollected(0);
-        setTotalRewardsEarned(0);
-      } catch (e) {
-        console.error("Error joining:", e);
-        toast({
-          title: "Error",
-          description: "Could not complete your request. Please try again.",
-          variant: "destructive"
-        });
-      }
-    }
-  };
-
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthLoading(true);
@@ -357,7 +257,7 @@ const JoinPage = () => {
               const memberData = {
                 business_id: businessData.id,
                 stamps: 0,
-                customer_name: customerName,
+                customer_name: customerName || data.user.email?.split('@')[0] || "Member",
                 user_id: data.user.id,
                 is_anonymous: false,
                 total_stamps_collected: 0,
@@ -377,19 +277,22 @@ const JoinPage = () => {
                 setJoined(true);
                 setCustomer({
                   id: data.user.id,
-                  name: customerName,
+                  name: memberData.customer_name,
                   stamps: 0
                 });
                 setStamps(0);
                 setTotalStampsCollected(0);
                 setTotalRewardsEarned(0);
+                
+                toast({
+                  title: "Welcome!",
+                  description: `You've been automatically enrolled in ${businessName}'s loyalty program!`,
+                });
               }
             } catch (e) {
               console.error("Error auto-joining loyalty program:", e);
             }
           }
-          
-          setIsAuthMode(false);
         }
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({ 
@@ -410,7 +313,6 @@ const JoinPage = () => {
         
         if (data.user) {
           setUserId(data.user.id);
-          setIsAuthMode(false);
           
           if (businessData && businessData.id) {
             const { data: membership, error: membershipError } = await supabase
@@ -554,10 +456,6 @@ const JoinPage = () => {
     }
   };
 
-  const toggleAuthMode = () => {
-    setIsAuthMode(!isAuthMode);
-  };
-  
   const handleNewCard = async () => {
     if (businessData?.id && memberId) {
       try {
@@ -628,24 +526,6 @@ const JoinPage = () => {
     return <ErrorState errorMessage="This loyalty program is currently not available." />;
   }
 
-  if (isAuthMode) {
-    return (
-      <LoginForm 
-        isSignup={isSignup}
-        setIsSignup={setIsSignup}
-        email={email}
-        setEmail={setEmail}
-        password={password}
-        setPassword={setPassword}
-        customerName={customerName}
-        setCustomerName={setCustomerName}
-        onSubmit={handleAuthSubmit}
-        authLoading={authLoading}
-        authError={authError}
-      />
-    );
-  }
-
   if (joined && customer && businessData) {
     return <MemberCard 
       businessName={businessName}
@@ -664,15 +544,21 @@ const JoinPage = () => {
     />;
   }
 
-  return <JoinForm 
-    businessName={businessName}
-    loyaltyCardConfig={loyaltyCardConfig}
-    customerName={customerName}
-    setCustomerName={setCustomerName}
-    onJoin={handleJoin}
-    setIsAuthMode={setIsAuthMode}
-    setIsSignup={setIsSignup}
-  />;
+  return (
+    <LoginForm 
+      isSignup={isSignup}
+      setIsSignup={setIsSignup}
+      email={email}
+      setEmail={setEmail}
+      password={password}
+      setPassword={setPassword}
+      customerName={customerName}
+      setCustomerName={setCustomerName}
+      onSubmit={handleAuthSubmit}
+      authLoading={authLoading}
+      authError={authError}
+    />
+  );
 };
 
 export default JoinPage;
