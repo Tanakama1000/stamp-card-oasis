@@ -81,7 +81,7 @@ const RewardCard: React.FC<RewardCardProps> = ({
     updateRewardStats();
   }, [showReward, businessId]);
 
-  // Reset handler - preserve total_stamps_collected when resetting the card
+  // Reset handler - preserve total_stamps_collected exactly as is during reset
   const handleReset = async () => {
     if (!businessId) {
       console.error('No business ID provided');
@@ -103,34 +103,31 @@ const RewardCard: React.FC<RewardCardProps> = ({
       if (fetchError) throw fetchError;
 
       if (membership) {
-        // Store the current values
-        const currentTotalStamps = membership.total_stamps_collected || 0;
+        // Store the EXACT current total_stamps_collected value without any modifications
+        const preservedTotalStamps = membership.total_stamps_collected || 0;
         const currentStamps = membership.stamps || 0;
+        
         console.log("RewardCard - Current stamps before reset:", currentStamps);
-        console.log("RewardCard - Current total stamps before reset:", currentTotalStamps);
+        console.log("RewardCard - Preserving exact total stamps value:", preservedTotalStamps);
         
         // Increment redeemed_rewards counter (permanent stat)
         const newRedeemedRewards = (membership.redeemed_rewards || 0) + 1;
         
-        // Calculate the new total_stamps_collected by adding current stamps 
-        // This ensures we never lose track of stamps when redeeming rewards
-        const newTotalStampsCollected = currentTotalStamps;
+        console.log("RewardCard - New redeemed rewards count:", newRedeemedRewards);
         
-        console.log("RewardCard - New total stamps to preserve:", newTotalStampsCollected);
-        
-        // Update the database
+        // Update the database - preserve total_stamps_collected EXACTLY as it was
         const { error: updateError } = await supabase
           .from('business_members')
           .update({
-            stamps: 0, // Reset card-cycle data
+            stamps: 0, // Reset card-cycle data to 0
             redeemed_rewards: newRedeemedRewards, // Increment permanent stat
-            total_stamps_collected: newTotalStampsCollected // Explicitly preserve the total
+            total_stamps_collected: preservedTotalStamps // Keep the EXACT same value, no additions
           })
           .eq('id', membership.id);
 
         if (updateError) throw updateError;
         
-        console.log("RewardCard - Card reset. Total stamps preserved:", newTotalStampsCollected);
+        console.log("RewardCard - Card reset complete. Stamps: 0, Total preserved exactly:", preservedTotalStamps);
       }
 
       if (onReset) onReset();

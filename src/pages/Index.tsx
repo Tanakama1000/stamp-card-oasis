@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
@@ -285,10 +284,10 @@ const Index = () => {
     }
     
     try {
-      // Get current data before updating to ensure we keep the total_stamps_collected value
+      // Get current data before updating to ensure we preserve the total_stamps_collected value EXACTLY
       const { data: currentMembership, error: fetchError } = await supabase
         .from('business_members')
-        .select('total_stamps_collected')
+        .select('total_stamps_collected, stamps')
         .eq('id', memberId)
         .single();
         
@@ -297,17 +296,19 @@ const Index = () => {
         throw fetchError;
       }
       
-      // Make sure we preserve the total_stamps_collected value
-      const preservedTotal = currentMembership?.total_stamps_collected || 0;
-      console.log("Preserving total stamps collected during reset:", preservedTotal);
+      // Preserve the EXACT total_stamps_collected value without any modifications
+      const preservedTotalStamps = currentMembership?.total_stamps_collected || 0;
+      const currentStamps = currentMembership?.stamps || 0;
       
-      // Reset the current card stamps but NOT the total stamps collected
+      console.log("Index.tsx - Current stamps before reset:", currentStamps);
+      console.log("Index.tsx - Preserving exact total stamps value:", preservedTotalStamps);
+      
+      // Reset the current card stamps but preserve total_stamps_collected EXACTLY as it was
       const { error } = await supabase
         .from('business_members')
         .update({
-          stamps: 0, // Reset only the current stamps
-          // Explicitly set the total_stamps_collected to its current value to ensure it's preserved
-          total_stamps_collected: preservedTotal
+          stamps: 0, // Reset only the current stamps to 0
+          total_stamps_collected: preservedTotalStamps // Keep the EXACT same value, no changes
         })
         .eq('id', memberId);
           
@@ -316,10 +317,11 @@ const Index = () => {
         throw error;
       }
       
-      // Update local state
+      // Update local state to match database
       setStamps(0);
-      setTotalStampsCollected(preservedTotal);
-      console.log("Card reset complete. Stamps: 0, Total preserved:", preservedTotal);
+      setTotalStampsCollected(preservedTotalStamps);
+      
+      console.log("Index.tsx - Card reset complete. Stamps: 0, Total preserved exactly:", preservedTotalStamps);
       
     } catch (error) {
       console.error("Exception while resetting stamps:", error);
