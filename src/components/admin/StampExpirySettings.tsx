@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Clock, AlertCircle, Bell } from "lucide-react";
+import { Clock, AlertCircle, Bell, Play, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface StampExpirySettingsProps {
@@ -16,8 +16,10 @@ interface StampExpirySettingsProps {
 const StampExpirySettings: React.FC<StampExpirySettingsProps> = ({ businessId }) => {
   const [expiryDays, setExpiryDays] = useState<number>(0);
   const [notificationDays, setNotificationDays] = useState<number>(3);
+  const [lastExpiryRun, setLastExpiryRun] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [runningExpiry, setRunningExpiry] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -28,7 +30,7 @@ const StampExpirySettings: React.FC<StampExpirySettingsProps> = ({ businessId })
     try {
       const { data, error } = await supabase
         .from('businesses')
-        .select('stamp_expiry_days, notification_days')
+        .select('stamp_expiry_days, notification_days, last_expiry_run')
         .eq('id', businessId)
         .single();
 
@@ -37,6 +39,7 @@ const StampExpirySettings: React.FC<StampExpirySettingsProps> = ({ businessId })
       if (data) {
         setExpiryDays(data.stamp_expiry_days || 0);
         setNotificationDays(data.notification_days || 3);
+        setLastExpiryRun(data.last_expiry_run);
       }
     } catch (error) {
       console.error('Error fetching expiry settings:', error);
@@ -76,6 +79,40 @@ const StampExpirySettings: React.FC<StampExpirySettingsProps> = ({ businessId })
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleRunExpiryNow = async () => {
+    setRunningExpiry(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('expire-stamps', {
+        body: { manual: true, businessId }
+      });
+
+      if (error) throw error;
+
+      // Update the last expiry run time
+      await supabase
+        .from('businesses')
+        .update({ last_expiry_run: new Date().toISOString() })
+        .eq('id', businessId);
+
+      // Refresh the data
+      await fetchExpirySettings();
+
+      toast({
+        title: "Expiry Check Complete",
+        description: data?.message || `Successfully expired ${data?.expiredCount || 0} stamps.`
+      });
+    } catch (error) {
+      console.error('Error running expiry check:', error);
+      toast({
+        title: "Error",
+        description: "Failed to run expiry check. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setRunningExpiry(false);
     }
   };
 
@@ -137,13 +174,39 @@ const StampExpirySettings: React.FC<StampExpirySettingsProps> = ({ businessId })
             </Alert>
           )}
 
-          <Button 
-            onClick={handleSave} 
-            disabled={saving}
-            className="w-full sm:w-auto"
-          >
-            {saving ? "Saving..." : "Save Settings"}
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 items-start">
+            <Button 
+              onClick={handleSave} 
+              disabled={saving}
+              className="w-full sm:w-auto"
+            >
+              {saving ? "Saving..." : "Save Settings"}
+            </Button>
+
+            {expiryDays > 0 && (
+              <div className="flex flex-col gap-2 w-full sm:w-auto">
+                <Button
+                  onClick={handleRunExpiryNow}
+                  disabled={runningExpiry}
+                  variant="outline"
+                  className="w-full sm:w-auto flex items-center gap-2"
+                >
+                  {runningExpiry ? (
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Play className="h-4 w-4" />
+                  )}
+                  {runningExpiry ? "Running..." : "Run Expiry Check Now"}
+                </Button>
+                
+                {lastExpiryRun && (
+                  <p className="text-sm text-gray-500">
+                    Last run: {new Date(lastExpiryRun).toLocaleString()}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </Card>

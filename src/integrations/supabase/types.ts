@@ -98,6 +98,7 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          last_expiry_run: string | null
           name: string
           notification_days: number | null
           owner_id: string
@@ -114,6 +115,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          last_expiry_run?: string | null
           name: string
           notification_days?: number | null
           owner_id: string
@@ -130,6 +132,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          last_expiry_run?: string | null
           name?: string
           notification_days?: number | null
           owner_id?: string

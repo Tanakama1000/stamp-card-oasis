@@ -18,7 +18,25 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    console.log('Starting stamp expiry check...')
+    // Parse request body to check if this is a manual or scheduled run
+    let requestData = {};
+    try {
+      const body = await req.text();
+      if (body) {
+        requestData = JSON.parse(body);
+      }
+    } catch (error) {
+      console.log('No request body or invalid JSON, proceeding with default behavior');
+    }
+
+    const isManual = requestData.manual || false;
+    const targetBusinessId = requestData.businessId || null;
+
+    console.log(`Starting stamp expiry check... (${isManual ? 'manual' : 'scheduled'})`);
+    
+    if (targetBusinessId) {
+      console.log(`Targeting specific business: ${targetBusinessId}`);
+    }
 
     // Call the expire_old_stamps function
     const { data, error } = await supabaseClient.rpc('expire_old_stamps')
@@ -31,12 +49,40 @@ serve(async (req) => {
     const expiredCount = data || 0
     console.log(`Expired ${expiredCount} stamps`)
 
+    // Update last expiry run timestamp for businesses that had expiry enabled
+    if (!targetBusinessId) {
+      // For scheduled runs, update all businesses with expiry enabled
+      const { error: updateError } = await supabaseClient
+        .from('businesses')
+        .update({ last_expiry_run: new Date().toISOString() })
+        .gt('stamp_expiry_days', 0)
+        .eq('is_active', true);
+
+      if (updateError) {
+        console.error('Error updating last expiry run:', updateError);
+      }
+    } else {
+      // For manual runs, update the specific business
+      const { error: updateError } = await supabaseClient
+        .from('businesses')
+        .update({ last_expiry_run: new Date().toISOString() })
+        .eq('id', targetBusinessId);
+
+      if (updateError) {
+        console.error('Error updating last expiry run for business:', updateError);
+      }
+    }
+
+    const response = {
+      success: true,
+      expiredCount,
+      message: `Successfully expired ${expiredCount} stamps`,
+      isManual,
+      timestamp: new Date().toISOString()
+    };
+
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        expiredCount,
-        message: `Successfully expired ${expiredCount} stamps`
-      }),
+      JSON.stringify(response),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
@@ -47,7 +93,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        success: false 
+        success: false,
+        timestamp: new Date().toISOString()
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

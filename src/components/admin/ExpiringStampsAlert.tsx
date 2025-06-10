@@ -1,115 +1,116 @@
 
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { AlertTriangle, Bell, User, Hash, Calendar } from "lucide-react";
-
-interface ExpiringStamp {
-  business_member_id: string;
-  customer_name: string;
-  stamps_expiring: number;
-  expires_in_days: number;
-}
+import { AlertTriangle, RefreshCw, Clock } from "lucide-react";
 
 interface ExpiringStampsAlertProps {
   businessId: string;
 }
 
+interface ExpiringStamp {
+  customer_name: string;
+  stamps_expiring: number;
+  expires_in_days: number;
+}
+
 const ExpiringStampsAlert: React.FC<ExpiringStampsAlertProps> = ({ businessId }) => {
   const [expiringStamps, setExpiringStamps] = useState<ExpiringStamp[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchExpiringStamps();
+    
+    // Set up an interval to refresh data every 5 minutes
+    const interval = setInterval(fetchExpiringStamps, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
   }, [businessId]);
 
   const fetchExpiringStamps = async () => {
+    if (!refreshing) setLoading(true);
+    
     try {
-      const { data, error } = await supabase.rpc('get_expiring_stamps', { days_ahead: 3 });
+      const { data, error } = await supabase.rpc('get_expiring_stamps', {
+        days_ahead: 3
+      });
 
-      if (error) throw error;
-      
-      // Filter for current business
-      const businessExpiringStamps = (data || []).filter(
-        (stamp: any) => stamp.business_id === businessId
-      );
-      
-      setExpiringStamps(businessExpiringStamps);
+      if (error) {
+        console.error('Error fetching expiring stamps:', error);
+        return;
+      }
+
+      // Filter for this specific business
+      const businessStamps = data?.filter(stamp => stamp.business_id === businessId) || [];
+      setExpiringStamps(businessStamps);
     } catch (error) {
       console.error('Error fetching expiring stamps:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load expiring stamps.",
-        variant: "destructive"
-      });
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
-  if (loading) {
-    return <div>Loading expiring stamps...</div>;
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchExpiringStamps();
+  };
+
+  if (loading && !refreshing) {
+    return (
+      <Card className="p-4">
+        <div className="flex items-center gap-2">
+          <Clock className="h-4 w-4 animate-spin" />
+          <span className="text-sm">Checking for expiring stamps...</span>
+        </div>
+      </Card>
+    );
   }
 
   if (expiringStamps.length === 0) {
     return null;
   }
 
-  return (
-    <Card className="p-6 border-yellow-200 bg-yellow-50">
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5 text-yellow-600" />
-          <h3 className="text-lg font-semibold text-yellow-800">Stamps Expiring Soon</h3>
-          <Badge variant="outline" className="text-yellow-700 border-yellow-300">
-            {expiringStamps.length} customer{expiringStamps.length !== 1 ? 's' : ''}
-          </Badge>
-        </div>
+  const totalExpiringStamps = expiringStamps.reduce((sum, item) => sum + item.stamps_expiring, 0);
 
-        <div className="space-y-3">
-          {expiringStamps.map((stamp, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-3 bg-white rounded-lg border border-yellow-200"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-gray-600" />
-                  <span className="font-medium">{stamp.customer_name || "Anonymous"}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Hash className="h-4 w-4 text-gray-600" />
-                  <Badge variant="outline" className="text-yellow-700">
-                    {stamp.stamps_expiring} stamp{stamp.stamps_expiring !== 1 ? 's' : ''}
-                  </Badge>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Calendar className="h-4 w-4 text-yellow-600" />
-                <span className="text-yellow-700 font-medium">
-                  {stamp.expires_in_days} day{stamp.expires_in_days !== 1 ? 's' : ''} left
-                </span>
+  return (
+    <Card className="p-4 border-orange-200 bg-orange-50">
+      <Alert>
+        <AlertTriangle className="h-4 w-4 text-orange-600" />
+        <AlertDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <strong className="text-orange-800">
+                {totalExpiringStamps} stamps expiring soon
+              </strong>
+              <div className="mt-2 space-y-1">
+                {expiringStamps.map((item, index) => (
+                  <div key={index} className="text-sm text-orange-700">
+                    <strong>{item.customer_name}</strong>: {item.stamps_expiring} stamps 
+                    expire in {item.expires_in_days} day{item.expires_in_days !== 1 ? 's' : ''}
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
-
-        <div className="pt-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={fetchExpiringStamps}
-            className="text-yellow-700 border-yellow-300 hover:bg-yellow-100"
-          >
-            <Bell className="h-4 w-4 mr-2" />
-            Refresh Alerts
-          </Button>
-        </div>
-      </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="ml-4"
+            >
+              {refreshing ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+        </AlertDescription>
+      </Alert>
     </Card>
   );
 };
