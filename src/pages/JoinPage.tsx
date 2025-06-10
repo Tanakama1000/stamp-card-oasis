@@ -23,6 +23,7 @@ const JoinPage = () => {
   const [businessName, setBusinessName] = useState<string>("");
   const [customerName, setCustomerName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
+  const [authChecking, setAuthChecking] = useState<boolean>(true); // New state for auth checking
   const [error, setError] = useState<string | null>(null);
   const [businessInactive, setBusinessInactive] = useState<boolean>(false);
   const [joined, setJoined] = useState<boolean>(false);
@@ -43,16 +44,26 @@ const JoinPage = () => {
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        setUserId(data.session.user.id);
+    const initializeApp = async () => {
+      try {
+        // First, check authentication status
+        setAuthChecking(true);
+        const { data } = await supabase.auth.getSession();
+        const currentUserId = data.session?.user?.id || null;
+        setUserId(currentUserId);
+        setAuthChecking(false);
+
+        // Then fetch business data
+        await fetchBusinessData(currentUserId);
+      } catch (e) {
+        console.error("Error in initialization:", e);
+        setError("Failed to load business data");
+        setAuthChecking(false);
+        setLoading(false);
       }
     };
     
-    checkAuth();
-    
-    const fetchBusinessData = async () => {
+    const fetchBusinessData = async (currentUserId: string | null) => {
       try {
         const { data: businesses, error } = await supabase
           .from("businesses")
@@ -86,6 +97,7 @@ const JoinPage = () => {
             setBusinessName(foundBusiness.name);
             setBusinessData(foundBusiness);
             await fetchLoyaltyCardConfig(foundBusiness.id);
+            await checkMembership(foundBusiness, currentUserId);
           } else if (businessSlug === "coffee-oasis") {
             setBusinessName("Coffee Oasis");
             const defaultBusinessData = {
@@ -96,6 +108,7 @@ const JoinPage = () => {
             };
             setBusinessData(defaultBusinessData);
             await fetchLoyaltyCardConfig(defaultBusinessData.id);
+            await checkMembership(defaultBusinessData, currentUserId);
           } else {
             setError("Business not found");
           }
@@ -109,51 +122,7 @@ const JoinPage = () => {
           setBusinessName(businesses.name);
           setBusinessData(businesses);
           await fetchLoyaltyCardConfig(businesses.id);
-          
-          if (userId) {
-            const { data: membership } = await supabase
-              .from("business_members")
-              .select("*")
-              .eq("business_id", businesses.id)
-              .eq("user_id", userId)
-              .eq("is_anonymous", false)
-              .single();
-              
-            if (membership) {
-              setJoined(true);
-              setMemberId(membership.id);
-              setCustomer({
-                id: userId,
-                name: membership.customer_name || "Member",
-                stamps: membership.stamps || 0
-              });
-              setStamps(membership.stamps || 0);
-            }
-          } else {
-            const savedMemberships = localStorage.getItem('memberships');
-            if (savedMemberships) {
-              try {
-                const memberships = JSON.parse(savedMemberships);
-                const membership = memberships.find((m: any) => 
-                  m.businessId === businesses.id
-                );
-                
-                if (membership) {
-                  setJoined(true);
-                  setMemberId(membership.id);
-                  setCustomer({
-                    id: membership.id,
-                    name: membership.customerName,
-                    stamps: membership.stamps || 0
-                  });
-                  setCustomerName(membership.customerName || "");
-                  setStamps(membership.stamps || 0);
-                }
-              } catch (e) {
-                console.error("Error parsing memberships:", e);
-              }
-            }
-          }
+          await checkMembership(businesses, currentUserId);
         } else {
           setError("Business not found");
         }
@@ -163,6 +132,60 @@ const JoinPage = () => {
         console.error("Error in fetchBusinessData:", e);
         setError("Failed to load business data");
         setLoading(false);
+      }
+    };
+
+    const checkMembership = async (business: any, currentUserId: string | null) => {
+      if (currentUserId) {
+        // Check database membership for authenticated users
+        const { data: membership } = await supabase
+          .from("business_members")
+          .select("*")
+          .eq("business_id", business.id)
+          .eq("user_id", currentUserId)
+          .eq("is_anonymous", false)
+          .single();
+          
+        if (membership) {
+          setJoined(true);
+          setMemberId(membership.id);
+          setCustomer({
+            id: currentUserId,
+            name: membership.customer_name || "Member",
+            stamps: membership.stamps || 0
+          });
+          setStamps(membership.stamps || 0);
+          setTotalStampsCollected(membership.total_stamps_collected || 0);
+          setTotalRewardsEarned(membership.total_rewards_earned || 0);
+          setCustomerName(membership.customer_name || "");
+        }
+      } else {
+        // Check localStorage for anonymous users
+        const savedMemberships = localStorage.getItem('memberships');
+        if (savedMemberships) {
+          try {
+            const memberships = JSON.parse(savedMemberships);
+            const membership = memberships.find((m: any) => 
+              m.businessId === business.id
+            );
+            
+            if (membership) {
+              setJoined(true);
+              setMemberId(membership.id);
+              setCustomer({
+                id: membership.id,
+                name: membership.customerName,
+                stamps: membership.stamps || 0
+              });
+              setCustomerName(membership.customerName || "");
+              setStamps(membership.stamps || 0);
+              setTotalStampsCollected(membership.totalStampsCollected || 0);
+              setTotalRewardsEarned(membership.totalRewardsEarned || 0);
+            }
+          } catch (e) {
+            console.error("Error parsing memberships:", e);
+          }
+        }
       }
     };
     
@@ -217,8 +240,8 @@ const JoinPage = () => {
       }
     };
     
-    fetchBusinessData();
-  }, [businessSlug, businessName, userId, customerName]);
+    initializeApp();
+  }, [businessSlug, businessName]);
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -514,7 +537,8 @@ const JoinPage = () => {
     }
   };
 
-  if (loading) {
+  // Show loading state while checking auth AND business data
+  if (loading || authChecking) {
     return <LoadingState />;
   }
 
@@ -526,6 +550,7 @@ const JoinPage = () => {
     return <ErrorState errorMessage="This loyalty program is currently not available." />;
   }
 
+  // Show member card for existing members
   if (joined && customer && businessData) {
     return <MemberCard 
       businessName={businessName}
@@ -544,6 +569,7 @@ const JoinPage = () => {
     />;
   }
 
+  // Only show login form for non-members after auth check is complete
   return (
     <LoginForm 
       isSignup={isSignup}
