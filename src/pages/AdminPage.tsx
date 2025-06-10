@@ -36,7 +36,6 @@ const AdminPage = () => {
   const { toast } = useToast();
   const [user, setUser] = useState(null);
   const [businessData, setBusinessData] = useState(null);
-  const [isCheckingBusiness, setIsCheckingBusiness] = useState(true);
   const [isCreatingBusiness, setIsCreatingBusiness] = useState(false);
   const [isNameEditing, setIsNameEditing] = useState(false);
   const [slugEditing, setSlugEditing] = useState(false);
@@ -59,38 +58,32 @@ const AdminPage = () => {
 
   useEffect(() => {
     const checkUser = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!session) {
-          toast({
-            title: "Please Login",
-            description: "You need to be logged in to access the admin page.",
-            variant: "destructive"
-          });
-          navigate('/auth');
-          return;
-        }
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: "Please Login",
+          description: "You need to be logged in to access the admin page.",
+          variant: "destructive"
+        });
+        navigate('/auth');
+        return;
+      }
 
-        setUser(session.user);
+      setUser(session.user);
 
-        const { data: businesses, error } = await supabase
-          .from('businesses')
-          .select('*')
-          .eq('owner_id', session.user.id)
-          .single();
+      const { data: businesses, error } = await supabase
+        .from('businesses')
+        .select('*')
+        .eq('owner_id', session.user.id)
+        .single();
 
-        if (businesses) {
-          setBusinessData(businesses);
-          localStorage.setItem('businessData', JSON.stringify(businesses));
-          setTempSlug(businesses.slug);
-        } else if (error && error.code !== 'PGRST116') {
-          console.error('Error fetching business:', error);
-        }
-      } catch (error) {
-        console.error('Error in checkUser:', error);
-      } finally {
-        setIsCheckingBusiness(false);
+      if (businesses) {
+        setBusinessData(businesses);
+        localStorage.setItem('businessData', JSON.stringify(businesses));
+        setTempSlug(businesses.slug);
+      } else if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching business:', error);
       }
     };
 
@@ -251,18 +244,8 @@ const AdminPage = () => {
     return date.toLocaleString();
   };
 
-  if (!user || isCheckingBusiness) {
-    return (
-      <Layout>
-        <div className="flex justify-center items-center h-screen bg-cream-light">
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-coffee-medium rounded-full animate-bounce" />
-            <div className="w-3 h-3 bg-coffee-medium rounded-full animate-bounce [animation-delay:0.2s]" />
-            <div className="w-3 h-3 bg-coffee-medium rounded-full animate-bounce [animation-delay:0.4s]" />
-          </div>
-        </div>
-      </Layout>
-    );
+  if (!user) {
+    return <Layout><div>Loading...</div></Layout>;
   }
 
   if (!businessData && !isCreatingBusiness) {
