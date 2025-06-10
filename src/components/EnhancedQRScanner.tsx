@@ -13,6 +13,16 @@ interface EnhancedQRScannerProps {
   onSuccessfulScan: (businessId: string, timestamp: number, stamps?: number) => void;
 }
 
+interface BonusPeriod {
+  id: string;
+  name: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  bonus_type: "multiplier" | "fixed";
+  bonus_value: number;
+}
+
 function uuidToNumericId(uuid: string): string {
   let num = 0;
   for (let i = 0; i < uuid.length; i++) {
@@ -63,6 +73,65 @@ const EnhancedQRScanner: React.FC<EnhancedQRScannerProps> = ({ onSuccessfulScan 
       }
     };
   }, [fallbackMode, deviceInfo]);
+
+  const checkActiveBonusPeriod = async (businessId: string): Promise<number> => {
+    try {
+      console.log("🎁 Checking for active bonus periods for business:", businessId);
+      
+      const { data, error } = await supabase
+        .from('businesses')
+        .select('bonus_periods')
+        .eq('id', businessId)
+        .single();
+
+      if (error) {
+        console.error('❌ Error fetching bonus periods:', error);
+        return 1; // Default to 1 stamp
+      }
+
+      if (data?.bonus_periods && Array.isArray(data.bonus_periods)) {
+        const bonusPeriods = data.bonus_periods as unknown as BonusPeriod[];
+        const now = new Date();
+        const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+        const currentTime = now.toTimeString().substr(0, 5); // "HH:MM" format
+
+        console.log(`🕐 Current time: ${currentTime}, Day: ${currentDay}`);
+
+        const activePeriod = bonusPeriods.find(period => {
+          const isCorrectDay = period.day_of_week === currentDay;
+          const isInTimeRange = currentTime >= period.start_time && currentTime <= period.end_time;
+          
+          console.log(`🔍 Checking period "${period.name}": Day ${period.day_of_week} (${isCorrectDay}), Time ${period.start_time}-${period.end_time} (${isInTimeRange})`);
+          
+          return isCorrectDay && isInTimeRange;
+        });
+
+        if (activePeriod) {
+          console.log(`🚀 Active bonus period found: ${activePeriod.name}`);
+          let bonusStamps = 1; // Default base stamps
+          
+          if (activePeriod.bonus_type === "multiplier") {
+            bonusStamps = activePeriod.bonus_value; // e.g., 2x stamps = 2 stamps
+            console.log(`✨ Multiplier bonus: ${bonusStamps} stamps`);
+          } else if (activePeriod.bonus_type === "fixed") {
+            bonusStamps = 1 + activePeriod.bonus_value; // e.g., +1 extra stamp = 2 total stamps
+            console.log(`✨ Fixed bonus: 1 + ${activePeriod.bonus_value} = ${bonusStamps} stamps`);
+          }
+          
+          return bonusStamps;
+        } else {
+          console.log("⏰ No active bonus period found");
+        }
+      } else {
+        console.log("📝 No bonus periods configured for this business");
+      }
+
+      return 1; // Default to 1 stamp if no bonus period is active
+    } catch (error) {
+      console.error('❌ Error checking bonus period:', error);
+      return 1;
+    }
+  };
 
   const validateBusinessExists = async (idFromQR: string, useNumericId: boolean = false): Promise<null | { id: string }> => {
     try {
@@ -144,7 +213,9 @@ const EnhancedQRScanner: React.FC<EnhancedQRScannerProps> = ({ onSuccessfulScan 
       businessId = foundBusiness.id;
       console.log("✅ Business validated:", businessId);
 
-      const defaultStamps = 1;
+      // Check for bonus period and calculate stamps to award
+      const stampsToAward = await checkActiveBonusPeriod(businessId);
+      console.log(`💰 Stamps to award: ${stampsToAward}`);
 
       // Check authentication status
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -176,13 +247,12 @@ const EnhancedQRScanner: React.FC<EnhancedQRScannerProps> = ({ onSuccessfulScan 
 
           console.log("📊 Existing membership:", existingMembership);
 
-          let newStampCount = defaultStamps;
           let memberId;
           
           if (existingMembership) {
-            const updatedStamps = (existingMembership.stamps || 0) + defaultStamps;
-            const updatedTotalStamps = (existingMembership.total_stamps_collected || 0) + defaultStamps;
-            console.log(`🔄 Updating stamps from ${existingMembership.stamps} to ${updatedStamps}`);
+            const updatedStamps = (existingMembership.stamps || 0) + stampsToAward;
+            const updatedTotalStamps = (existingMembership.total_stamps_collected || 0) + stampsToAward;
+            console.log(`🔄 Updating stamps from ${existingMembership.stamps} to ${updatedStamps} (+${stampsToAward})`);
             
             const { error: updateError } = await supabase
               .from('business_members')
@@ -197,7 +267,6 @@ const EnhancedQRScanner: React.FC<EnhancedQRScannerProps> = ({ onSuccessfulScan 
               throw new Error(`Failed to update stamps: ${updateError.message}`);
             }
             
-            newStampCount = updatedStamps;
             memberId = existingMembership.id;
             console.log("✅ Successfully updated existing membership");
           } else {
@@ -207,8 +276,8 @@ const EnhancedQRScanner: React.FC<EnhancedQRScannerProps> = ({ onSuccessfulScan 
               .insert({
                 business_id: businessId,
                 user_id: userId,
-                stamps: defaultStamps,
-                total_stamps_collected: defaultStamps,
+                stamps: stampsToAward,
+                total_stamps_collected: stampsToAward,
                 is_anonymous: false,
               })
               .select('id')
@@ -227,25 +296,34 @@ const EnhancedQRScanner: React.FC<EnhancedQRScannerProps> = ({ onSuccessfulScan 
             }
           }
 
-          onSuccessfulScan(businessId, new Date().getTime(), defaultStamps);
+          onSuccessfulScan(businessId, new Date().getTime(), stampsToAward);
           setScanResult({
             success: true,
-            message: `Successfully scanned! ${defaultStamps} stamp(s) added to your loyalty card.`,
+            message: `Successfully scanned! ${stampsToAward} stamp(s) added to your loyalty card.`,
           });
-          toast({
-            title: "Stamp Collected!",
-            description: `${defaultStamps} stamp(s) have been added to your loyalty card.`,
-          });
+          
+          // Enhanced toast message for bonus stamps
+          if (stampsToAward > 1) {
+            toast({
+              title: "🎉 Bonus Stamps Collected!",
+              description: `You received ${stampsToAward} stamps! A bonus period is currently active.`,
+            });
+          } else {
+            toast({
+              title: "Stamp Collected!",
+              description: `${stampsToAward} stamp has been added to your loyalty card.`,
+            });
+          }
         } catch (error) {
           console.error("❌ Database operation failed:", error);
           handleInvalidQR(`Database error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`);
         }
       } else {
         console.log("🔄 Processing anonymous user scan...");
-        onSuccessfulScan(businessId, new Date().getTime(), defaultStamps);
+        onSuccessfulScan(businessId, new Date().getTime(), stampsToAward);
         setScanResult({
           success: true,
-          message: `Successfully scanned! ${defaultStamps} stamp(s) added to your loyalty card.`,
+          message: `Successfully scanned! ${stampsToAward} stamp(s) added to your loyalty card.`,
         });
       }
     } catch (err) {

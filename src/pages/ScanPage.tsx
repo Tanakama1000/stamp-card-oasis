@@ -38,11 +38,21 @@ const ScanPage = () => {
       
       if (sessionData?.session?.user?.id) {
         console.log("✅ Authenticated user scanned business QR:", businessId);
-        toast({
-          title: "QR Code Scanned Successfully!",
-          description: `You collected ${stamps} stamp${stamps !== 1 ? 's' : ''}! Check your loyalty card to see your progress.`,
-          variant: "default",
-        });
+        
+        // Enhanced toast message for bonus stamps
+        if (stamps > 1) {
+          toast({
+            title: "🎉 Bonus Stamps Collected!",
+            description: `You collected ${stamps} stamps! A bonus period was active. Check your loyalty card to see your progress.`,
+            variant: "default",
+          });
+        } else {
+          toast({
+            title: "QR Code Scanned Successfully!",
+            description: `You collected ${stamps} stamp! Check your loyalty card to see your progress.`,
+            variant: "default",
+          });
+        }
       } else {
         console.log("👤 Anonymous user - storing in localStorage");
         try {
@@ -54,7 +64,7 @@ const ScanPage = () => {
           if (existingIndex >= 0) {
             const oldStamps = memberships[existingIndex].stamps || 0;
             memberships[existingIndex].stamps = oldStamps + stamps;
-            console.log(`📊 Updated localStorage stamps from ${oldStamps} to ${memberships[existingIndex].stamps}`);
+            console.log(`📊 Updated localStorage stamps from ${oldStamps} to ${memberships[existingIndex].stamps} (+${stamps})`);
           } else {
             const newMembership = {
               id: `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -70,11 +80,20 @@ const ScanPage = () => {
           localStorage.setItem('memberships', JSON.stringify(memberships));
           console.log("✅ localStorage updated successfully");
           
-          toast({
-            title: "QR Code Scanned Successfully!",
-            description: `You collected ${stamps} stamp${stamps !== 1 ? 's' : ''}! Sign in to sync your stamps across devices.`,
-            variant: "default",
-          });
+          // Enhanced toast message for bonus stamps
+          if (stamps > 1) {
+            toast({
+              title: "🎉 Bonus Stamps Collected!",
+              description: `You collected ${stamps} stamps! A bonus period was active. Sign in to sync your stamps across devices.`,
+              variant: "default",
+            });
+          } else {
+            toast({
+              title: "QR Code Scanned Successfully!",
+              description: `You collected ${stamps} stamp! Sign in to sync your stamps across devices.`,
+              variant: "default",
+            });
+          }
         } catch (e) {
           console.error("❌ Error updating localStorage:", e);
           setError("Could not save your stamp locally. Please try again or sign in to save your stamps.");
