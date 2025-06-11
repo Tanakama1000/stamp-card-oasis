@@ -46,11 +46,11 @@ const BonusTimeAlert: React.FC<BonusTimeAlertProps> = ({ businessId }) => {
           const currentTime = now.toTimeString().substr(0, 5); // "HH:MM" format
 
           const activePeriod = bonusPeriods.find(period => {
-            return (
-              period.day_of_week === currentDay &&
-              currentTime >= period.start_time &&
-              currentTime <= period.end_time
-            );
+            // Check if it's an "everyday" period (-1) or matches the current day
+            const isCorrectDay = period.day_of_week === -1 || period.day_of_week === currentDay;
+            const isInTimeRange = currentTime >= period.start_time && currentTime <= period.end_time;
+            
+            return isCorrectDay && isInTimeRange;
           });
 
           setActiveBonusPeriod(activePeriod || null);
