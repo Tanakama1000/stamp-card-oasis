@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LoyaltyCard from "@/components/LoyaltyCard";
-import ProfileDropdown from "@/components/ProfileDropdown";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +22,6 @@ const Index = () => {
   const [totalStampsCollected, setTotalStampsCollected] = useState<number>(0);
   const [memberId, setMemberId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserStats = async () => {
@@ -375,64 +373,15 @@ const Index = () => {
     }
   };
 
-  const handleNameUpdate = (newName: string) => {
-    setCustomerName(newName);
-  };
-
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      
-      // Clear all local state
-      setCustomerName("");
-      setStamps(0);
-      setTotalStampsCollected(0);
-      setTotalEarned(0);
-      setMemberId(null);
-      setUserId(null);
-      
-      // Clear localStorage
-      localStorage.removeItem('anonymousUserId');
-      localStorage.removeItem('loyaltyCardConfig');
-      
-      toast({
-        title: "Logged Out",
-        description: "You have been successfully logged out.",
-        duration: 2000,
-      });
-      
-      // Reload the page to reset everything
-      window.location.reload();
-    } catch (error) {
-      console.error('Error logging out:', error);
-      toast({
-        title: "Error",
-        description: "Failed to log out. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const miniRewards = cardStyle?.rewards || [];
   const sortedRewards = [...(miniRewards || [])].sort((a, b) => a.stampNumber - b.stampNumber);
 
   return (
     <Layout>
       <div className="max-w-3xl mx-auto">
-        {/* Header with Profile Button */}
-        <div className="flex justify-between items-start mb-8">
-          <div className="text-center flex-1">
-            <h1 className="text-3xl font-bold text-coffee-dark mb-2">Welcome to Stamp Card Oasis</h1>
-            <p className="text-coffee-light">Collect stamps and earn rewards from your favorite businesses</p>
-          </div>
-          <div className="flex-shrink-0 ml-4">
-            <ProfileDropdown
-              customerName={customerName}
-              businessId={businessId}
-              onNameUpdate={handleNameUpdate}
-              onLogout={handleLogout}
-            />
-          </div>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-coffee-dark mb-2">Welcome to Stamp Card Oasis</h1>
+          <p className="text-coffee-light">Collect stamps and earn rewards from your favorite businesses</p>
         </div>
 
         {/* Add BonusTimeAlert right after the header */}

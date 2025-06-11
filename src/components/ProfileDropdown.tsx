@@ -1,123 +1,151 @@
 
 import React, { useState } from "react";
-import { User, Edit, LogOut } from "lucide-react";
+import { User, Edit3, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProfileDropdownProps {
+  userId: string | null;
   customerName: string;
-  businessId: string;
   onNameUpdate: (newName: string) => void;
   onLogout: () => void;
 }
 
 const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
+  userId,
   customerName,
-  businessId,
   onNameUpdate,
   onLogout
 }) => {
-  const { toast } = useToast();
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingName, setEditingName] = useState(false);
   const [newName, setNewName] = useState(customerName);
+  const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
 
   const handleSaveName = async () => {
-    if (!businessId) return;
-
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user?.id;
-
-      const { error } = await supabase
-        .from('business_members')
-        .update({
-          customer_name: newName.trim()
-        })
-        .eq('business_id', businessId)
-        .eq(userId ? 'user_id' : 'is_anonymous', userId || true);
-
-      if (error) throw error;
-      
-      onNameUpdate(newName.trim());
-      setIsEditDialogOpen(false);
-      
-      toast({
-        title: "Name Updated",
-        description: "Your card name has been updated successfully.",
-        duration: 2000,
-      });
-    } catch (error) {
-      console.error('Error saving customer name:', error);
+    if (!newName.trim()) {
       toast({
         title: "Error",
-        description: "Failed to update your name. Please try again.",
+        description: "Name cannot be empty",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      onNameUpdate(newName.trim());
+      setEditingName(false);
+      toast({
+        title: "Name Updated",
+        description: "Your card name has been updated successfully",
+      });
+    } catch (error) {
+      console.error("Error updating name:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update name. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      onLogout();
+      toast({
+        title: "Logged Out",
+        description: "You have been logged out successfully",
+      });
+    } catch (error) {
+      console.error("Error logging out:", error);
+      toast({
+        title: "Error",
+        description: "Failed to log out. Please try again.",
         variant: "destructive",
       });
     }
   };
 
   return (
-    <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
-          >
-            <User className="h-5 w-5" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 bg-white border shadow-lg">
-          <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)} className="cursor-pointer">
-            <Edit className="mr-2 h-4 w-4" />
-            Edit Card Name
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={onLogout} className="cursor-pointer">
-            <LogOut className="mr-2 h-4 w-4" />
-            Log Out
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="bg-white">
-          <DialogHeader>
-            <DialogTitle>Edit Card Name</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="cardName" className="block text-sm font-medium mb-2">
-                Card Name
-              </label>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="rounded-full">
+          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+            <User size={16} className="text-gray-600" />
+          </div>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <Popover open={editingName} onOpenChange={setEditingName}>
+          <PopoverTrigger asChild>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <Edit3 size={16} className="mr-2" />
+              Edit Card Name
+            </DropdownMenuItem>
+          </PopoverTrigger>
+          <PopoverContent className="w-64" align="end">
+            <div className="space-y-3">
+              <h4 className="font-medium">Edit Card Name</h4>
               <Input
-                id="cardName"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Enter your name"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSaveName();
+                  }
+                }}
               />
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  onClick={handleSaveName}
+                  disabled={saving}
+                  className="flex-1"
+                >
+                  {saving ? "Saving..." : "Save"}
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => {
+                    setEditingName(false);
+                    setNewName(customerName);
+                  }}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+              </div>
             </div>
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleSaveName}>
-                Save
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+          </PopoverContent>
+        </Popover>
+        
+        {userId && (
+          <DropdownMenuItem onClick={handleLogout}>
+            <LogOut size={16} className="mr-2" />
+            Log Out
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

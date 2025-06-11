@@ -243,6 +243,65 @@ const JoinPage = () => {
     initializeApp();
   }, [businessSlug, businessName]);
 
+  const handleNameUpdate = async (newName: string) => {
+    if (memberId) {
+      try {
+        const { error } = await supabase
+          .from('business_members')
+          .update({ customer_name: newName })
+          .eq('id', memberId);
+          
+        if (error) {
+          console.error("Error updating name:", error);
+          throw error;
+        }
+        
+        setCustomerName(newName);
+        setCustomer(prev => ({
+          ...prev,
+          name: newName
+        }));
+        
+        // Update localStorage for anonymous users
+        if (!userId) {
+          try {
+            const savedMemberships = localStorage.getItem('memberships') || '[]';
+            const memberships = JSON.parse(savedMemberships);
+            const membershipIndex = memberships.findIndex((m: any) => m.id === memberId);
+            
+            if (membershipIndex !== -1) {
+              memberships[membershipIndex].customerName = newName;
+              localStorage.setItem('memberships', JSON.stringify(memberships));
+            }
+          } catch (e) {
+            console.error("Error updating localStorage:", e);
+          }
+        }
+      } catch (error) {
+        console.error("Error updating name:", error);
+        throw error;
+      }
+    }
+  };
+
+  const handleLogout = () => {
+    // Reset all user-related state
+    setUserId(null);
+    setJoined(false);
+    setCustomer(null);
+    setMemberId(null);
+    setCustomerName("");
+    setStamps(0);
+    setTotalStampsCollected(0);
+    setTotalRewardsEarned(0);
+    
+    // Clear auth form state
+    setEmail("");
+    setPassword("");
+    setIsSignup(true);
+    setAuthError(null);
+  };
+
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthLoading(true);
@@ -566,6 +625,8 @@ const JoinPage = () => {
       scannerOpen={scannerOpen}
       onScannerClose={() => setScannerOpen(false)}
       onSuccessfulScan={handleSuccessfulScan}
+      onNameUpdate={handleNameUpdate}
+      onLogout={handleLogout}
     />;
   }
 
