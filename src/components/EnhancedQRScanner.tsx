@@ -98,7 +98,8 @@ const EnhancedQRScanner: React.FC<EnhancedQRScannerProps> = ({ onSuccessfulScan 
         console.log(`🕐 Current time: ${currentTime}, Day: ${currentDay}`);
 
         const activePeriod = bonusPeriods.find(period => {
-          const isCorrectDay = period.day_of_week === currentDay;
+          // Check if it's an "everyday" period (-1) or matches the current day
+          const isCorrectDay = period.day_of_week === -1 || period.day_of_week === currentDay;
           const isInTimeRange = currentTime >= period.start_time && currentTime <= period.end_time;
           
           console.log(`🔍 Checking period "${period.name}": Day ${period.day_of_week} (${isCorrectDay}), Time ${period.start_time}-${period.end_time} (${isInTimeRange})`);

@@ -23,6 +23,7 @@ interface BonusPeriod {
 }
 
 const DAYS_OF_WEEK = [
+  { value: -1, label: "Everyday" },
   { value: 1, label: "Monday" },
   { value: 2, label: "Tuesday" },
   { value: 3, label: "Wednesday" },
@@ -71,7 +72,7 @@ const TimeBonusSettings: React.FC<TimeBonusSettingsProps> = ({ businessId }) => 
     const newPeriod: BonusPeriod = {
       id: Date.now().toString(),
       name: "",
-      day_of_week: 1,
+      day_of_week: -1, // Default to "Everyday"
       start_time: "09:00",
       end_time: "17:00",
       bonus_type: "fixed",
