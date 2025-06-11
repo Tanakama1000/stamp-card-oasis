@@ -8,6 +8,7 @@ import LoyaltyCard from "@/components/LoyaltyCard";
 import QRScannerDialog from "@/components/QRScannerDialog";
 import CookieConsent from "@/components/CookieConsent";
 import BonusTimeAlert from "@/components/BonusTimeAlert";
+import ProfileDropdown from "@/components/ProfileDropdown";
 import { supabase } from "@/integrations/supabase/client";
 
 interface MemberCardProps {
@@ -89,6 +90,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
         {businessData?.id && <BonusTimeAlert businessId={businessData.id} />}
         
         <Card className="p-6 bg-white card-shadow">
+          {/* Profile dropdown in top right */}
           <div className="flex justify-between items-start mb-6">
             <div className="flex-1">
               {loyaltyCardConfig?.businessLogo ? (
@@ -101,7 +103,12 @@ const MemberCard: React.FC<MemberCardProps> = ({
                 <Coffee size={40} className="mb-2" style={{ color: themeColor }} />
               )}
             </div>
-            {/* Profile dropdown removed from here */}
+            <ProfileDropdown
+              userId={userId}
+              customerName={customerName}
+              onNameUpdate={onNameUpdate}
+              onLogout={onLogout}
+            />
           </div>
 
           <div className="text-center mb-6">
