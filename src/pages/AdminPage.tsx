@@ -24,8 +24,6 @@ import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig"
 import ExpiringStampsAlert from "@/components/admin/ExpiringStampsAlert";
 import StampExpirySettings from "@/components/admin/StampExpirySettings";
 import TimeBonusSettings from "@/components/admin/TimeBonusSettings";
-import ReferralSettings from "@/components/admin/ReferralSettings";
-import ReferralAnalytics from "@/components/ReferralAnalytics";
 
 const businessSchema = z.object({
   name: z.string().min(2, {
@@ -454,7 +452,7 @@ const AdminPage = () => {
 
         <div className="mt-8">
           <Tabs defaultValue="qr-generator">
-            <TabsList className="grid grid-cols-6 mb-6">
+            <TabsList className="grid grid-cols-5 mb-6">
               <TabsTrigger value="qr-generator" className="flex items-center gap-2">
                 <QrCode size={18} />
                 <span className="hidden sm:inline">QR Generator</span>
@@ -470,14 +468,9 @@ const AdminPage = () => {
                 <span className="hidden sm:inline">Settings</span>
                 <span className="sm:hidden">Settings</span>
               </TabsTrigger>
-              <TabsTrigger value="analytics" className="flex items-center gap-2">
-                <BarChart2 size={18} />
-                <span className="hidden sm:inline">Analytics</span>
-                <span className="sm:hidden">Analytics</span>
-              </TabsTrigger>
               <TabsTrigger value="recent-activity" className="flex items-center gap-2">
-                <Users size={18} />
-                <span className="hidden sm:inline">Activity</span>
+                <BarChart2 size={18} />
+                <span className="hidden sm:inline">Recent Activity</span>
                 <span className="sm:hidden">Activity</span>
               </TabsTrigger>
               <TabsTrigger value="customers" className="flex items-center gap-2">
@@ -508,11 +501,7 @@ const AdminPage = () => {
                 <WelcomeStampsSettings businessId={businessData.id} />
                 <StampExpirySettings businessId={businessData.id} />
                 <TimeBonusSettings businessId={businessData.id} />
-                <ReferralSettings businessId={businessData.id} />
               </div>
-            </TabsContent>
-            <TabsContent value="analytics">
-              <ReferralAnalytics businessId={businessData.id} />
             </TabsContent>
             <TabsContent value="recent-activity">
               <RecentActivity businessId={businessData.id} />

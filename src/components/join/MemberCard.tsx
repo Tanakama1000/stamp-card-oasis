@@ -1,127 +1,160 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { CheckCircle, XCircle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Coffee, ScanQrCode } from "lucide-react";
+import LoyaltyCard from "@/components/LoyaltyCard";
+import QRScannerDialog from "@/components/QRScannerDialog";
+import CookieConsent from "@/components/CookieConsent";
 import BonusTimeAlert from "@/components/BonusTimeAlert";
-import { useToast } from "@/hooks/use-toast";
-import ReferralCodeDisplay from "@/components/ReferralCodeDisplay";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MemberCardProps {
-  memberData: any;
+  businessName: string;
   businessData: any;
+  loyaltyCardConfig: any;
+  customerName: string;
+  stamps: number;
+  totalStampsCollected: number;
+  totalRewardsEarned: number;
+  userId: string | null;
+  onCollectStamp: () => void;
+  onResetCard: () => void;
+  scannerOpen: boolean;
+  onScannerClose: () => void;
+  onSuccessfulScan: (businessId: string, timestamp: number, stampCount?: number) => void;
 }
 
-const MemberCard: React.FC<MemberCardProps> = ({ memberData, businessData }) => {
-  const [progress, setProgress] = useState(0);
-  const [isFirstStampCompleted, setIsFirstStampCompleted] = useState(memberData.first_stamp_completed || false);
-  const { toast } = useToast();
-
+const MemberCard: React.FC<MemberCardProps> = ({
+  businessName,
+  businessData,
+  loyaltyCardConfig,
+  customerName,
+  stamps,
+  totalStampsCollected,
+  totalRewardsEarned,
+  userId,
+  onCollectStamp,
+  onResetCard,
+  scannerOpen,
+  onScannerClose,
+  onSuccessfulScan
+}) => {
+  const themeColor = loyaltyCardConfig?.businessNameColor || "#0EA5E9";
+  const [verifiedTotalStamps, setVerifiedTotalStamps] = useState<number>(totalStampsCollected);
+  
+  // Double check the total stamps value from database to ensure it's accurate
   useEffect(() => {
-    if (memberData && businessData) {
-      setProgress(Math.min((memberData.stamps / businessData.max_stamps) * 100, 100));
-    }
-  }, [memberData, businessData]);
-
-  useEffect(() => {
-    const checkAndAwardBonus = async () => {
-      if (memberData.stamps > 0 && !isFirstStampCompleted) {
-        try {
-          const { error } = await supabase
-            .from('business_members')
-            .update({
-              first_stamp_completed: true,
-              stamps: memberData.stamps
-            })
-            .eq('id', memberData.id);
-
-          if (error) {
-            console.error("Error awarding referral bonus:", error);
-            toast({
-              title: "Referral Bonus Error",
-              description: "Failed to award referral bonus. Please contact support.",
-              variant: "destructive"
-            });
-          } else {
-            setIsFirstStampCompleted(true);
-            toast({
-              title: "Bonus Awarded!",
-              description: "You've received bonus stamps for using a referral code!",
-            });
-          }
-        } catch (error) {
-          console.error("Unexpected error awarding referral bonus:", error);
-          toast({
-            title: "Unexpected Error",
-            description: "An unexpected error occurred while awarding the referral bonus.",
-            variant: "destructive"
-          });
+    const verifyTotalStamps = async () => {
+      if (!businessData?.id) return;
+      
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const currentUserId = session?.user?.id;
+        
+        const { data: membershipData, error } = await supabase
+          .from('business_members')
+          .select('total_stamps_collected')
+          .eq('business_id', businessData.id)
+          .eq(currentUserId ? 'user_id' : 'is_anonymous', currentUserId || true)
+          .maybeSingle();
+          
+        if (error) {
+          console.error('Error verifying total stamps:', error);
+          return;
         }
+        
+        if (membershipData) {
+          const dbTotalStamps = membershipData.total_stamps_collected || 0;
+          console.log("Verified total stamps from database:", dbTotalStamps);
+          setVerifiedTotalStamps(dbTotalStamps);
+        }
+      } catch (error) {
+        console.error('Exception verifying total stamps:', error);
       }
     };
-
-    checkAndAwardBonus();
-  }, [memberData, isFirstStampCompleted, toast]);
-
+    
+    verifyTotalStamps();
+  }, [businessData?.id, totalStampsCollected]);
+  
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-6">
-      {/* Bonus Time Alert */}
-      {businessData && businessData.id && (
-        <BonusTimeAlert businessId={businessData.id} />
-      )}
-
-      {/* Main Loyalty Card */}
-      <Card className="bg-white card-shadow">
-        <div className="p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-2xl font-bold text-coffee-dark">
-                {businessData.name}
-              </h3>
-              <p className="text-coffee-light">
-                {memberData.customer_name}, you're collecting stamps!
-              </p>
-            </div>
-            <img
-              src="/coffee-shop.png"
-              alt="Coffee Shop"
-              className="w-16 h-16 object-cover rounded-md"
+    <Layout>
+      <div className="max-w-md mx-auto mt-8 mb-12">
+        {/* Add BonusTimeAlert at the top */}
+        {businessData?.id && <BonusTimeAlert businessId={businessData.id} />}
+        
+        <Card className="p-6 bg-white card-shadow">
+          <div className="text-center mb-6">
+            {loyaltyCardConfig?.businessLogo ? (
+              <img 
+                src={loyaltyCardConfig.businessLogo} 
+                alt={businessName}
+                className="h-12 w-12 object-contain mx-auto mb-2"
+              />
+            ) : (
+              <Coffee size={40} className="mx-auto mb-2" style={{ color: themeColor }} />
+            )}
+            <h2 
+              className="text-2xl font-bold mb-1"
+              style={{ color: themeColor }}
+            >
+              Welcome to {businessName}!
+            </h2>
+            <p style={{ color: themeColor }}>
+              Here's your loyalty card
+            </p>
+            
+            {userId ? (
+              <div className="mt-2 text-sm text-green-600 flex items-center justify-center gap-1">
+                <span className="w-2 h-2 bg-green-600 rounded-full"></span>
+                Signed in as member
+              </div>
+            ) : (
+              <div className="mt-2 text-sm text-gray-500">
+                Guest mode - card stored on this device only
+              </div>
+            )}
+          </div>
+          
+          <div className="mb-6">
+            <LoyaltyCard 
+              customerName={customerName}
+              maxStamps={loyaltyCardConfig?.maxStamps || 10}
+              currentStamps={stamps}
+              cardStyle={loyaltyCardConfig}
+              onStampCollected={() => {}}
+              onReset={onResetCard}
+              businessId={businessData.id}
             />
           </div>
 
-          <Progress value={progress} className="h-4 rounded-full" />
-
-          <div className="flex items-center justify-between">
-            <p className="text-coffee-light">
-              {memberData.stamps} / {businessData.max_stamps} stamps
+          <div className="text-center space-y-4">
+            <p className="text-sm" style={{ color: themeColor }}>
+              Show this card when you visit {businessName} to collect stamps
             </p>
-            {memberData.stamps >= businessData.max_stamps ? (
-              <Badge variant="default" className="gap-2 bg-green-500 text-white">
-                <CheckCircle className="h-4 w-4" />
-                Reward unlocked!
-              </Badge>
-            ) : (
-              <Badge variant="secondary" className="gap-2">
-                <XCircle className="h-4 w-4" />
-                Keep collecting
-              </Badge>
-            )}
+            
+            <Button
+              onClick={onCollectStamp}
+              className="w-full flex items-center justify-center gap-2 text-white"
+              style={{ backgroundColor: themeColor, borderColor: themeColor }}
+            >
+              <ScanQrCode size={20} />
+              Scan QR Code to Collect Stamp
+            </Button>
           </div>
-        </div>
-      </Card>
-      
-      {/* Referral Code Section */}
-      {memberData.referral_code && (
-        <ReferralCodeDisplay
-          referralCode={memberData.referral_code}
-          customerName={memberData.customer_name || "Member"}
-          businessName={businessData.name}
-          businessSlug={businessData.slug}
+          
+          {/* Removed the RewardsCard component from here */}
+        </Card>
+
+        <QRScannerDialog 
+          isOpen={scannerOpen} 
+          onClose={onScannerClose}
+          onSuccessfulScan={onSuccessfulScan}
         />
-      )}
-    </div>
+      </div>
+      <CookieConsent />
+    </Layout>
   );
 };
 
