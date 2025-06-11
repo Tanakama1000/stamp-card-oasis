@@ -537,6 +537,58 @@ const JoinPage = () => {
     }
   };
 
+  const handleNameUpdate = async (newName: string) => {
+    setCustomerName(newName);
+    
+    if (businessData?.id && memberId) {
+      try {
+        const { error } = await supabase
+          .from('business_members')
+          .update({ customer_name: newName })
+          .eq('id', memberId);
+          
+        if (error) {
+          console.error("Error updating customer name:", error);
+          toast({
+            title: "Error",
+            description: "Could not update your name. Please try again.",
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        // Update local customer object
+        setCustomer(prev => ({
+          ...prev,
+          name: newName
+        }));
+        
+        // Update localStorage for anonymous users
+        if (!userId) {
+          try {
+            const savedMemberships = localStorage.getItem('memberships') || '[]';
+            const memberships = JSON.parse(savedMemberships);
+            const membershipIndex = memberships.findIndex((m: any) => m.id === memberId);
+            
+            if (membershipIndex !== -1) {
+              memberships[membershipIndex].customerName = newName;
+              localStorage.setItem('memberships', JSON.stringify(memberships));
+            }
+          } catch (e) {
+            console.error("Error updating localStorage:", e);
+          }
+        }
+      } catch (e) {
+        console.error("Error updating name:", e);
+        toast({
+          title: "Error",
+          description: "Could not update your name. Please try again.",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
   // Show loading state while checking auth AND business data
   if (loading || authChecking) {
     return <LoadingState />;
@@ -566,6 +618,7 @@ const JoinPage = () => {
       scannerOpen={scannerOpen}
       onScannerClose={() => setScannerOpen(false)}
       onSuccessfulScan={handleSuccessfulScan}
+      onNameUpdate={handleNameUpdate}
     />;
   }
 
