@@ -4,35 +4,18 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Clock, AlertCircle, Bell, Play, RefreshCw, Plus, Trash2 } from "lucide-react";
+import { Clock, AlertCircle, Bell, Play, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface StampExpirySettingsProps {
   businessId: string;
 }
 
-interface ExpiryRule {
-  dayOfWeek: number; // -1 for everyday, 0-6 for specific days (0 = Sunday)
-  expiryDays: number;
-  notificationDays: number;
-}
-
-const DAYS_OF_WEEK = [
-  { value: -1, label: "Everyday" },
-  { value: 0, label: "Sunday" },
-  { value: 1, label: "Monday" },
-  { value: 2, label: "Tuesday" },
-  { value: 3, label: "Wednesday" },
-  { value: 4, label: "Thursday" },
-  { value: 5, label: "Friday" },
-  { value: 6, label: "Saturday" },
-];
-
 const StampExpirySettings: React.FC<StampExpirySettingsProps> = ({ businessId }) => {
-  const [expiryRules, setExpiryRules] = useState<ExpiryRule[]>([]);
+  const [expiryDays, setExpiryDays] = useState<number>(0);
+  const [notificationDays, setNotificationDays] = useState<number>(3);
   const [lastExpiryRun, setLastExpiryRun] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -47,15 +30,15 @@ const StampExpirySettings: React.FC<StampExpirySettingsProps> = ({ businessId })
     try {
       const { data, error } = await supabase
         .from('businesses')
-        .select('expiry_day_rules, last_expiry_run')
+        .select('stamp_expiry_days, notification_days, last_expiry_run')
         .eq('id', businessId)
         .single();
 
       if (error) throw error;
       
       if (data) {
-        const rules = data.expiry_day_rules || [];
-        setExpiryRules(rules.length > 0 ? rules : [{ dayOfWeek: -1, expiryDays: 0, notificationDays: 3 }]);
+        setExpiryDays(data.stamp_expiry_days || 0);
+        setNotificationDays(data.notification_days || 3);
         setLastExpiryRun(data.last_expiry_run);
       }
     } catch (error) {
@@ -70,28 +53,15 @@ const StampExpirySettings: React.FC<StampExpirySettingsProps> = ({ businessId })
     }
   };
 
-  const addExpiryRule = () => {
-    setExpiryRules([...expiryRules, { dayOfWeek: -1, expiryDays: 0, notificationDays: 3 }]);
-  };
-
-  const removeExpiryRule = (index: number) => {
-    if (expiryRules.length > 1) {
-      setExpiryRules(expiryRules.filter((_, i) => i !== index));
-    }
-  };
-
-  const updateExpiryRule = (index: number, field: keyof ExpiryRule, value: number) => {
-    const updatedRules = [...expiryRules];
-    updatedRules[index] = { ...updatedRules[index], [field]: value };
-    setExpiryRules(updatedRules);
-  };
-
   const handleSave = async () => {
     setSaving(true);
     try {
       const { error } = await supabase
         .from('businesses')
-        .update({ expiry_day_rules: expiryRules })
+        .update({ 
+          stamp_expiry_days: expiryDays,
+          notification_days: notificationDays
+        })
         .eq('id', businessId);
 
       if (error) throw error;
@@ -146,12 +116,6 @@ const StampExpirySettings: React.FC<StampExpirySettingsProps> = ({ businessId })
     }
   };
 
-  const getDayLabel = (dayOfWeek: number) => {
-    return DAYS_OF_WEEK.find(day => day.value === dayOfWeek)?.label || "Unknown";
-  };
-
-  const hasActiveExpiry = expiryRules.some(rule => rule.expiryDays > 0);
-
   if (loading) {
     return <div>Loading stamp expiry settings...</div>;
   }
@@ -165,91 +129,50 @@ const StampExpirySettings: React.FC<StampExpirySettingsProps> = ({ businessId })
         </div>
 
         <div className="space-y-4">
-          {expiryRules.map((rule, index) => (
-            <div key={index} className="border rounded-lg p-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="font-medium">Expiry Rule {index + 1}</h4>
-                {expiryRules.length > 1 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeExpiryRule(index)}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor={`dayOfWeek-${index}`}>Day of Week</Label>
-                  <Select
-                    value={rule.dayOfWeek.toString()}
-                    onValueChange={(value) => updateExpiryRule(index, 'dayOfWeek', parseInt(value))}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Select day" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {DAYS_OF_WEEK.map((day) => (
-                        <SelectItem key={day.value} value={day.value.toString()}>
-                          {day.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor={`expiryDays-${index}`}>Stamp Expiry Period (Days)</Label>
-                  <Input
-                    id={`expiryDays-${index}`}
-                    type="number"
-                    min="0"
-                    value={rule.expiryDays}
-                    onChange={(e) => updateExpiryRule(index, 'expiryDays', parseInt(e.target.value) || 0)}
-                    className="mt-1"
-                    placeholder="0 = Never expire"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor={`notificationDays-${index}`}>Notification Warning (Days Before)</Label>
-                  <Input
-                    id={`notificationDays-${index}`}
-                    type="number"
-                    min="1"
-                    max={Math.max(1, rule.expiryDays - 1)}
-                    value={rule.notificationDays}
-                    onChange={(e) => updateExpiryRule(index, 'notificationDays', parseInt(e.target.value) || 3)}
-                    className="mt-1"
-                    placeholder="3"
-                    disabled={rule.expiryDays === 0}
-                  />
-                </div>
-              </div>
-
-              {rule.expiryDays > 0 && (
-                <Alert>
-                  <Bell className="h-4 w-4" />
-                  <AlertDescription>
-                    On {getDayLabel(rule.dayOfWeek)}: Stamps will expire after {rule.expiryDays} days. 
-                    Customers will be notified {rule.notificationDays} days before expiry.
-                  </AlertDescription>
-                </Alert>
-              )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="expiryDays">Stamp Expiry Period (Days)</Label>
+              <Input
+                id="expiryDays"
+                type="number"
+                min="0"
+                value={expiryDays}
+                onChange={(e) => setExpiryDays(parseInt(e.target.value) || 0)}
+                className="mt-1"
+                placeholder="0 = Never expire"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                Set to 0 for stamps that never expire. Changes only affect new stamps.
+              </p>
             </div>
-          ))}
 
-          <Button
-            variant="outline"
-            onClick={addExpiryRule}
-            className="w-full flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Add Another Expiry Rule
-          </Button>
+            <div>
+              <Label htmlFor="notificationDays">Notification Warning (Days Before)</Label>
+              <Input
+                id="notificationDays"
+                type="number"
+                min="1"
+                max={Math.max(1, expiryDays - 1)}
+                value={notificationDays}
+                onChange={(e) => setNotificationDays(parseInt(e.target.value) || 3)}
+                className="mt-1"
+                placeholder="3"
+                disabled={expiryDays === 0}
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                How many days before expiry to notify customers.
+              </p>
+            </div>
+          </div>
+
+          {expiryDays > 0 && (
+            <Alert>
+              <Bell className="h-4 w-4" />
+              <AlertDescription>
+                Stamps will expire after {expiryDays} days. Customers will be notified {notificationDays} days before their stamps expire.
+              </AlertDescription>
+            </Alert>
+          )}
 
           <div className="flex flex-col sm:flex-row gap-4 items-start">
             <Button 
@@ -260,7 +183,7 @@ const StampExpirySettings: React.FC<StampExpirySettingsProps> = ({ businessId })
               {saving ? "Saving..." : "Save Settings"}
             </Button>
 
-            {hasActiveExpiry && (
+            {expiryDays > 0 && (
               <div className="flex flex-col gap-2 w-full sm:w-auto">
                 <Button
                   onClick={handleRunExpiryNow}
@@ -284,11 +207,6 @@ const StampExpirySettings: React.FC<StampExpirySettingsProps> = ({ businessId })
               </div>
             )}
           </div>
-
-          <p className="text-sm text-gray-500 mt-2">
-            Set expiry days to 0 for stamps that never expire. You can create multiple rules for different days of the week.
-            Use "Everyday" to apply the same expiry period to all days.
-          </p>
         </div>
       </div>
     </Card>

@@ -96,7 +96,6 @@ export type Database = {
         Row: {
           bonus_periods: Json | null
           created_at: string
-          expiry_day_rules: Json | null
           id: string
           is_active: boolean
           last_expiry_run: string | null
@@ -114,7 +113,6 @@ export type Database = {
         Insert: {
           bonus_periods?: Json | null
           created_at?: string
-          expiry_day_rules?: Json | null
           id?: string
           is_active?: boolean
           last_expiry_run?: string | null
@@ -132,7 +130,6 @@ export type Database = {
         Update: {
           bonus_periods?: Json | null
           created_at?: string
-          expiry_day_rules?: Json | null
           id?: string
           is_active?: boolean
           last_expiry_run?: string | null
