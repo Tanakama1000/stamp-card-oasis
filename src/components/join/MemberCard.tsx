@@ -8,7 +8,6 @@ import LoyaltyCard from "@/components/LoyaltyCard";
 import QRScannerDialog from "@/components/QRScannerDialog";
 import CookieConsent from "@/components/CookieConsent";
 import BonusTimeAlert from "@/components/BonusTimeAlert";
-import ProfileDropdown from "@/components/ProfileDropdown";
 import { supabase } from "@/integrations/supabase/client";
 
 interface MemberCardProps {
@@ -25,8 +24,6 @@ interface MemberCardProps {
   scannerOpen: boolean;
   onScannerClose: () => void;
   onSuccessfulScan: (businessId: string, timestamp: number, stampCount?: number) => void;
-  onNameUpdate: (newName: string) => void;
-  onLogout: () => void;
 }
 
 const MemberCard: React.FC<MemberCardProps> = ({
@@ -42,9 +39,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onResetCard,
   scannerOpen,
   onScannerClose,
-  onSuccessfulScan,
-  onNameUpdate,
-  onLogout
+  onSuccessfulScan
 }) => {
   const themeColor = loyaltyCardConfig?.businessNameColor || "#0EA5E9";
   const [verifiedTotalStamps, setVerifiedTotalStamps] = useState<number>(totalStampsCollected);
@@ -90,28 +85,16 @@ const MemberCard: React.FC<MemberCardProps> = ({
         {businessData?.id && <BonusTimeAlert businessId={businessData.id} />}
         
         <Card className="p-6 bg-white card-shadow">
-          {/* Profile dropdown in top right */}
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex-1">
-              {loyaltyCardConfig?.businessLogo ? (
-                <img 
-                  src={loyaltyCardConfig.businessLogo} 
-                  alt={businessName}
-                  className="h-12 w-12 object-contain mb-2"
-                />
-              ) : (
-                <Coffee size={40} className="mb-2" style={{ color: themeColor }} />
-              )}
-            </div>
-            <ProfileDropdown
-              userId={userId}
-              customerName={customerName}
-              onNameUpdate={onNameUpdate}
-              onLogout={onLogout}
-            />
-          </div>
-
           <div className="text-center mb-6">
+            {loyaltyCardConfig?.businessLogo ? (
+              <img 
+                src={loyaltyCardConfig.businessLogo} 
+                alt={businessName}
+                className="h-12 w-12 object-contain mx-auto mb-2"
+              />
+            ) : (
+              <Coffee size={40} className="mx-auto mb-2" style={{ color: themeColor }} />
+            )}
             <h2 
               className="text-2xl font-bold mb-1"
               style={{ color: themeColor }}
@@ -160,6 +143,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
               Scan QR Code to Collect Stamp
             </Button>
           </div>
+          
+          {/* Removed the RewardsCard component from here */}
         </Card>
 
         <QRScannerDialog 
