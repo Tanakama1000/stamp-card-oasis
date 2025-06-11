@@ -43,6 +43,16 @@ const JoinPage = () => {
   const [authLoading, setAuthLoading] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
+  const handleNameUpdate = (newName: string) => {
+    setCustomerName(newName);
+    if (customer) {
+      setCustomer(prev => ({
+        ...prev,
+        name: newName
+      }));
+    }
+  };
+
   useEffect(() => {
     const initializeApp = async () => {
       try {
@@ -561,11 +571,13 @@ const JoinPage = () => {
       totalStampsCollected={totalStampsCollected}
       totalRewardsEarned={totalRewardsEarned}
       userId={userId}
+      memberId={memberId}
       onCollectStamp={handleCollectStamp}
       onResetCard={handleNewCard}
       scannerOpen={scannerOpen}
       onScannerClose={() => setScannerOpen(false)}
       onSuccessfulScan={handleSuccessfulScan}
+      onNameUpdate={handleNameUpdate}
     />;
   }
 
