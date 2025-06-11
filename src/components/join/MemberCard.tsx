@@ -8,7 +8,6 @@ import LoyaltyCard from "@/components/LoyaltyCard";
 import QRScannerDialog from "@/components/QRScannerDialog";
 import CookieConsent from "@/components/CookieConsent";
 import BonusTimeAlert from "@/components/BonusTimeAlert";
-import CustomerNameEditor from "@/components/CustomerNameEditor";
 import { supabase } from "@/integrations/supabase/client";
 
 interface MemberCardProps {
@@ -20,13 +19,11 @@ interface MemberCardProps {
   totalStampsCollected: number;
   totalRewardsEarned: number;
   userId: string | null;
-  memberId: string | null;
   onCollectStamp: () => void;
   onResetCard: () => void;
   scannerOpen: boolean;
   onScannerClose: () => void;
   onSuccessfulScan: (businessId: string, timestamp: number, stampCount?: number) => void;
-  onNameUpdate: (newName: string) => void;
 }
 
 const MemberCard: React.FC<MemberCardProps> = ({
@@ -38,13 +35,11 @@ const MemberCard: React.FC<MemberCardProps> = ({
   totalStampsCollected,
   totalRewardsEarned,
   userId,
-  memberId,
   onCollectStamp,
   onResetCard,
   scannerOpen,
   onScannerClose,
-  onSuccessfulScan,
-  onNameUpdate
+  onSuccessfulScan
 }) => {
   const themeColor = loyaltyCardConfig?.businessNameColor || "#0EA5E9";
   const [verifiedTotalStamps, setVerifiedTotalStamps] = useState<number>(totalStampsCollected);
@@ -121,17 +116,6 @@ const MemberCard: React.FC<MemberCardProps> = ({
               </div>
             )}
           </div>
-
-          {/* Add Customer Name Editor */}
-          <div className="mb-6">
-            <CustomerNameEditor
-              currentName={customerName}
-              businessId={businessData?.id}
-              memberId={memberId}
-              userId={userId}
-              onNameUpdate={onNameUpdate}
-            />
-          </div>
           
           <div className="mb-6">
             <LoyaltyCard 
@@ -159,6 +143,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
               Scan QR Code to Collect Stamp
             </Button>
           </div>
+          
+          {/* Removed the RewardsCard component from here */}
         </Card>
 
         <QRScannerDialog 

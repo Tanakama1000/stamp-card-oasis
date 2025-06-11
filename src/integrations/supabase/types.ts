@@ -105,7 +105,6 @@ export type Database = {
           owner_id: string
           referral_bonus_points: number | null
           referral_enabled: boolean | null
-          referral_referee_bonus_points: number | null
           slug: string
           stamp_expiry_days: number | null
           updated_at: string
@@ -124,7 +123,6 @@ export type Database = {
           owner_id: string
           referral_bonus_points?: number | null
           referral_enabled?: boolean | null
-          referral_referee_bonus_points?: number | null
           slug: string
           stamp_expiry_days?: number | null
           updated_at?: string
@@ -143,7 +141,6 @@ export type Database = {
           owner_id?: string
           referral_bonus_points?: number | null
           referral_enabled?: boolean | null
-          referral_referee_bonus_points?: number | null
           slug?: string
           stamp_expiry_days?: number | null
           updated_at?: string
