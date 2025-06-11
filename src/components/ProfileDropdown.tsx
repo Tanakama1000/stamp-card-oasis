@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -69,16 +69,20 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="rounded-full">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
+          >
             <User className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
+        <DropdownMenuContent align="end" className="w-48 bg-white border shadow-lg">
+          <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)} className="cursor-pointer">
             <Edit className="mr-2 h-4 w-4" />
             Edit Card Name
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={onLogout}>
+          <DropdownMenuItem onClick={onLogout} className="cursor-pointer">
             <LogOut className="mr-2 h-4 w-4" />
             Log Out
           </DropdownMenuItem>
@@ -86,7 +90,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
       </DropdownMenu>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-white">
           <DialogHeader>
             <DialogTitle>Edit Card Name</DialogTitle>
           </DialogHeader>

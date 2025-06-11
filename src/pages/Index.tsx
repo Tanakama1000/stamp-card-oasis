@@ -420,12 +420,12 @@ const Index = () => {
     <Layout>
       <div className="max-w-3xl mx-auto">
         {/* Header with Profile Button */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-start mb-8">
           <div className="text-center flex-1">
             <h1 className="text-3xl font-bold text-coffee-dark mb-2">Welcome to Stamp Card Oasis</h1>
             <p className="text-coffee-light">Collect stamps and earn rewards from your favorite businesses</p>
           </div>
-          <div className="ml-4">
+          <div className="flex-shrink-0 ml-4">
             <ProfileDropdown
               customerName={customerName}
               businessId={businessId}
