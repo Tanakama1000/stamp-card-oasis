@@ -104,7 +104,8 @@ const JoinPage = () => {
               name: "Coffee Oasis",
               slug: "coffee-oasis",
               id: "coffee-oasis-id",
-              is_active: true
+              is_active: true,
+              max_stamps: 10
             };
             setBusinessData(defaultBusinessData);
             await fetchLoyaltyCardConfig(defaultBusinessData.id);
@@ -120,9 +121,9 @@ const JoinPage = () => {
             return;
           }
           setBusinessName(businesses.name);
-          setBusinessData(businesses);
+          setBusinessData({ ...businesses, max_stamps: 10 });
           await fetchLoyaltyCardConfig(businesses.id);
-          await checkMembership(businesses, currentUserId);
+          await checkMembership({ ...businesses, max_stamps: 10 }, currentUserId);
         } else {
           setError("Business not found");
         }
@@ -552,20 +553,18 @@ const JoinPage = () => {
 
   // Show member card for existing members
   if (joined && customer && businessData) {
+    const memberData = {
+      id: memberId,
+      customer_name: customerName || customer.name,
+      stamps: stamps,
+      first_stamp_completed: customer.first_stamp_completed || false,
+      referral_code: customer.referral_code || null,
+      referred_by_code: customer.referred_by_code || null
+    };
+
     return <MemberCard 
-      businessName={businessName}
+      memberData={memberData}
       businessData={businessData}
-      loyaltyCardConfig={loyaltyCardConfig}
-      customerName={customerName || customer.name}
-      stamps={stamps}
-      totalStampsCollected={totalStampsCollected}
-      totalRewardsEarned={totalRewardsEarned}
-      userId={userId}
-      onCollectStamp={handleCollectStamp}
-      onResetCard={handleNewCard}
-      scannerOpen={scannerOpen}
-      onScannerClose={() => setScannerOpen(false)}
-      onSuccessfulScan={handleSuccessfulScan}
     />;
   }
 
@@ -588,3 +587,5 @@ const JoinPage = () => {
 };
 
 export default JoinPage;
+
+}

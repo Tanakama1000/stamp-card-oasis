@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -97,7 +98,7 @@ const MemberCard: React.FC<MemberCardProps> = ({ memberData, businessData }) => 
               {memberData.stamps} / {businessData.max_stamps} stamps
             </p>
             {memberData.stamps >= businessData.max_stamps ? (
-              <Badge variant="success" className="gap-2">
+              <Badge variant="default" className="gap-2 bg-green-500 text-white">
                 <CheckCircle className="h-4 w-4" />
                 Reward unlocked!
               </Badge>
