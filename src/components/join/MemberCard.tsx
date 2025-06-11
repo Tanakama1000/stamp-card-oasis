@@ -8,6 +8,7 @@ import LoyaltyCard from "@/components/LoyaltyCard";
 import QRScannerDialog from "@/components/QRScannerDialog";
 import CookieConsent from "@/components/CookieConsent";
 import BonusTimeAlert from "@/components/BonusTimeAlert";
+import ProfileDropdown from "@/components/ProfileDropdown";
 import { supabase } from "@/integrations/supabase/client";
 
 interface MemberCardProps {
@@ -24,6 +25,7 @@ interface MemberCardProps {
   scannerOpen: boolean;
   onScannerClose: () => void;
   onSuccessfulScan: (businessId: string, timestamp: number, stampCount?: number) => void;
+  onNameUpdate: (newName: string) => void;
 }
 
 const MemberCard: React.FC<MemberCardProps> = ({
@@ -39,7 +41,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onResetCard,
   scannerOpen,
   onScannerClose,
-  onSuccessfulScan
+  onSuccessfulScan,
+  onNameUpdate
 }) => {
   const themeColor = loyaltyCardConfig?.businessNameColor || "#0EA5E9";
   const [verifiedTotalStamps, setVerifiedTotalStamps] = useState<number>(totalStampsCollected);
@@ -142,6 +145,12 @@ const MemberCard: React.FC<MemberCardProps> = ({
               <ScanQrCode size={20} />
               Scan QR Code to Collect Stamp
             </Button>
+
+            <ProfileDropdown
+              customerName={customerName}
+              onNameUpdate={onNameUpdate}
+              themeColor={themeColor}
+            />
           </div>
           
           {/* Removed the RewardsCard component from here */}
