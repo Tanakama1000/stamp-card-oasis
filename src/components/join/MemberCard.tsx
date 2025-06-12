@@ -10,6 +10,7 @@ import CookieConsent from "@/components/CookieConsent";
 import BonusTimeAlert from "@/components/BonusTimeAlert";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import { supabase } from "@/integrations/supabase/client";
+import { checkScanCooldown, recordScanTimestamp, formatCooldownTime, CooldownInfo } from "@/utils/cooldownUtils";
 
 interface MemberCardProps {
   businessName: string;
@@ -46,6 +47,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
 }) => {
   const themeColor = loyaltyCardConfig?.businessNameColor || "#0EA5E9";
   const [verifiedTotalStamps, setVerifiedTotalStamps] = useState<number>(totalStampsCollected);
+  const [cooldownInfo, setCooldownInfo] = useState<CooldownInfo>({ isInCooldown: false, remainingSeconds: 0, lastScanTime: null });
+  const [cooldownTimer, setCooldownTimer] = useState<NodeJS.Timeout | null>(null);
   
   // Double check the total stamps value from database to ensure it's accurate
   useEffect(() => {
@@ -80,6 +83,91 @@ const MemberCard: React.FC<MemberCardProps> = ({
     
     verifyTotalStamps();
   }, [businessData?.id, totalStampsCollected]);
+
+  // Check cooldown status on component mount and when stamps change
+  useEffect(() => {
+    const checkCooldown = async () => {
+      if (!businessData?.id) return;
+      
+      const cooldownMinutes = businessData.cooldown_minutes || 2; // Default to 2 minutes
+      const cooldownStatus = await checkScanCooldown(businessData.id, cooldownMinutes);
+      setCooldownInfo(cooldownStatus);
+      
+      if (cooldownStatus.isInCooldown) {
+        // Start the countdown timer
+        const timer = setInterval(async () => {
+          const updatedStatus = await checkScanCooldown(businessData.id, cooldownMinutes);
+          setCooldownInfo(updatedStatus);
+          
+          if (!updatedStatus.isInCooldown) {
+            clearInterval(timer);
+            setCooldownTimer(null);
+          }
+        }, 1000);
+        
+        setCooldownTimer(timer);
+      }
+    };
+    
+    checkCooldown();
+    
+    // Cleanup timer on unmount
+    return () => {
+      if (cooldownTimer) {
+        clearInterval(cooldownTimer);
+      }
+    };
+  }, [businessData?.id, stamps]);
+
+  // Clear timer on component unmount
+  useEffect(() => {
+    return () => {
+      if (cooldownTimer) {
+        clearInterval(cooldownTimer);
+      }
+    };
+  }, [cooldownTimer]);
+
+  const handleScanButtonClick = () => {
+    if (!cooldownInfo.isInCooldown) {
+      onCollectStamp();
+    }
+  };
+
+  const handleSuccessfulScanWithCooldown = async (businessId: string, timestamp: number, stampCount?: number) => {
+    // Record the scan timestamp for cooldown tracking
+    await recordScanTimestamp(businessId);
+    
+    // Call the original success handler
+    onSuccessfulScan(businessId, timestamp, stampCount);
+    
+    // Check cooldown again after successful scan
+    const cooldownMinutes = businessData.cooldown_minutes || 2;
+    const cooldownStatus = await checkScanCooldown(businessId, cooldownMinutes);
+    setCooldownInfo(cooldownStatus);
+    
+    if (cooldownStatus.isInCooldown) {
+      // Start the countdown timer
+      const timer = setInterval(async () => {
+        const updatedStatus = await checkScanCooldown(businessId, cooldownMinutes);
+        setCooldownInfo(updatedStatus);
+        
+        if (!updatedStatus.isInCooldown) {
+          clearInterval(timer);
+          setCooldownTimer(null);
+        }
+      }, 1000);
+      
+      setCooldownTimer(timer);
+    }
+  };
+
+  const getButtonText = () => {
+    if (cooldownInfo.isInCooldown) {
+      return `Wait ${formatCooldownTime(cooldownInfo.remainingSeconds)} to scan again`;
+    }
+    return "Scan QR Code to Collect Stamp";
+  };
   
   return (
     <Layout>
@@ -138,12 +226,18 @@ const MemberCard: React.FC<MemberCardProps> = ({
             </p>
             
             <Button
-              onClick={onCollectStamp}
-              className="w-full flex items-center justify-center gap-2 text-white"
-              style={{ backgroundColor: themeColor, borderColor: themeColor }}
+              onClick={handleScanButtonClick}
+              disabled={cooldownInfo.isInCooldown}
+              className={`w-full flex items-center justify-center gap-2 text-white ${
+                cooldownInfo.isInCooldown ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              style={{ 
+                backgroundColor: cooldownInfo.isInCooldown ? '#9CA3AF' : themeColor, 
+                borderColor: cooldownInfo.isInCooldown ? '#9CA3AF' : themeColor 
+              }}
             >
               <ScanQrCode size={20} />
-              Scan QR Code to Collect Stamp
+              {getButtonText()}
             </Button>
 
             <ProfileDropdown
@@ -159,7 +253,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
         <QRScannerDialog 
           isOpen={scannerOpen} 
           onClose={onScannerClose}
-          onSuccessfulScan={onSuccessfulScan}
+          onSuccessfulScan={handleSuccessfulScanWithCooldown}
         />
       </div>
       <CookieConsent />
