@@ -95,7 +95,6 @@ export type Database = {
       businesses: {
         Row: {
           bonus_periods: Json | null
-          cooldown_minutes: number | null
           created_at: string
           expiry_day_rules: Json | null
           id: string
@@ -115,7 +114,6 @@ export type Database = {
         }
         Insert: {
           bonus_periods?: Json | null
-          cooldown_minutes?: number | null
           created_at?: string
           expiry_day_rules?: Json | null
           id?: string
@@ -135,7 +133,6 @@ export type Database = {
         }
         Update: {
           bonus_periods?: Json | null
-          cooldown_minutes?: number | null
           created_at?: string
           expiry_day_rules?: Json | null
           id?: string
