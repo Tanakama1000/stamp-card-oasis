@@ -17,18 +17,14 @@ const NailPolishIcon = React.forwardRef<SVGSVGElement, LucideProps>(
       strokeLinejoin="round"
       {...props}
     >
-      {/* Main bottle body (rounded rectangular) */}
-      <path d="M8 10 L8 18 Q8 20 10 20 L14 20 Q16 20 16 18 L16 10 Z" />
+      {/* Nail polish bottle body */}
+      <rect x="8" y="8" width="8" height="12" rx="2" />
       {/* Bottle neck */}
-      <rect x="10" y="8" width="4" height="2" />
-      {/* Cap/brush holder base */}
-      <rect x="9.5" y="6" width="5" height="2" rx="0.5" />
-      {/* Brush handle (vertical line) */}
+      <rect x="10" y="6" width="4" height="2" />
+      {/* Cap */}
+      <rect x="9" y="2" width="6" height="4" rx="1" />
+      {/* Brush handle */}
       <line x1="12" y1="6" x2="12" y2="3" />
-      {/* Brush top (tapered shape like in image) */}
-      <path d="M10.5 3 L12 1 L13.5 3 Z" />
-      {/* Label on bottle (small rectangle) */}
-      <rect x="10" y="13" width="4" height="3" rx="0.5" />
     </svg>
   )
 );
