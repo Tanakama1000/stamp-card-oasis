@@ -1,3 +1,4 @@
+
 import {
   Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy, Sparkles, Cake, Pizza, IceCream, Flower, Diamond, Bell, Medal, ThumbsUp,
   Scissors, Utensils, Beer, GlassWater, ShoppingCart, Dumbbell, Target, Brush, Palette, Hammer, Wrench, BookOpen, Car, Dog,
@@ -7,6 +8,7 @@ import NailPolishIcon from "./icons/NailPolishIcon";
 import NailPolishBottleIcon from "./icons/NailPolishBottleIcon";
 import ManicureIcon from "./icons/ManicureIcon";
 import CarWashIcon from "./icons/CarWashIcon";
+import CoffeeBeanIcon from "./icons/CoffeeBeanIcon";
 import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 
 export interface Reward {
@@ -42,6 +44,7 @@ export const STAMP_ICONS = {
   Diamond,
   Bell,
   Coffee,
+  CoffeeBean: CoffeeBeanIcon,
   Zap,
   Battery,
   Scissors,
