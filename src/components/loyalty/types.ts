@@ -7,6 +7,7 @@ import NailPolishIcon from "./icons/NailPolishIcon";
 import NailPolishBottleIcon from "./icons/NailPolishBottleIcon";
 import ManicureIcon from "./icons/ManicureIcon";
 import CarWashIcon from "./icons/CarWashIcon";
+import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 
 export interface Reward {
   stampNumber: number;
