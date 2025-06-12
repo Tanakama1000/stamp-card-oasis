@@ -22,20 +22,20 @@ const NailPolishIcon: React.FC<NailPolishIconProps> = ({
       strokeLinejoin="round"
       className={className}
     >
-      {/* Brush cap */}
-      <rect x="9" y="2" width="6" height="3" rx="1" />
+      {/* Brush/Cap */}
+      <path d="M9 2h6v4l-1 1h-4l-1-1V2z" />
       
-      {/* Brush stem */}
-      <line x1="12" y1="5" x2="12" y2="8" />
+      {/* Brush handle/stem */}
+      <line x1="12" y1="6" x2="12" y2="9" />
       
       {/* Bottle neck */}
-      <rect x="10" y="8" width="4" height="2" rx="1" />
+      <rect x="10" y="9" width="4" height="2" rx="1" />
       
       {/* Main bottle body */}
-      <rect x="8" y="10" width="8" height="10" rx="2" />
+      <path d="M8 11h8v8c0 1.5-1 3-3 3h-2c-2 0-3-1.5-3-3v-8z" />
       
-      {/* Polish level indicator */}
-      <line x1="10" y1="14" x2="14" y2="14" />
+      {/* Label/Window on bottle */}
+      <rect x="10" y="14" width="4" height="4" rx="0.5" />
     </svg>
   );
 };
