@@ -4,6 +4,7 @@ import {
   Scissors, Utensils, Beer, GlassWater, ShoppingCart, Dumbbell, Target, Brush, Palette, Hammer, Wrench, BookOpen, Car, Dog,
   Luggage, BrickWall, Flame, Gem, BanknoteIcon, Coins, UtensilsCrossed, Package, Scale
 } from "lucide-react";
+import NailPolishIcon from "./icons/NailPolishIcon";
 
 import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 
@@ -43,7 +44,7 @@ export const STAMP_ICONS = {
   Zap,
   Battery,
   Scissors,
-  // Removed NailPolish as it doesn't exist in lucide-react
+  NailPolish: NailPolishIcon,
   Utensils,
   Beer,
   GlassWater,
