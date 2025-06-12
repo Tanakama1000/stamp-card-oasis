@@ -50,7 +50,9 @@ export const validateBusinessExists = async (idFromQR: string, useNumericId: boo
 
 export const checkCooldownPeriod = async (businessId: string, userId: string | null): Promise<{ allowed: boolean; remainingMinutes?: number }> => {
   try {
-    // Get business cooldown setting
+    console.log(`🔍 Checking cooldown for business ${businessId}, user ${userId || 'anonymous'}`);
+    
+    // Get business cooldown setting - fail if we can't get it
     const { data: businessData, error: businessError } = await supabase
       .from('businesses')
       .select('cooldown_minutes')
@@ -58,64 +60,79 @@ export const checkCooldownPeriod = async (businessId: string, userId: string | n
       .single();
 
     if (businessError) {
-      console.error('Error fetching business cooldown settings:', businessError);
-      return { allowed: true }; // Allow if we can't check
+      console.error('❌ Error fetching business cooldown settings:', businessError);
+      return { allowed: false }; // Fail closed - don't allow if we can't check
     }
 
-    const cooldownMinutes = businessData?.cooldown_minutes || 2;
+    if (!businessData) {
+      console.error('❌ No business data found');
+      return { allowed: false }; // Fail closed
+    }
 
-    // Check last scan time for this user at this business
-    let query = supabase
+    const cooldownMinutes = businessData.cooldown_minutes || 2;
+    console.log(`⏰ Business cooldown period: ${cooldownMinutes} minutes`);
+
+    // For anonymous users, we can't enforce individual cooldowns reliably
+    if (!userId) {
+      console.log('⚠️ Anonymous user - allowing scan (cooldown cannot be enforced)');
+      return { allowed: true };
+    }
+
+    // For authenticated users, check via business_members and stamp_records
+    const { data: memberData, error: memberError } = await supabase
+      .from('business_members')
+      .select('id')
+      .eq('business_id', businessId)
+      .eq('user_id', userId)
+      .single();
+
+    if (memberError) {
+      console.error('❌ Error fetching member data:', memberError);
+      return { allowed: false }; // Fail closed
+    }
+
+    if (!memberData) {
+      console.log('✅ New member - allowing first scan');
+      return { allowed: true }; // New member, allow first scan
+    }
+
+    // Check last scan time for this member
+    const { data: lastScanData, error: scanError } = await supabase
       .from('stamp_records')
       .select('created_at')
+      .eq('business_member_id', memberData.id)
       .eq('business_id', businessId)
       .order('created_at', { ascending: false })
       .limit(1);
 
-    if (userId) {
-      // For authenticated users, check via business_members
-      const { data: memberData, error: memberError } = await supabase
-        .from('business_members')
-        .select('id')
-        .eq('business_id', businessId)
-        .eq('user_id', userId)
-        .single();
-
-      if (memberError || !memberData) {
-        return { allowed: true }; // New member, allow
-      }
-
-      query = query.eq('business_member_id', memberData.id);
-    } else {
-      // For anonymous users, we can't track individual cooldowns reliably
-      // Allow the scan but log a warning
-      console.log('⚠️ Anonymous user scan - cooldown cannot be enforced');
-      return { allowed: true };
-    }
-
-    const { data: lastScanData, error: scanError } = await query;
-
     if (scanError) {
-      console.error('Error checking last scan:', scanError);
-      return { allowed: true }; // Allow if we can't check
+      console.error('❌ Error checking last scan:', scanError);
+      return { allowed: false }; // Fail closed
     }
 
     if (!lastScanData || lastScanData.length === 0) {
-      return { allowed: true }; // No previous scans, allow
+      console.log('✅ No previous scans found - allowing scan');
+      return { allowed: true };
     }
 
     const lastScanTime = new Date(lastScanData[0].created_at);
     const now = new Date();
     const timeDifferenceMinutes = (now.getTime() - lastScanTime.getTime()) / (1000 * 60);
 
+    console.log(`⏰ Last scan: ${lastScanTime.toISOString()}`);
+    console.log(`⏰ Time difference: ${timeDifferenceMinutes.toFixed(2)} minutes`);
+    console.log(`⏰ Required cooldown: ${cooldownMinutes} minutes`);
+
     if (timeDifferenceMinutes < cooldownMinutes) {
       const remainingMinutes = Math.ceil(cooldownMinutes - timeDifferenceMinutes);
+      console.log(`🚫 Cooldown active - ${remainingMinutes} minutes remaining`);
       return { allowed: false, remainingMinutes };
     }
 
+    console.log('✅ Cooldown period has passed - allowing scan');
     return { allowed: true };
   } catch (error) {
-    console.error('Error checking cooldown period:', error);
-    return { allowed: true }; // Allow if there's an error
+    console.error('❌ Exception in cooldown check:', error);
+    return { allowed: false }; // Fail closed on any exception
   }
 };

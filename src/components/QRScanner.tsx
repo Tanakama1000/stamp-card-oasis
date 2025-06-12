@@ -128,14 +128,18 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
       const userId = sessionData?.session?.user?.id;
       console.log("👤 User ID:", userId || "Anonymous");
 
-      // Check cooldown period
+      // Check cooldown period - this now fails closed
       const cooldownCheck = await checkCooldownPeriod(businessId, userId || null);
       if (!cooldownCheck.allowed) {
-        const remainingText = cooldownCheck.remainingMinutes === 1 
-          ? "1 minute" 
-          : `${cooldownCheck.remainingMinutes} minutes`;
-        
-        handleInvalidQR(`🔒 You've already collected a stamp here recently. Please wait ${remainingText} before scanning again.`);
+        if (cooldownCheck.remainingMinutes) {
+          const remainingText = cooldownCheck.remainingMinutes === 1 
+            ? "1 minute" 
+            : `${cooldownCheck.remainingMinutes} minutes`;
+          
+          handleInvalidQR(`🕐 Please wait ${remainingText} before scanning again. This prevents duplicate stamps and ensures fair use of the loyalty program.`);
+        } else {
+          handleInvalidQR("🔒 Unable to verify scan eligibility. Please try again in a moment.");
+        }
         return;
       }
 
