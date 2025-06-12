@@ -18,13 +18,17 @@ const NailPolishIcon = React.forwardRef<SVGSVGElement, LucideProps>(
       {...props}
     >
       {/* Nail polish bottle body */}
-      <rect x="8" y="8" width="8" height="12" rx="2" />
+      <rect x="8" y="10" width="8" height="10" rx="2" />
       {/* Bottle neck */}
-      <rect x="10" y="6" width="4" height="2" />
-      {/* Cap */}
-      <rect x="9" y="2" width="6" height="4" rx="1" />
-      {/* Brush handle */}
-      <line x1="12" y1="6" x2="12" y2="3" />
+      <rect x="10" y="8" width="4" height="2" />
+      {/* Cap base (wider part) */}
+      <rect x="9" y="6" width="6" height="2" rx="0.5" />
+      {/* Cap top (narrower brush holder) */}
+      <rect x="10.5" y="3" width="3" height="3" rx="0.5" />
+      {/* Brush handle/stem */}
+      <line x1="12" y1="6" x2="12" y2="8" />
+      {/* Brush bristles (wider at top) */}
+      <path d="M11 2 L11 4 L13 4 L13 2" />
     </svg>
   )
 );
