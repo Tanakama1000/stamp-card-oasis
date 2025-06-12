@@ -5,6 +5,7 @@ import {
   Luggage, BrickWall, Flame, Gem, BanknoteIcon, Coins, UtensilsCrossed, Package, Scale
 } from "lucide-react";
 import NailPolishIcon from "./icons/NailPolishIcon";
+import NailPolishBottleIcon from "./icons/NailPolishBottleIcon";
 
 import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 
@@ -45,6 +46,7 @@ export const STAMP_ICONS = {
   Battery,
   Scissors,
   NailPolish: NailPolishIcon,
+  NailPolishBottle: NailPolishBottleIcon,
   Utensils,
   Beer,
   GlassWater,
