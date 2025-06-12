@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +9,7 @@ import CustomerList from "@/components/CustomerList";
 import RecentActivity from "@/components/RecentActivity";
 import CardCustomization from "@/components/loyalty/CardCustomization";
 import WelcomeStampsSettings from "@/components/admin/WelcomeStampsSettings";
+import StampCooldownSettings from "@/components/admin/StampCooldownSettings";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QrCode, BarChart2, Users, UserCircle, Link as LinkIcon, Copy, CreditCard, Clock, Gift, Settings } from "lucide-react";
@@ -499,6 +501,7 @@ const AdminPage = () => {
             <TabsContent value="settings">
               <div className="space-y-6">
                 <WelcomeStampsSettings businessId={businessData.id} />
+                <StampCooldownSettings businessId={businessData.id} />
                 <StampExpirySettings businessId={businessData.id} />
                 <TimeBonusSettings businessId={businessData.id} />
               </div>
