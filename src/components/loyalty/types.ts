@@ -1,4 +1,3 @@
-
 import {
   Coffee, Star, Heart, Award, Battery, Zap, Gift, Trophy, Sparkles, Cake, Pizza, IceCream, Flower, Diamond, Bell, Medal, ThumbsUp,
   Scissors, Utensils, Beer, GlassWater, ShoppingCart, Dumbbell, Target, Brush, Palette, Hammer, Wrench, BookOpen, Car, Dog,
@@ -6,6 +5,7 @@ import {
 } from "lucide-react";
 
 import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
+import NailPolishIcon from "./icons/NailPolishIcon";
 
 export interface Reward {
   stampNumber: number;
@@ -43,7 +43,7 @@ export const STAMP_ICONS = {
   Zap,
   Battery,
   Scissors,
-  // Removed NailPolish as it doesn't exist in lucide-react
+  NailPolish: NailPolishIcon,
   Utensils,
   Beer,
   GlassWater,
