@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { User, LogOut, Edit } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useParams } from "react-router-dom";
 
 interface ProfileDropdownProps {
   customerName: string;
@@ -24,11 +25,17 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
   themeColor
 }) => {
   const { toast } = useToast();
+  const { businessSlug } = useParams();
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(customerName);
 
   const handleLogout = async () => {
     try {
+      // Store the current business slug for redirect after re-login
+      if (businessSlug) {
+        localStorage.setItem('lastBusinessSlug', businessSlug);
+      }
+      
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
@@ -37,8 +44,8 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
         description: "You have been successfully logged out.",
       });
       
-      // Redirect to home or login page
-      window.location.href = "/";
+      // Redirect to customer authentication page
+      window.location.href = "/customer-auth";
     } catch (error) {
       console.error("Error logging out:", error);
       toast({

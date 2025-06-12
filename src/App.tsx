@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import ScanPage from "./pages/ScanPage";
 import AuthPage from "./pages/AuthPage";
+import CustomerAuth from "./pages/CustomerAuth";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminRoute from "./components/AdminRoute";
 import TermsOfService from "./pages/TermsOfService";
@@ -80,6 +81,7 @@ const App = () => {
             </AdminRoute>
           } />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/customer-auth" element={<CustomerAuth />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/email-confirmation" element={<EmailConfirmationPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
