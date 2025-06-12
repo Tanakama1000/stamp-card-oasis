@@ -4,11 +4,7 @@ import {
   Scissors, Utensils, Beer, GlassWater, ShoppingCart, Dumbbell, Target, Brush, Palette, Hammer, Wrench, BookOpen, Car, Dog,
   Luggage, BrickWall, Flame, Gem, BanknoteIcon, Coins, UtensilsCrossed, Package, Scale
 } from "lucide-react";
-import NailPolishIcon from "./icons/NailPolishIcon";
-import NailPolishBottleIcon from "./icons/NailPolishBottleIcon";
-import ManicureIcon from "./icons/ManicureIcon";
-import CarWashIcon from "./icons/CarWashIcon";
-import CoffeeBeanIcon from "./icons/CoffeeBeanIcon";
+
 import { LoyaltyCardConfig } from "./types/LoyaltyCardConfig";
 
 export interface Reward {
@@ -44,14 +40,10 @@ export const STAMP_ICONS = {
   Diamond,
   Bell,
   Coffee,
-  CoffeeBean: CoffeeBeanIcon,
   Zap,
   Battery,
   Scissors,
-  NailPolish: NailPolishIcon,
-  NailPolishBottle: NailPolishBottleIcon,
-  Manicure: ManicureIcon,
-  CarWash: CarWashIcon,
+  // Removed NailPolish as it doesn't exist in lucide-react
   Utensils,
   Beer,
   GlassWater,
