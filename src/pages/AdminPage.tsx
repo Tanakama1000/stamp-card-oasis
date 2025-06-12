@@ -24,6 +24,7 @@ import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig"
 import ExpiringStampsAlert from "@/components/admin/ExpiringStampsAlert";
 import StampExpirySettings from "@/components/admin/StampExpirySettings";
 import TimeBonusSettings from "@/components/admin/TimeBonusSettings";
+import StampCooldownSettings from "@/components/admin/StampCooldownSettings";
 
 const businessSchema = z.object({
   name: z.string().min(2, {
@@ -499,6 +500,7 @@ const AdminPage = () => {
             <TabsContent value="settings">
               <div className="space-y-6">
                 <WelcomeStampsSettings businessId={businessData.id} />
+                <StampCooldownSettings businessId={businessData.id} />
                 <StampExpirySettings businessId={businessData.id} />
                 <TimeBonusSettings businessId={businessData.id} />
               </div>

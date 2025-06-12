@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { Card } from "@/components/ui/card";
@@ -90,6 +91,78 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
     } catch (error) {
       console.error('Error checking bonus period:', error);
       return 1;
+    }
+  };
+
+  const checkCooldownPeriod = async (businessId: string, userId: string | null): Promise<{ allowed: boolean; remainingMinutes?: number }> => {
+    try {
+      // Get business cooldown setting
+      const { data: businessData, error: businessError } = await supabase
+        .from('businesses')
+        .select('cooldown_minutes')
+        .eq('id', businessId)
+        .single();
+
+      if (businessError) {
+        console.error('Error fetching business cooldown settings:', businessError);
+        return { allowed: true }; // Allow if we can't check
+      }
+
+      const cooldownMinutes = businessData?.cooldown_minutes || 2;
+
+      // Check last scan time for this user at this business
+      let query = supabase
+        .from('stamp_records')
+        .select('created_at')
+        .eq('business_id', businessId)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (userId) {
+        // For authenticated users, check via business_members
+        const { data: memberData, error: memberError } = await supabase
+          .from('business_members')
+          .select('id')
+          .eq('business_id', businessId)
+          .eq('user_id', userId)
+          .single();
+
+        if (memberError || !memberData) {
+          return { allowed: true }; // New member, allow
+        }
+
+        query = query.eq('business_member_id', memberData.id);
+      } else {
+        // For anonymous users, we can't track individual cooldowns reliably
+        // Allow the scan but log a warning
+        console.log('⚠️ Anonymous user scan - cooldown cannot be enforced');
+        return { allowed: true };
+      }
+
+      const { data: lastScanData, error: scanError } = await query;
+
+      if (scanError) {
+        console.error('Error checking last scan:', scanError);
+        return { allowed: true }; // Allow if we can't check
+      }
+
+      if (!lastScanData || lastScanData.length === 0) {
+        return { allowed: true }; // No previous scans, allow
+      }
+
+      const lastScanTime = new Date(lastScanData[0].created_at);
+      const now = new Date();
+      const timeDifferenceMinutes = (now.getTime() - lastScanTime.getTime()) / (1000 * 60);
+
+      if (timeDifferenceMinutes < cooldownMinutes) {
+        const remainingMinutes = Math.ceil(cooldownMinutes - timeDifferenceMinutes);
+        return { allowed: false, remainingMinutes };
+      }
+
+      return { allowed: true };
+    } catch (error) {
+      console.error('Error checking cooldown period:', error);
+      return { allowed: true }; // Allow if there's an error
     }
   };
 
@@ -213,10 +286,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
       businessId = foundBusiness.id;
       console.log("✅ Business validated:", businessId);
 
-      // Check for bonus period and calculate stamps to award
-      const stampsToAward = await checkActiveBonusPeriod(businessId);
-      console.log(`💰 Stamps to award: ${stampsToAward}`);
-
       // Check authentication status
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
@@ -228,6 +297,21 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
 
       const userId = sessionData?.session?.user?.id;
       console.log("👤 User ID:", userId || "Anonymous");
+
+      // Check cooldown period
+      const cooldownCheck = await checkCooldownPeriod(businessId, userId || null);
+      if (!cooldownCheck.allowed) {
+        const remainingText = cooldownCheck.remainingMinutes === 1 
+          ? "1 minute" 
+          : `${cooldownCheck.remainingMinutes} minutes`;
+        
+        handleInvalidQR(`🔒 You've already collected a stamp here recently. Please wait ${remainingText} before scanning again.`);
+        return;
+      }
+
+      // Check for bonus period and calculate stamps to award
+      const stampsToAward = await checkActiveBonusPeriod(businessId);
+      console.log(`💰 Stamps to award: ${stampsToAward}`);
 
       if (userId) {
         try {
@@ -342,7 +426,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
       console.error("❌ Unexpected error in QR processing:", err);
       handleInvalidQR("Could not process QR code data. Please try again.");
     } finally {
-      setProcessingQr(false);
+      setProcessing(false);
     }
   };
 
