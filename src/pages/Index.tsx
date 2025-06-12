@@ -10,6 +10,7 @@ import { LoyaltyCardConfig } from "@/components/loyalty/types/LoyaltyCardConfig"
 import { supabase } from "@/integrations/supabase/client";
 import CookieConsent from "@/components/CookieConsent";
 import BonusTimeAlert from "@/components/BonusTimeAlert";
+import { checkScanCooldown, recordScanTimestamp, formatCooldownTime, CooldownInfo } from "@/utils/cooldownUtils";
 
 const Index = () => {
   const { toast } = useToast();
@@ -22,6 +23,9 @@ const Index = () => {
   const [totalStampsCollected, setTotalStampsCollected] = useState<number>(0);
   const [memberId, setMemberId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [businessData, setBusinessData] = useState<any>(null);
+  const [cooldownInfo, setCooldownInfo] = useState<CooldownInfo>({ isInCooldown: false, remainingSeconds: 0, lastScanTime: null });
+  const [cooldownTimer, setCooldownTimer] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const fetchUserStats = async () => {
@@ -194,6 +198,16 @@ const Index = () => {
       return;
     }
 
+    // Check cooldown before allowing stamp collection
+    if (cooldownInfo.isInCooldown) {
+      toast({
+        title: "Please wait",
+        description: `You can collect another stamp in ${formatCooldownTime(cooldownInfo.remainingSeconds)}`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
@@ -259,6 +273,29 @@ const Index = () => {
       }
 
       setStamps(newStamps);
+      
+      // Record scan timestamp for cooldown tracking
+      await recordScanTimestamp(businessId);
+      
+      // Check cooldown again after successful scan
+      const cooldownMinutes = businessData?.cooldown_minutes || 2;
+      const cooldownStatus = await checkScanCooldown(businessId, cooldownMinutes);
+      setCooldownInfo(cooldownStatus);
+      
+      if (cooldownStatus.isInCooldown) {
+        // Start the countdown timer
+        const timer = setInterval(async () => {
+          const updatedStatus = await checkScanCooldown(businessId, cooldownMinutes);
+          setCooldownInfo(updatedStatus);
+          
+          if (!updatedStatus.isInCooldown) {
+            clearInterval(timer);
+            setCooldownTimer(null);
+          }
+        }, 1000);
+        
+        setCooldownTimer(timer);
+      }
       
       toast({
         title: "Stamp Collected!",
@@ -376,6 +413,13 @@ const Index = () => {
   const miniRewards = cardStyle?.rewards || [];
   const sortedRewards = [...(miniRewards || [])].sort((a, b) => a.stampNumber - b.stampNumber);
 
+  const getStampButtonText = () => {
+    if (cooldownInfo.isInCooldown) {
+      return `Wait ${formatCooldownTime(cooldownInfo.remainingSeconds)} to collect again`;
+    }
+    return "Collect Stamp";
+  };
+
   return (
     <Layout>
       <div className="max-w-3xl mx-auto">
@@ -441,6 +485,28 @@ const Index = () => {
                 Save
               </Button>
             </div>
+          </Card>
+        </div>
+
+        {/* Add test stamp collection button with cooldown */}
+        <div className="mb-8">
+          <Card className="p-4 bg-white card-shadow">
+            <h3 className="font-semibold text-coffee-dark mb-3">Test Stamp Collection</h3>
+            <p className="text-sm text-gray-600 mb-3">
+              Click to manually collect a stamp (with {businessData?.cooldown_minutes || 2} minute cooldown)
+            </p>
+            <Button
+              onClick={handleStampCollected}
+              disabled={cooldownInfo.isInCooldown}
+              className={`w-full ${
+                cooldownInfo.isInCooldown ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              style={{ 
+                backgroundColor: cooldownInfo.isInCooldown ? '#9CA3AF' : undefined
+              }}
+            >
+              {getStampButtonText()}
+            </Button>
           </Card>
         </div>
 
