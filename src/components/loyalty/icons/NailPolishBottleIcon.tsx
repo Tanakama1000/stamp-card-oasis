@@ -22,24 +22,18 @@ const NailPolishBottleIcon: React.FC<NailPolishBottleIconProps> = ({
       strokeLinejoin="round"
       className={className}
     >
-      {/* Sparkle/star decoration */}
-      <path d="M8 6l2-2 2 2-2 2-2-2z" />
-      <line x1="10" y1="2" x2="10" y2="4" />
-      <line x1="10" y1="8" x2="10" y2="10" />
-      <line x1="6" y1="6" x2="8" y2="6" />
-      <line x1="12" y1="6" x2="14" y2="6" />
+      {/* Finger outline */}
+      <path d="M8 4c0-1 1-2 2-2h4c1 0 2 1 2 2v16c0 1-1 2-2 2h-4c-1 0-2-1-2-2V4z" />
       
-      {/* Nail polish brush/cap */}
-      <rect x="15" y="10" width="4" height="3" rx="0.5" />
+      {/* Fingernail area */}
+      <path d="M8 4c0-1 1-2 2-2h4c1 0 2 1 2 2v3H8V4z" fill="currentColor" />
       
-      {/* Brush handle */}
-      <line x1="17" y1="13" x2="17" y2="15" />
+      {/* Nail polish shine effect */}
+      <ellipse cx="11" cy="5" rx="1.5" ry="0.8" fill="white" opacity="0.6" />
       
-      {/* Bottle body */}
-      <path d="M15 15h4v6c0 1-0.5 1.5-1.5 1.5h-1c-1 0-1.5-0.5-1.5-1.5v-6z" />
-      
-      {/* Bottle neck */}
-      <rect x="16" y="13" width="2" height="2" />
+      {/* Finger joint lines */}
+      <line x1="8" y1="12" x2="16" y2="12" opacity="0.3" />
+      <line x1="8" y1="16" x2="16" y2="16" opacity="0.3" />
     </svg>
   );
 };
