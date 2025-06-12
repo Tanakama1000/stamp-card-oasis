@@ -128,26 +128,33 @@ const QRScanner: React.FC<QRScannerProps> = ({ onSuccessfulScan }) => {
       const userId = sessionData?.session?.user?.id;
       console.log("👤 User ID:", userId || "Anonymous");
 
-      // Check cooldown period - this now fails closed
+      // Check cooldown period - this is now properly implemented for both auth and anon users
+      console.log("🕐 Starting cooldown check...");
       const cooldownCheck = await checkCooldownPeriod(businessId, userId || null);
+      console.log("🕐 Cooldown check result:", cooldownCheck);
+      
       if (!cooldownCheck.allowed) {
         if (cooldownCheck.remainingMinutes) {
           const remainingText = cooldownCheck.remainingMinutes === 1 
             ? "1 minute" 
             : `${cooldownCheck.remainingMinutes} minutes`;
           
-          handleInvalidQR(`🕐 Please wait ${remainingText} before scanning again. This prevents duplicate stamps and ensures fair use of the loyalty program.`);
+          const userType = userId ? "authenticated" : "anonymous";
+          handleInvalidQR(`🕐 Please wait ${remainingText} before scanning again. This prevents duplicate stamps and ensures fair use of the loyalty program. (${userType} user)`);
         } else {
           handleInvalidQR("🔒 Unable to verify scan eligibility. Please try again in a moment.");
         }
         return;
       }
 
+      console.log("✅ Cooldown check passed, proceeding with stamp collection");
+
       // Check for bonus period and calculate stamps to award
       const stampsToAward = await checkActiveBonusPeriod(businessId);
       console.log(`💰 Stamps to award: ${stampsToAward}`);
 
       if (userId) {
+        console.log("🔄 Processing authenticated user scan...");
         const result = await StampProcessor.processAuthenticatedUser(businessId, userId, stampsToAward);
         
         if (result.success) {
